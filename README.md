@@ -13,10 +13,7 @@
 * Backend: NodeJS + Express + Axios
 * Frontend: VueJS
 * Authentication: JSON Web Tokens
- 
-### Architecture Template
-![architecture](https://github.com/ManuelePasini/watering_web_refactoring/assets/62949013/39353053-77f0-4c7c-8f8b-03da535f67de)
-
+* 
 ### Steps
 1. Reengineer backend
    - Define backend architecture
@@ -25,3 +22,7 @@
    - Attach new backend to old frontend
 2. Reengineer Frontend
 2. Attach new frontend to new backend
+
+### Backend Architecture Template
+![architecture](https://github.com/ManuelePasini/watering_web_refactoring/assets/62949013/39353053-77f0-4c7c-8f8b-03da535f67de)
+
