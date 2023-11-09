@@ -1,4 +1,4 @@
-# Watering Ecosystem Reengineering
+# Thesis - Watering Ecosystem Reengineering
 
 # Steps
 
