@@ -15,4 +15,4 @@
  
 ### Architecture Template
 ``
-![Reengineed Architecture](https://github.com/ManuelePasini/watering_web_refactoring/blob/master/architecture.png?raw=true)
+![Reengineed Architecture](https://github.com/ManuelePasini/watering_web_refactoring/blob/master/doc/architecture.png?raw=true)
