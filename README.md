@@ -14,4 +14,4 @@
 - Authentication: JSON Web Tokens
  
 ### Architecture Template
-![Reengineed Architecture](https://github.com/ManuelePasini/watering_web_refactoring/blob/master/doc/architecture.png?raw=true)
+![architecture](https://github.com/ManuelePasini/watering_web_refactoring/assets/62949013/39353053-77f0-4c7c-8f8b-03da535f67de)
