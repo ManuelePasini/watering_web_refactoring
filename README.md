@@ -19,9 +19,9 @@
 
 ### Steps
 1. Reengineer backend
- - Define backend architecture
- - Define and implement tests (opt. result: CI/CD pipeline)
- - Implement new backend architecture
- - Attach new backend to old frontend
+   - Define backend architecture
+   - Define and implement tests (opt. result: CI/CD pipeline)
+   - Implement new backend architecture
+   - Attach new backend to old frontend
 2. Reengineer Frontend
 2. Attach new frontend to new backend
