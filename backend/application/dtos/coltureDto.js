@@ -8,4 +8,4 @@ class ColtureDto {
 
 }
 
-module.exports = ColtureDto
+module.exports = ColtureDto;

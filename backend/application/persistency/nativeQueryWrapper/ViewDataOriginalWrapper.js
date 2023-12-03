@@ -15,3 +15,5 @@ class ViewDataOriginalWrapper {
     }
 
 }
+
+module.exports = ViewDataOriginalWrapper;

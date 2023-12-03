@@ -16,17 +16,17 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
                             ${calculationType} as value,
                             "timestamp"
             FROM view_data_original
-            WHERE "detectedValueTypeId" = ANY (${detectedValueTypeDescription})
-              AND "timestamp" >= ${timeFilterFrom}
-              AND "timestamp" <= ${timeFilterTo}
-              AND "refStructureName" = ${refStructureName}
-              AND "companyName" = ${companyName}
+            WHERE "detectedValueTypeId" = ANY ('{ ${detectedValueTypeDescription.map(value => `${value}`).join(', ')} }')
+              AND "timestamp" >= '${timeFilterFrom}'
+              AND "timestamp" <= '${timeFilterTo}'
+              AND "refStructureName" = '${refStructureName}'
+              AND "companyName" = '${companyName}'
               AND ("fieldName" IS NULL
-               OR "fieldName" = ${fieldName})
-              AND "plantNum" = ${plantNum}
-              AND "plantRow" = ${plantRow}
-              AND "colture" = ${colture}
-              AND "coltureType" = ${coltureType}
+               OR "fieldName" = '${fieldName}')
+              AND "plantNum" = '${plantNum}'
+              AND "plantRow" = '${plantRow}'
+              AND "colture" = '${colture}'
+              AND "coltureType" = '${coltureType}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", "colture", "coltureType", "timestamp"
             ORDER BY timestamp ASC`;
 
@@ -81,3 +81,6 @@ class ViewDataOriginalRepository {
         return getResults('SUM(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, this.sequelize);
     }
 }
+
+module.exports = ViewDataOriginalRepository;
+

@@ -2,6 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const userRouter = require('./routes/userAuthenticationRouter');
 const userFieldsRouter = require('./routes/userFieldsRouter');
+const fieldChartRouter = require('./routes/fieldChartsRouter');
+
 const sequelize = require('./configs/dbConfig')
 
 const app = express();
@@ -24,3 +26,4 @@ app.listen(port, () => {
 app.use(bodyParser.json());
 app.use('/user', userRouter);
 app.use('/userFields', userFieldsRouter);
+app.use('/fieldCharts', fieldChartRouter);

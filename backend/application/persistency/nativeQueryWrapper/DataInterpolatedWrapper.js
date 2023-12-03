@@ -15,3 +15,5 @@ class DataInterpolatedWrapper {
     }
 
 }
+
+module.exports = DataInterpolatedWrapper;

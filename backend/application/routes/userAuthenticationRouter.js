@@ -1,10 +1,9 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 
 const sequelize = require('../configs/dbConfig');
 
 const UserService =  require('../services/UserService');
-const { UserTokenResponse, UserTokenRequest } = require('../dtos/authenticate/authenticationDto')
+const { UserTokenResponse, UserTokenRequest } = require('../dtos/authenticationDto')
 const AuthenticationService = require('../services/AuthenticationService');
 
 const userAuthenticationRouter = express.Router();

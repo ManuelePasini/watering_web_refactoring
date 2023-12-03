@@ -30,7 +30,7 @@ class AuthenticationService {
                 throw new Error('The password is invalid');
 
             const payload = {userId: user.dataValues.userId}
-            return jwt.sign(payload, jwtSecret, {expiresIn: "2h"});
+            return jwt.sign(payload, jwtSecret, {expiresIn: "24h"});
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
         }
