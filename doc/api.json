@@ -1,0 +1,182 @@
+// Authentication IFarming / Users
+
+// POST: Create a new field
+//   create_field(token, field: JSON)
+//
+[
+    {
+        "structureName": "ZESPRI",
+        "companies": [
+            {
+                "companyName": "AZ. AGR. DALLE FABBRICHE ANDREA",
+                "fields": [
+                    {
+                        "fieldName": "Fondo Errano 2023",
+                        "coltureType": "Kiwi",
+                        "loc": {
+                            "type": "Feature",
+                            "properties": {},
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            12.49237060546875,
+                                            41.890261610446215
+                                        ],
+                                        [
+                                            12.49237060546875,
+                                            41.90999497888673
+                                        ],
+                                        [
+                                            12.529312133789062,
+                                            41.90999497888673
+                                        ],
+                                        [
+                                            12.529312133789062,
+                                            41.890261610446215
+                                        ],
+                                        [
+                                            12.49237060546875,
+                                            41.890261610446215
+                                        ]
+                                    ]
+                                ]
+                            }
+                        },
+                        "sectors": [
+                            {
+                                "sectorUUID": "...",
+                                "sectorName": "T1",
+                                "wateringCapacity": 4, // (l/h)
+                                "initialWatering": 4.5, // cold start (l)
+                                "maximumWatering": 12, // (l)
+                                "adviceTime": 9, // il consiglio irriguo è calcolato tutti i giorni alle 9 
+                                "wateringType": "Ala singola", // ["Ala doppia", "Sprinkler"]
+                                "loc": {},
+                                "theses": [
+                                    {
+                                        "UUID": "whatever",
+                                        "adviceWeight": 1, // [0, 1], 0 la tesi non è considerata, la somma dei pesi per settore *deve* essere 1
+                                        "thesisName": "T1 alto",
+                                        "loc": { },
+                                        "sensorNumber": 12,
+                                        "sensors": [
+                                            {
+                                                "id": "A-403:GRND_WATER_G_20_0", // nodeID:detectedValueTypeID
+                                                "name": "Potenziale Idrico Gessetti H -20cm D 0cm", // detectedValueTypeDescription
+                                                "type": "Gessetto",
+                                                "x": 0,
+                                                "y": -20,
+                                                "z": 0
+                                            },
+                                            {
+                                                "id": "A-219:DRIPPER",
+                                                "name": "Gocciolatore",
+                                                "type": "Dripper",
+                                                "x": 0,
+                                                "y": 0,
+                                                "z": 0
+                                            }//, { ... }
+                                        ]
+                                    },
+                                    {
+                                        "thesisName": "T1 basso",
+                                        //...
+                                    }
+                                ]
+                            },
+                            {
+                                "sectorName": "T2",
+                                "wateringCapacity": 4.6,
+                                "theses": [ ] //, ...
+                            },
+                            {
+                                "sectorName": "T0",
+                                "wateringCapacity": 4,
+                                "theses": [ ] //, ...
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+// POST: Set optimal state
+// set_opt_state(token, user_id, thesis_UUID, valid_from, valid_to, opt_state: JSON)
+
+[
+    {
+        "thesisUUID": "...",
+        "validFrom": "2024-05-01T00:00:00.000Z",
+        "validTo":   "2024-06-01T00:00:00.000Z",
+        "optimalState": [
+            {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "value": -30,
+            },
+            {
+                "x": 25,
+                "y": -20,
+                "z": 0,
+                "value": -30,
+            } //, ...
+        ]
+    } //, ...
+]
+
+// POST: Register a new user
+// register_user(token, user_id, authType, user_pwd, name) 
+[
+    {
+        "id": "user@domain.it",
+        "name": "asd asd",
+        "affiliation": "unibo",
+        "password": "somehashedvalue",
+        "authType": "password", // one among ["token", "password"]
+    }, 
+    {
+        "id": "Some-UUID-!£$%&/", // @Manuele come è fatto l'UUID? e come lo si usa per autenticazione?
+        "affiliation": "IFarming",
+        "authType": "token", // one among ["token", "password"]
+    }//, ...
+]
+
+// POST: Assign access to the user
+// grant_field_access(token, user_id, application, sector) 
+[
+    {
+        "applications": ["watering", "monitoring"],
+        "userId": "Some-UUID-!£$%&/",
+        "sectorUUID": "whatever"
+    },
+]
+
+// GET/POST: last watering advice (in liters)
+// get_last_watering_advice(token, user_id, sector_UUID)
+
+[
+    {
+        "sectorUUID": "whatever"
+    } //, { ... }, 
+]
+// Result:
+{
+    "wateringAdvice": 9, // (in liters)
+    "computedAt": "2024-05-01T00:08:00.000Z",
+    "startWatering": "2024-05-01T00:00:00.000Z",
+}
+
+// POST: injection conoscenza esterna
+// inject_watering_knowledge(token, user_id, start_watering, end_watering, unexpected_watering)
+
+{
+    "sectorUUID": "whatever",
+    "startWatering": "2024-05-01T00:00:00.000Z",
+    "endWatering": "2024-05-01T00:00:00.000Z",
+    "unexpectedWatering": 5 // (l)
+}
