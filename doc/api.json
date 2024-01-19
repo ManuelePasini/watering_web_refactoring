@@ -46,7 +46,6 @@
                         },
                         "sectors": [
                             {
-                                "sectorUUID": "...",
                                 "sectorName": "T1",
                                 "wateringCapacity": 4, // (l/h)
                                 "initialWatering": 4.5, // cold start (l)
@@ -56,7 +55,6 @@
                                 "loc": {},
                                 "theses": [
                                     {
-                                        "UUID": "whatever",
                                         "adviceWeight": 1, // [0, 1], 0 la tesi non è considerata, la somma dei pesi per settore *deve* essere 1
                                         "thesisName": "T1 alto",
                                         "loc": { },
@@ -105,11 +103,16 @@
 ]
 
 // POST: Set optimal state
-// set_opt_state(token, user_id, thesis_UUID, valid_from, valid_to, opt_state: JSON)
+// set_opt_state(token, user_id, structureName, companyName, fieldName, sectorName, thesisName, valid_from, valid_to, opt_state: JSON)
+
 
 [
     {
-        "thesisUUID": "...",
+        "structureName": "ZESPRI",
+        "companyName": "AZ. AGR. DALLE FABBRICHE ANDREA",
+        "fieldName": "Fondo Errano 2023",
+        "sectorName": "T1",
+        "thesis": "T1 Basso",
         "validFrom": "2024-05-01T00:00:00.000Z",
         "validTo":   "2024-06-01T00:00:00.000Z",
         "optimalState": [
@@ -133,14 +136,14 @@
 // register_user(token, user_id, authType, user_pwd, name) 
 [
     {
-        "id": "user@domain.it",
+        "id": "someHashedValue",
         "name": "asd asd",
         "affiliation": "unibo",
-        "password": "somehashedvalue",
+        "password": "someHashedValue",
         "authType": "password", // one among ["token", "password"]
     }, 
     {
-        "id": "Some-UUID-!£$%&/", // @Manuele come è fatto l'UUID? e come lo si usa per autenticazione?
+        "id": "someHashedValue", // 
         "affiliation": "IFarming",
         "authType": "token", // one among ["token", "password"]
     }//, ...
@@ -150,18 +153,24 @@
 // grant_field_access(token, user_id, application, sector) 
 [
     {
+        "structureName": "ZESPRI",
+        "companyName": "AZ. AGR. DALLE FABBRICHE ANDREA",
+        "fieldName": "Fondo Errano 2023",
+        "sectorName": "T1",
         "applications": ["watering", "monitoring"],
         "userId": "Some-UUID-!£$%&/",
-        "sectorUUID": "whatever"
     },
 ]
 
 // GET/POST: last watering advice (in liters)
-// get_last_watering_advice(token, user_id, sector_UUID)
+//get_watering_advice(token, user_id, structureName, companyName, fieldName, sectorName)
 
 [
     {
-        "sectorUUID": "whatever"
+        "structureName": "ZESPRI",
+        "companyName": "AZ. AGR. DALLE FABBRICHE ANDREA",
+        "fieldName": "Fondo Errano 2023",
+        "sectorName": "T1",
     } //, { ... }, 
 ]
 // Result:
@@ -172,10 +181,14 @@
 }
 
 // POST: injection conoscenza esterna
-// inject_watering_knowledge(token, user_id, start_watering, end_watering, unexpected_watering)
+// reschedule_watering(token, user_id, structureName, companyName, fieldName, sectorName, date, [start_watering], [end_watering], [unexpected_watering]))
+
 
 {
-    "sectorUUID": "whatever",
+    "structureName": "ZESPRI",
+    "companyName": "AZ. AGR. DALLE FABBRICHE ANDREA",
+    "fieldName": "Fondo Errano 2023",
+    "sectorName": "T1",
     "startWatering": "2024-05-01T00:00:00.000Z",
     "endWatering": "2024-05-01T00:00:00.000Z",
     "unexpectedWatering": 5 // (l)
