@@ -1,5 +1,5 @@
-const HumidityBinWrapper = require('../nativeQueryWrapper/HumidityBinWrapper');
-const HumidityBinEventWrapper = require('../nativeQueryWrapper/HumidityBinEventWrapper');
+const HumidityBinWrapper = require('../querywrappers/HumidityBinWrapper');
+const HumidityBinEventWrapper = require('../querywrappers/HumidityBinEventWrapper');
 
 const {QueryTypes, DataTypes} = require('sequelize');
 

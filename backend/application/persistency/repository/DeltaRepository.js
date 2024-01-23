@@ -1,4 +1,4 @@
-const DeltaWrapper = require('../nativeQueryWrapper/DeltaWrapper');
+const DeltaWrapper = require('../querywrappers/DeltaWrapper');
 const {QueryTypes} = require("sequelize");
 
 class DeltaRepository {

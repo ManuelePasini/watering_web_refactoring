@@ -5,19 +5,50 @@ class UserInPlant extends Model {
 
 }
 
-UserInPlant.init({
-    source: DataTypes.TEXT,
-    refStructureName: DataTypes.TEXT,
-    companyName: DataTypes.TEXT,
-    fieldName: DataTypes.TEXT,
-    plantNum: DataTypes.BIGINT,
-    plantRow: DataTypes.TEXT,
-    userId: DataTypes.BIGINT,
-    wateringAdvice: DataTypes.BOOLEAN,
-}, {
-    modelName: "user_in_plant",
-    timestamps: false,
-    sequelize
-})
+function initUserInPlant(sequelize) {
 
-module.exports = UserInPlant;
+    UserInPlant.init({
+        source: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        refStructureName: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        companyName: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        fieldName: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        plantNum: {
+            type: DataTypes.BIGINT,
+            allowNull: false
+        },
+        plantRow: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        userId: {
+            type: DataTypes.BIGINT,
+            allowNull: false
+        },
+        wateringAdvice: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
+    }, {
+        modelName: "user_in_plant",
+        timestamps: false,
+        id: false,
+        sequelize
+    })
+
+    return UserInPlant
+}
+
+
+module.exports = initUserInPlant;

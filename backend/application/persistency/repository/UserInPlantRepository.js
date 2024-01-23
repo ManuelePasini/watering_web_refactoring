@@ -1,4 +1,4 @@
-const UserInFieldWrapper = require('../nativeQueryWrapper/UserInFieldWrapper');
+const UserInFieldWrapper = require('../querywrappers/UserInFieldWrapper');
 
 const {QueryTypes} = require('sequelize');
 

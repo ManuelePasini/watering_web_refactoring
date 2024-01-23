@@ -1,5 +1,4 @@
 const {Model, DataTypes} = require('sequelize');
-const sequelize = require('../../configs/dbConfig');
 
 class User extends Model {
 
@@ -19,6 +18,10 @@ function initUser(sequelize) {
             validate: {
                 isEmail: true
             }
+        },
+        partner: {
+          type: DataTypes.STRING,
+          allowNull: false
         },
         password: {
             type: DataTypes.STRING,

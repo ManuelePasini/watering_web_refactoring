@@ -4,6 +4,13 @@ const HumidityBinsRepository = require('../persistency/repository/HumidityBinsRe
 const ViewDataOriginalRepository = require('../persistency/repository/ViewDataOriginalRepository');
 const WateringAdviceRepository = require('../persistency/repository/WateringAdviceRepository');
 const DtoConverter = require('./DtoConverter');
+const FieldRepository = require('../persistency/repository/FieldRepository')
+
+const initMatrixProfile = require('../persistency/model/MatrixProfile')
+const initMatrixField = require('../persistency/model/MatrixField')
+const initTranscodingField = require('../persistency/model/TranscodingField')
+
+const { FieldCreateDto } = require('../dtos/createFieldDto')
 
 const dtoConverter = new DtoConverter();
 
@@ -15,11 +22,12 @@ class FieldService {
         this.humidityBinsRepository = new HumidityBinsRepository(sequelize);
         this.viewDataOriginalRepository = new ViewDataOriginalRepository(sequelize);
         this.wateringAdviceRepository = new WateringAdviceRepository(sequelize);
+        this.fieldRepository = new FieldRepository(initMatrixProfile(sequelize), initMatrixField(sequelize), initTranscodingField(sequelize), sequelize);
     }
 
     async getInterpolatedMeans(refStructureName, companyName, fieldName, plantNum, plantRow) {
         const result = await this.dataInterpolatedRepository.findInterpolatedMeans(refStructureName, companyName, fieldName, plantNum, plantRow);
-        return dtoConverter.convertDataInterpolatedMeanWrapper(refStructureName, companyName, fieldName, plantNum, plantRow, result);
+        return [dtoConverter.convertDataInterpolatedMeanWrapper(refStructureName, companyName, fieldName, plantNum, plantRow, result)];
     }
 
     async getDataInterpolated(refStructureName, companyName, fieldName, plantNum, plantRow, timestamp){
@@ -65,6 +73,25 @@ class FieldService {
     async getWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType){
         const result = await this.wateringAdviceRepository.findWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType);
         return dtoConverter.convertWateringAdviceWrapper(result);
+    }
+
+    async createMatrixOptState(optStateDto) {
+        const matrixFieldInserted =  await this.fieldRepository.createMatrixField(optStateDto.matrixId, optStateDto.refStructureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.plantNum, optStateDto.plantRow, optStateDto.timestampFrom, optStateDto.timestampTo)
+        for (const matrixData of optStateDto.matrixDataList) {
+            await this.fieldRepository.createMatrixProfile(optStateDto.matrixId, matrixData.xx, matrixData.yy, matrixData.zz, matrixData.optValue, matrixData.weight)
+        }
+    }
+
+    async getCurrentWateringAdvice(refStructureName, companyName, fieldName, plantNum, plantRow) {
+        return this.fieldRepository.getCurrentWaterAdvice(refStructureName, companyName, fieldName, plantNum, plantRow)
+    }
+
+    async createTranscodingFields(source, refStructureName, companyName, fieldName, plantNum, plantRow, fieldCreateDto) {
+        for(const field of fieldCreateDto.fields.fields){
+            for(const sensor of field.sensors) {
+                await this.fieldRepository.createTranscodingField(source, field.fieldId, field.refStructureId, field.refStructureName, field.companyId, field.companyName, field.fieldName, field.parcelCode, field.address, field.plant, field.latitude, field.longitude, sensor)
+            }
+        }
     }
 
 }

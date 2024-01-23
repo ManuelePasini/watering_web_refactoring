@@ -1,4 +1,4 @@
-const DataViewOriginalWrapper = require('../nativeQueryWrapper/ViewDataOriginalWrapper');
+const DataViewOriginalWrapper = require('../querywrappers/ViewDataOriginalWrapper');
 
 const {QueryTypes} = require('sequelize');
 
@@ -74,7 +74,7 @@ class ViewDataOriginalRepository {
     }
 
     async findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType) {
-        return getResults('AVG(64.3 * \"value\" -15.2)', 'ELECT_COND', timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, this.sequelize);
+        return getResults('AVG(64.3 * \"value\" -15.2)', ['ELECT_COND'], timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, this.sequelize);
     }
 
     async findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType) {

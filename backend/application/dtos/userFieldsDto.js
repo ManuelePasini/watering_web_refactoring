@@ -19,5 +19,4 @@ class UserFieldsDto {
 
 }
 
-module.exports = UserField;
-module.exports = UserFieldsDto;
+module.exports = {UserField, UserFieldsDto}

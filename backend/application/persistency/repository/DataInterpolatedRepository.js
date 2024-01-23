@@ -1,5 +1,5 @@
-const DataInterpolatedWrapper = require('../nativeQueryWrapper/DataInterpolatedWrapper');
-const DataInterpolatedMeanWrapper = require('../nativeQueryWrapper/DataInterpolatedMeanWrapper');
+const DataInterpolatedWrapper = require('../querywrappers/DataInterpolatedWrapper');
+const DataInterpolatedMeanWrapper = require('../querywrappers/DataInterpolatedMeanWrapper');
 
 const {QueryTypes} = require('sequelize');
 
@@ -52,6 +52,7 @@ const getResults = async (refStructureName, companyName, fieldName, plantNum, pl
         result.yy,
         result.xx,
         result.timestamp,
+        result.value
     ));
 }
 

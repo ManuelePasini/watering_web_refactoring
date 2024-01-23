@@ -5,15 +5,19 @@ const fieldChartRouter = express.Router();
 const UserService =  require('../services/UserService');
 const userService = new UserService(sequelize);
 const AuthenticationService = require('../services/AuthenticationService');
-const authenticationService = new AuthenticationService(userService);
+const AuthorizationService = require('../services/AuthorizationService')
 const FieldService = require('../services/FieldService');
+
+const authenticationService = new AuthenticationService(userService);
+const { InterpolatedDataResponse } = require('../dtos/interpolatedDataDto')
+const authorizationService = new AuthorizationService(sequelize)
 const fieldService = new FieldService(sequelize);
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/groundWaterPotential', async (req, res) => {
 
     try {
-        authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!user) throw new Error("Not found user");
     } catch (error) {
         return res.status(403).json({message:'Authentication failed'});
     }
@@ -40,11 +44,11 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/dripperAndPluv', async (req, res) => {
 
     try {
-        await authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!user) throw new Error("Not found user");
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
@@ -76,7 +80,8 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/wateringAdvice', async (req, res) => {
 
     try {
-        await authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!user) throw new Error("Not found user");
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
@@ -102,11 +107,11 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/airTemp', async (req, res) => {
 
     try {
-        await authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!user) throw new Error("Not found user");
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
@@ -133,11 +138,11 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/groundTemp', async (req, res) => {
 
     try {
-        await authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!user) throw new Error("Not found user");
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
@@ -164,11 +169,11 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/humidityEvents', async (req, res) => {
 
     try {
-        await authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!user) throw new Error("Not found user");
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
@@ -195,7 +200,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/electCondition', async (req, res) => {
 
     try {
@@ -227,7 +231,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/humidityBins', async (req, res) => {
 
     try {
@@ -255,7 +258,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/dynamicHeatmap', async (req, res) => {
 
     try {
@@ -283,7 +285,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/heatmap', async (req, res) => {
 
     try {
@@ -309,7 +310,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
     }
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/statisticsChart', async (req, res) => {
 
     try {
@@ -327,29 +327,30 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
 
         const result = await fieldService.getInterpolatedMeans(refStructureName, companyName, fieldName, plantNum, plantRow);
 
-        res.status(200).json(result);
+        res.status(200).json(new InterpolatedDataResponse(result));
     } catch (error) {
         return res.status(500).json({message: error.message});
     }
 
 });
 
-//TODO
 fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/delta', async (req, res) => {
 
+    const refStructureName = req.params.refStructureName;
+    const companyName = req.params.companyName;
+    const fieldName = req.params.fieldName;
+    const plantNum = req.params.plantNum;
+    const plantRow = req.params.plantRow;
+
     try {
-        await authenticationService.validateJwt(req.headers.authorization);
+        const user = await authenticationService.validateJwt(req.headers.authorization);
+        if(!(await authorizationService.isUserAuthorizedByFieldAndId(user.userId, refStructureName, companyName, fieldName, plantNum, plantRow, 'DeltaChart')))
+            return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
 
     try {
-        const refStructureName = req.params.refStructureName;
-        const companyName = req.params.companyName;
-        const fieldName = req.params.fieldName;
-        const plantNum = req.params.plantNum;
-        const plantRow = req.params.plantRow;
-
         const timeFilterFrom = req.query.timeFilterFrom;
         const timeFilterTo = req.query.timeFilterTo;
 
@@ -361,5 +362,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:plantNum/:plan
     }
 
 });
+
+
 
 module.exports = fieldChartRouter;

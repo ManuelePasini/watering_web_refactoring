@@ -1,4 +1,4 @@
-const WateringAdviceWrapper = require('../nativeQueryWrapper/WateringAdviceWrapper');
+const WateringAdviceWrapper = require('../querywrappers/WateringAdviceWrapper');
 const {QueryTypes} = require("sequelize");
 
 class WateringAdviceRepository {
@@ -18,6 +18,7 @@ class WateringAdviceRepository {
                             "plantRow",
                             MAX("value") as value, rounded_timestamp
             FROM (
+                (
                 SELECT DISTINCT "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", SUM ("value") as value, ((3600*24) * (timestamp / (3600*24)):: INT) as rounded_timestamp
                 FROM view_data_original
                 WHERE "detectedValueTypeId" IN ('DRIPPER', 'PLUV_CURR')
@@ -32,9 +33,9 @@ class WateringAdviceRepository {
                 AND "coltureType" = '${coltureType}'
                 GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", rounded_timestamp
                 ORDER BY rounded_timestamp ASC
-                ) AS A
+                )
             UNION
-            SELECT DISTINCT "refStructureName",
+            (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             'Advice' as "detectedValueTypeDescription",
@@ -53,9 +54,9 @@ class WateringAdviceRepository {
               AND "colture" = '${colture}'
               AND "coltureType" = '${coltureType}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", rounded_timestamp
-            ORDER BY rounded_timestamp ASC
+            ORDER BY rounded_timestamp ASC)
             UNION
-            SELECT DISTINCT "refStructureName",
+            (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             "detectedValueTypeDescription",
@@ -75,9 +76,9 @@ class WateringAdviceRepository {
               AND "colture" = '${colture}'
               AND "coltureType" = '${coltureType}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", rounded_timestamp
-            ORDER BY rounded_timestamp ASC
+            ORDER BY rounded_timestamp ASC)
             UNION
-            SELECT DISTINCT "refStructureName",
+            (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             'Advice' as "detectedValueTypeDescription",
@@ -95,12 +96,13 @@ class WateringAdviceRepository {
               AND "plantNum" = '${plantNum}'
               AND "plantRow" = '${plantRow}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "advice", "plantNum", "plantRow", rounded_timestamp
-            ORDER BY rounded_timestamp ASC) AS A
+            ORDER BY rounded_timestamp ASC)
+                ) A
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", rounded_timestamp
-            ORDER BY rounded_timestamp ASC, "detectedValueTypeDescription" ASC;
+            ORDER BY rounded_timestamp ASC, "detectedValueTypeDescription" ASC
         `;
 
-        const results = this.sequelize.query(queryString, {
+        const results = await this.sequelize.query(queryString, {
             type: QueryTypes.SELECT,
             bind: {
                 timefilterFrom,
@@ -123,7 +125,7 @@ class WateringAdviceRepository {
             result.plantNum,
             result.plantRow,
             result.value,
-            result.timestamp
+            result.rounded_timestamp
         ));
     }
 

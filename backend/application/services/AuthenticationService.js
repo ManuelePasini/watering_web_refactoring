@@ -1,14 +1,6 @@
-const crypto = require('crypto');
 const jwt = require("jsonwebtoken");
-
+const hashPassword = require('../commons/hashPassword')
 const jwtSecret = require('../commons/constants');
-const hash = crypto.createHash('sha512');
-
-const hashpassword = (password) => {
-    const hash = crypto.createHash('sha512');
-    hash.update(password);
-    return hash.digest('hex');
-}
 
 
 class AuthenticationService {
@@ -24,12 +16,12 @@ class AuthenticationService {
             if (!user)
                 throw new Error('The mail does not exist');
 
-            const match = (user.dataValues.password === hashpassword(request.password));
+            const match = (user.dataValues.password === hashPassword(request.password));
 
             if (!match)
                 throw new Error('The password is invalid');
 
-            const payload = {userId: user.dataValues.userId}
+            const payload = {userId: user.dataValues.userId, partner: user.dataValues.partner}
             return jwt.sign(payload, jwtSecret, {expiresIn: "24h"});
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
@@ -44,7 +36,9 @@ class AuthenticationService {
                     if (err) {
                         reject(new Error('Authentication failed: token verify error'));
                     } else {
-                        resolve(decoded.userId);
+                        if(decoded.userId !== undefined && decoded.partner !== undefined)
+                            resolve({userId: decoded.userId, partner: decoded.partner});
+                        else reject(new Error('Authentication failed: token verify error'));
                     }
                 });
             });
