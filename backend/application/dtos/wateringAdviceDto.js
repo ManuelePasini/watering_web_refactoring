@@ -11,12 +11,11 @@ class WateringAdviceDto {
 
 class WateringAdviceProfileData {
 
-  constructor(xx, yy, zz, optValue, weight) {
+  constructor(xx, yy, zz, optValue) {
     this.xx  = xx
     this.yy = yy
     this.zz = zz
     this.optValue = optValue
-    this.weight = weight
   }
 
 }

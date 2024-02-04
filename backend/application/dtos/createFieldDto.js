@@ -1,44 +1,84 @@
 
-class FieldCreateDto {
+class CreateFieldDto {
 
-  constructor(fields) {
+  constructor(structures) {
+    this.structures = structures
+  }
+
+}
+
+class StructureDto {
+
+  constructor(companies) {
+    this.companies = companies
+  }
+
+}
+
+class CompaniesDto {
+
+  constructor(structureName, companies) {
+    this.structureName = structureName
+    this.companies = companies
+  }
+
+}
+
+class CompanyDto {
+
+  constructor(companyName, fields) {
+    this.companyName = companyName
     this.fields = fields
   }
 
 }
 
-class FieldData {
+class FieldDto {
 
-  constructor(fieldId, refStructureId, refStructureName, companyId, companyName, fieldName, parcelCode, address, plant, latitude, longitude, sensors) {
-    this.fieldId = fieldId;
-    this.refStructureId = refStructureId;
-    this.refStructureName = refStructureName;
-    this.companyId = companyId;
-    this.companyName = companyName;
+  constructor(fieldName, coltureType, sectors) {
     this.fieldName = fieldName;
-    this.parcelCode = parcelCode;
-    this.address = address;
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.plant = plant;
-    this.sensors = sensors;
+    this.coltureType = coltureType;
+    this.sectors = sectors;
   }
 
 }
 
-class SensorData {
+class SectorDto {
 
-  constructor(nodeId, nodeDescription, refNode, sensorNumber, doProfile, xx, yy, zz) {
-    this.nodeId = nodeId;
-    this.nodeDescription = nodeDescription;
-    this.refNode = refNode;
-    this.sensorNumber = sensorNumber;
-    this.doProfile = doProfile;
-    this.xx = xx;
-    this.yy = yy;
-    this.zz = zz;
+  constructor(sectorName, wateringCapacity, initialWatering, maximumWatering, adviceTime, wateringType, theses) {
+    this.sectorName = sectorName;
+    this.wateringCapacity = wateringCapacity;
+    this.initialWatering = initialWatering;
+    this.maximumWatering = maximumWatering;
+    this.adviceTime = adviceTime;
+    this.wateringType = wateringType;
+    this.theses = theses;
   }
 
 }
 
-module.exports = {FieldCreateDto, NodeData: FieldData, SensorData}
+class ThesisDto {
+
+  constructor(adviceWeight, thesisName, sensorNumber, sensors) {
+    this.adviceWeight = adviceWeight
+    this.thesisName = thesisName
+    this.sensorNumber = sensorNumber
+    this.sensors = sensors
+  }
+
+}
+
+class SensorDto {
+
+  constructor(id, name, type, x, y, z) {
+    this.id = id
+    this.name = name
+    this.type = type
+    this.x = x
+    this.y = y
+    this.z = z
+  }
+
+}
+
+module.exports = {CreateFieldDto, StructureDto, CompaniesDto, CompanyDto, FieldDto, SectorDto, ThesisDto, SensorDto}

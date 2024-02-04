@@ -12,12 +12,15 @@ const userService = new UserService(sequelize);
 const authenticationService = new AuthenticationService(userService);
 const authorizationService = new AuthorizationService(sequelize)
 
+const {RegisterUsersDto, RegisterUserDto} = require('../dtos/registerUsersDto')
+const { UserGrantsDto } = require('../dtos/userGrantsDto')
+
 usersRouter.post("/login", async  (req, res) => {
     try {
         if(!req.body && req.body === '')
             throw new Error('Body is empty');
 
-        const request = new UserTokenRequest(req.body.email, req.body.password);
+        const request = new UserTokenRequest(req.body.username, req.body.password, req.body.affiliation, req.body.auth_type);
 
         const token = await authenticationService.generateJwt(request);
 
@@ -32,7 +35,7 @@ usersRouter.get("/validateToken", async (req, res) => {
     try {
         const bearerHeader = req.headers.authorization;
         const requestUserData = await authenticationService.validateJwt(bearerHeader);
-        res.json({message: `UserId: ${requestUserData.userId}; Partner: ${requestUserData.partner}`});
+        res.json({message: `UserId: ${requestUserData.user}; Partner: ${requestUserData.affiliation}; Auth_Type: ${requestUserData.auth_type}`});
     } catch (error) {
         return res.status(403).json({error:error.toString()});
     }
@@ -57,7 +60,7 @@ usersRouter.get('/userFields', async (req, res) => {
     }
 });
 
-usersRouter.put('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/createUser', async (req, res) => {
+usersRouter.put('/registerUsers', async (req, res) => {
     let requestUserData = {userId: -1, partner: ''}
     try {
         requestUserData = await authenticationService.validateJwt(req.headers.authorization);
@@ -65,39 +68,32 @@ usersRouter.put('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/
         return res.status(403).json({message: 'Authentication failed'});
     }
 
-    const refStructureName = req.params.refStructureName;
-    const companyName = req.params.companyName;
-    const fieldName = req.params.fieldName;
-    const plantNum = req.params.plantNum;
-    const plantRow = req.params.plantRow;
-
     try {
-
-        if(!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userId, refStructureName, companyName, fieldName, plantNum, plantRow, 'CU')))
+        if(!(await authorizationService.isUserAuthorized(requestUserData.user, 'partner')))
             return res.status(401).json({message: 'Unauthorized request'});
 
         if(!req.body && req.body === '')
             throw new Error('Body is empty');
 
 
-        const email = req.body.email
-        const password = req.body.password
-        const name = req.body.name
-        const surname = req.body.surname
-        const partner = requestUserData.partner
+        const request = new RegisterUsersDto(req.body.map(user => new RegisterUserDto(
+          user.username,
+          user.name,
+          user.affiliation,
+          user.password,
+          user.authType,
+        )));
 
-        const userCreated = await userService.createUser(email, password, name, surname, partner)
-        const userInFieldCreated = await userService.createUserInField(userCreated.userId, partner, refStructureName, companyName, fieldName, plantNum, plantRow, false)
-
-        return res.status(200).json({message: `User ${userCreated.email} created with success`})
+        await userService.createUsers(request)
+        return res.status(200).json({message: `Users created with success`})
     } catch (error) {
-        console.log(`Fail creating user for field ${refStructureName}/${companyName}/${fieldName}/${plantNum}/${plantRow} caused by: ${error.message}`)
+        console.log(`Fail creating user caused by: ${error.message}`)
         return res.status(505).json({error: "Error on creating user"})
     }
 
 });
 
-usersRouter.put('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/createGrant', async (req, res) => {
+usersRouter.put('/createGrants', async (req, res) => {
     let requestUserData = {userId: -1, partner: ''}
     try {
         requestUserData = await authenticationService.validateJwt(req.headers.authorization);
@@ -105,37 +101,20 @@ usersRouter.put('/:refStructureName/:companyName/:fieldName/:plantNum/:plantRow/
         return res.status(403).json({message: 'Authentication failed'});
     }
 
-    const refStructureName = req.params.refStructureName;
-    const companyName = req.params.companyName;
-    const fieldName = req.params.fieldName;
-    const plantNum = req.params.plantNum;
-    const plantRow = req.params.plantRow;
-
     try {
-
-        if(!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userId, refStructureName, companyName, fieldName, plantNum, plantRow, 'SP')))
+        if(!(await authorizationService.isUserAuthorized(requestUserData.user, 'partner')))
             return res.status(401).json({message: 'Unauthorized request'});
 
         if(!req.body && req.body === '')
             throw new Error('Body is empty');
 
+        const requestDto = new UserGrantsDto(req.body)
 
-        const userToGrantemail = req.body.email
-        const permit = req.body.permit
+        await userService.createUserGrants(requestUserData.affiliation, requestDto)
 
-        if(permit === 'PAR')
-            return res.status(403).json({message: 'Unauthorized request'});
-
-        const userToGrant = await userService.findUserByEmail(userToGrantemail)
-        if(userToGrant.partner !== requestUserData.partner)
-            return res.status(403).json({message: 'Unauthorized request'});
-
-        const permitCreated = await userService.createUserPermits(userToGrant.userId, permit, requestUserData.partner, refStructureName, companyName, fieldName, plantNum, plantRow)
-        if(!permitCreated) return res.status(500).json({error: "Error on creating user grant"})
-
-        return res.status(200).json({message: `Grant ${permit} to user ${userToGrant.email} created with success`})
+        return res.status(200).json({message: `Grants created with success`})
     } catch (error) {
-        console.log(`Fail creating user grant for field ${refStructureName}/${companyName}/${fieldName}/${plantNum}/${plantRow} caused by: ${error.message}`)
+        console.log(`Fail creating user grant caused by: ${error.message}`)
         return res.status(500).json({error: "Error on creating user grant"})
     }
 

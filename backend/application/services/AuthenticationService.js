@@ -11,18 +11,23 @@ class AuthenticationService {
 
     async generateJwt(request) {
         try {
-            const user = await this.userService.findUserByEmail(request.email);
+            const user = await this.userService.findUser(request.username);
 
             if (!user)
                 throw new Error('The mail does not exist');
 
-            const match = (user.dataValues.password === hashPassword(request.password));
+            if(user.auth_type === 'token') {
+                const match = (user.dataValues.affiliation === request.affiliation)
+                if (!match)
+                    throw new Error('Affiliation is invalid');
+            } else {
+                const match = (user.dataValues.pwd === request.password);
+                if (!match)
+                    throw new Error('Password is invalid');
+            }
 
-            if (!match)
-                throw new Error('The password is invalid');
-
-            const payload = {userId: user.dataValues.userId, partner: user.dataValues.partner}
-            return jwt.sign(payload, jwtSecret, {expiresIn: "24h"});
+            const payload = {user: user.dataValues.user, affiliation: user.dataValues.affiliation, auth_type: user.auth_type}
+            return jwt.sign(payload, jwtSecret, {expiresIn: "1w"});
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
         }
@@ -36,8 +41,8 @@ class AuthenticationService {
                     if (err) {
                         reject(new Error('Authentication failed: token verify error'));
                     } else {
-                        if(decoded.userId !== undefined && decoded.partner !== undefined)
-                            resolve({userId: decoded.userId, partner: decoded.partner});
+                        if(decoded.user !== undefined && decoded.affiliation !== undefined && decoded.auth_type !== undefined)
+                            resolve({user: decoded.user, affiliation: decoded.affiliation, auth_type: decoded.auth_type});
                         else reject(new Error('Authentication failed: token verify error'));
                     }
                 });
@@ -46,6 +51,7 @@ class AuthenticationService {
             throw new Error('Authentication failed: bearer header not found.');
         }
     }
+
 
 }
 

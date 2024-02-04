@@ -26,10 +26,6 @@ function initMatrixProfile(sequelize) {
       optValue: {
         type: DataTypes.DOUBLE,
         allowNull: false
-      },
-      weight: {
-        type: DataTypes.DOUBLE,
-        allowNull: false
       }
     }, {
       modelName: 'matrix_profile',

@@ -1,27 +1,25 @@
 class OptStateDto {
 
-  constructor(matrixId, refStructureName, companyName, fieldName, plantRow, plantNum, timestampFrom, timestampTo, matrixDataList) {
-    this.matrixId = matrixId
-    this.refStructureName = refStructureName
+  constructor(structureName, companyName, fieldName, sectorName, thesis, validFrom, validTo, optimalState) {
+    this.structureName = structureName
     this.companyName = companyName
     this.fieldName = fieldName
-    this.plantRow = plantRow
-    this.plantNum = plantNum
-    this.timestampFrom = timestampFrom
-    this.timestampTo = timestampTo
-    this.matrixDataList = matrixDataList
+    this.sectorName = sectorName
+    this.thesis = thesis
+    this.validFrom = validFrom
+    this.validTo = validTo
+    this.optimalState = optimalState
   }
 
 }
 
 class MatrixData {
 
-  constructor(xx, yy, zz, optValue, weight) {
-    this.xx = xx
-    this.yy = yy
-    this.zz = zz
-    this.optValue = optValue
-    this.weight = weight
+  constructor(x, y, z, value) {
+    this.x = x
+    this.y = y
+    this.z = z
+    this.optValue = value
   }
 
 }

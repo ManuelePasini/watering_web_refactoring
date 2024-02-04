@@ -76,9 +76,9 @@ class FieldService {
     }
 
     async createMatrixOptState(optStateDto) {
-        const matrixFieldInserted =  await this.fieldRepository.createMatrixField(optStateDto.matrixId, optStateDto.refStructureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.plantNum, optStateDto.plantRow, optStateDto.timestampFrom, optStateDto.timestampTo)
-        for (const matrixData of optStateDto.matrixDataList) {
-            await this.fieldRepository.createMatrixProfile(optStateDto.matrixId, matrixData.xx, matrixData.yy, matrixData.zz, matrixData.optValue, matrixData.weight)
+        const matrixFieldInserted =  await this.fieldRepository.createMatrixField(optStateDto.structureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.sectorName, optStateDto.thesis, optStateDto.validFrom, optStateDto.validTo)
+        for (const matrixData of optStateDto.optimalState) {
+            await this.fieldRepository.createMatrixProfile(matrixFieldInserted.matrixId, matrixData.x, matrixData.y, matrixData.z, matrixData.value)
         }
     }
 
@@ -86,10 +86,18 @@ class FieldService {
         return this.fieldRepository.getCurrentWaterAdvice(refStructureName, companyName, fieldName, plantNum, plantRow)
     }
 
-    async createTranscodingFields(source, refStructureName, companyName, fieldName, plantNum, plantRow, fieldCreateDto) {
-        for(const field of fieldCreateDto.fields.fields){
-            for(const sensor of field.sensors) {
-                await this.fieldRepository.createTranscodingField(source, field.fieldId, field.refStructureId, field.refStructureName, field.companyId, field.companyName, field.fieldName, field.parcelCode, field.address, field.plant, field.latitude, field.longitude, sensor)
+    async createTranscodingFields(affiliation, request) {
+        for(const structure of request.structures) {
+            for (const company of structure.companies) {
+                for (const field of company.fields) {
+                    for (const sector of field.sectors) {
+                        for (const thesis of sector.theses) {
+                            for (const sensor of thesis.sensors) {
+                                await this.fieldRepository.createTranscodingField(affiliation, structure.structureName, company.companyName, field.fieldName, field.coltureType, sector.sectorName, sector.wateringCapacity, sector.initialWatering, sector.maximumWatering, sector.adviceTime, sector.wateringType, thesis.adviceWeight, thesis.thesisName, thesis.sensorNumber, sensor.id, sensor.name, sensor.type, sensor.x, sensor.y, sensor.z)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

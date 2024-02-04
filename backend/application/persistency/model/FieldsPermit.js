@@ -1,26 +1,22 @@
 const {Model, DataTypes} = require('sequelize')
 const sequelize = require('../../configs/dbConfig')
 
-class UserPermits extends Model {
+class FieldsPermit extends Model {
 
 }
 
-function initUserPermits(sequelize) {
-  UserPermits.init({
-    userPermitId: {
+function initFieldsPermit(sequelize) {
+  FieldsPermit.init({
+    permitid: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    source: {
+    userid: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    supergroup: {
+    affiliation: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -36,21 +32,25 @@ function initUserPermits(sequelize) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    plantNum: {
+    sectorname: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    plantRow: {
+    thesis: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    permit: {
       type: DataTypes.STRING,
       allowNull: false
     }
   }, {
-    modelName: 'user_permits',
+    modelName: 'permit_field',
     timestamps: false,
     sequelize
   });
 
-  return UserPermits;
+  return FieldsPermit;
 }
 
-module.exports = initUserPermits;
+module.exports = initFieldsPermit;

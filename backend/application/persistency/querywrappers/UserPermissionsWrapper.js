@@ -1,10 +1,10 @@
 
 class UserPermissionsWrapper {
 
-  constructor(idUser, userEmail, partner, permissions) {
-    this.idUser = idUser
-    this.userEmail = userEmail
-    this.partner = partner
+  constructor(user, affiliation, role, permissions) {
+    this.user = user
+    this.affiliation = affiliation
+    this.role = role
     this.permissions = permissions
   }
 

@@ -6,31 +6,32 @@ class User extends Model {
 
 function initUser(sequelize) {
     User.init({
-        userId: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        email: {
+        user: {
             type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true
-            }
+            primaryKey: true
         },
-        partner: {
-          type: DataTypes.STRING,
-          allowNull: false
-        },
-        password: {
+        auth_type: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        name: DataTypes.STRING,
-        surname: DataTypes.STRING
+        affiliation: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
+        pwd: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false
+        }
     }, {
-        modelName: 'watering_user',
+        modelName: 'users',
         timestamps: false,
         sequelize
     });

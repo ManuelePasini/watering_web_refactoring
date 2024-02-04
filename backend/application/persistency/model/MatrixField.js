@@ -9,7 +9,8 @@ function initMatrixField(sequelize) {
   MatrixField.init({
       matrixId: {
         type: DataTypes.BIGINT,
-        allowNull: false
+        primaryKey: true,
+        autoIncrement: true
       },
       refStructureName: {
         type: DataTypes.STRING,
@@ -23,11 +24,11 @@ function initMatrixField(sequelize) {
         type: DataTypes.STRING,
         allowNull: false
       },
-      plantRow: {
+      sectorName: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      plantNum: {
+      thesis: {
         type: DataTypes.STRING,
         allowNull: false
       },
