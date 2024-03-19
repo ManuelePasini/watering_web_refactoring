@@ -26,8 +26,8 @@ class AuthenticationService {
                     throw new Error('Password is invalid');
             }
 
-            const payload = {user: user.dataValues.user, affiliation: user.dataValues.affiliation, auth_type: user.auth_type}
-            return jwt.sign(payload, jwtSecret, {expiresIn: "1w"});
+            const payload = {user: user.dataValues.userid, affiliation: user.dataValues.affiliation, auth_type: user.dataValues.auth_type}
+            return jwt.sign(payload, jwtSecret, {expiresIn: "1h"});
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
         }

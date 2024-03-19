@@ -1,13 +1,13 @@
 
 class WateringAdviceWrapper {
 
-    constructor(refStructureName, companyName, fieldName, detectedValueTypeDescription, plantNum, plantRow, value, timestamp) {
+    constructor(refStructureName, companyName, fieldName, detectedValueTypeDescription, sectorname, thesis, value, timestamp) {
         this.refStructureName = refStructureName;
         this.companyName = companyName;
         this.fieldName = fieldName;
         this.detectedValueTypeDescription = detectedValueTypeDescription;
-        this.plantNum = plantNum;
-        this.plantRow = plantRow;
+        this.sectorname = sectorname;
+        this.thesis = thesis;
         this.value = value;
         this.timestamp = timestamp;
     }

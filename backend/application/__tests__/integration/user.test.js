@@ -2,8 +2,11 @@ const {Sequelize, DataTypes} = require('sequelize');
 const {PostgreSqlContainer} = require("@testcontainers/postgresql");
 
 const initUser = require('../../persistency/model/User');
+const initFieldsPermit = require('../../persistency/model/FieldsPermit');
+const initTranscodingField = require('../../persistency/model/TranscodingField');
+
 const UserRepository = require('../../persistency/repository/UserRepository');
-describe("Integration test", () => {
+describe("Integration tests", () => {
 
     let container;
     let sequelize;
@@ -21,8 +24,7 @@ describe("Integration test", () => {
         sequelize = new Sequelize(container.getDatabase(), container.getUsername(), container.getPassword(), {
             host: container.getHost(),
             port: container.getPort(),
-            dialect: 'postgres',
-            logging: false
+            dialect: 'postgres'
         });
 
         try {
@@ -33,15 +35,28 @@ describe("Integration test", () => {
         }
 
         const User = initUser(sequelize);
+        const FieldsPermit = initFieldsPermit(sequelize);
+        const TranscodingField = initTranscodingField(sequelize);
 
         await User.sync({ force: true });
+        await FieldsPermit.sync({ force: true });
+        await TranscodingField.sync({ force: true });
 
-        await User.create({ email: 'user1@example.com', password: 'user1Pass', name:'User1', surname:'Surname1' });
-        await User.create({ email: 'user2@example.com', password: 'user2Pass', name:'User2', surname:'Surname2' });
+        const user1 = User.build({ userid: 'user1@example.com', auth_type: 'psw', affiliation:'abs@unibo.it', pwd: 'user1Pass', name:'User1', role:'user' });
+        const user2 = User.build({ userid: 'user2@example.com', auth_type: 'token', affiliation:'ifarming@test.it', pwd: 'user2Pass', name:'User2', role:'user' });
+
+        const fieldPermit1 = FieldsPermit.build({permitid:1, userid: 'user1@example.com', affiliation: 'abs@unibo.it', refStructureName:'structure1', companyName:'company1', fieldName:'field1', sectorname:'sector1', thesis:'thesis1', permit:'permit1'})
+        const fieldPermit2 = FieldsPermit.build({permitid:2, userid: 'user2@example.com', affiliation: 'ifarming@unibo.it',
+            refStructureName:'structure2', companyName:'company2', fieldName:'field2', sectorname:'sector2', thesis:'thesis2', permit:'permit2'})
+
+        await user1.save()
+        await user2.save()
+        await fieldPermit1.save()
+        await fieldPermit2.save()
 
         console.log('Database successfully populated.');
 
-        userRepository = new UserRepository(User);
+        userRepository = new UserRepository(User, FieldsPermit, TranscodingField, sequelize);
     }, 20000);
 
     afterEach(async () => {
@@ -50,13 +65,31 @@ describe("Integration test", () => {
     }, 10000);
 
 
-    test('shoult fetch users correctly', async () => {
-        const users = await userRepository.findByEmail('user1@example.com');
-        expect(users.dataValues.userId).toBe(1);
-        expect(users.dataValues.email).toBe('user1@example.com');
-        expect(users.dataValues.password).toBe('user1Pass');
-        expect(users.dataValues.name).toBe('User1');
-        expect(users.dataValues.surname).toBe('Surname1');
+    test('should fetch user 1 correctly', async () => {
+        const user = await userRepository.findUser('user1@example.com');
+        expect(user.dataValues.userid).toBe('user1@example.com');
+        expect(user.dataValues.auth_type).toBe('psw');
+        expect(user.dataValues.affiliation).toBe('abs@unibo.it');
+        expect(user.dataValues.pwd).toBe('user1Pass');
+        expect(user.dataValues.name).toBe('User1');
+        expect(user.dataValues.role).toBe('user');
+    }, 30000);
+
+    test('should fetch user 2 permissions correctly', async () => {
+        const user = await userRepository.findUserPermissions('user2@example.com');
+        expect(user.dataValues.userid).toBe('user2@example.com');
+        expect(user.dataValues.auth_type).toBe('token');
+        expect(user.dataValues.affiliation).toBe('ifarming@test.it');
+        expect(user.dataValues.pwd).toBe('user2Pass');
+        expect(user.dataValues.name).toBe('User2');
+        expect(user.dataValues.role).toBe('user');
+        expect(user.dataValues.permit_fields.length).toBe(1)
+        expect(user.dataValues.permit_fields[0].refStructureName).toBe('structure2')
+        expect(user.dataValues.permit_fields[0].companyName).toBe('company2')
+        expect(user.dataValues.permit_fields[0].fieldName).toBe('field2')
+        expect(user.dataValues.permit_fields[0].sectorname).toBe('sector2')
+        expect(user.dataValues.permit_fields[0].thesis).toBe('thesis2')
+        expect(user.dataValues.permit_fields[0].permit).toBe('permit2')
     }, 30000);
 
 });

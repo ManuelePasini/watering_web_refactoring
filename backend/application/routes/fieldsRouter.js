@@ -14,29 +14,36 @@ const authenticationService = new AuthenticationService(userService);
 const authorizationService = new AuthorizationService(sequelize)
 const fieldService = new FieldService(sequelize)
 
-const UserInPlantRepository = require('../persistency/repository/UserInPlantRepository');
 const { CreateFieldDto } = require('../dtos/createFieldDto')
-const userInPlantRepository = new UserInPlantRepository(sequelize);
 
-fieldsRouter.get('/', async (req, res) => {
-   let requestUserData;
 
-   try {
-     requestUserData = await authenticationService.validateJwt(req.headers.authorization);
-       if(!requestUserData || requestUserData === 'undefined')
-           throw new Error('User not found');
-   } catch (error) {
-       return res.status(403).json({message:'authentication failed'});
-   }
-
-    try {
-       const result = await userInPlantRepository.findAllUserFields(requestUserData.userId, req.query.timeFilterFrom, req.query.timeFilterTo);
-       res.status(200).json(result);
-   } catch (error) {
-       res.status(500).json({message:error.message});
-   }
-});
-
+/**
+ * @swagger
+ * /fields/setOptState:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Set optimal state for a field
+ *     description: Set the optimal state for a field.
+ *     tags: [Field Operations]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/OptStateDto'
+ *     responses:
+ *       '200':
+ *         description: Matrix opt state created successfully.
+ *       '400':
+ *         description: Invalid request or opt state matrix does not match.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on creating field opt matrix.
+ */
 fieldsRouter.put('/setOptState', async (req, res) => {
   let requestUserData = {userId: -1, partner: ''}
   try {
@@ -45,17 +52,22 @@ fieldsRouter.put('/setOptState', async (req, res) => {
     return res.status(403).json({message: 'Authentication failed'});
   }
 
-  try {
-    if(!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.user, 'SetOpt')))
-      return res.status(401).json({message: 'Unauthorized request'});
+  if(!req.body && req.body === '')
+    throw new Error('Body is empty');
 
-    if(!req.body && req.body === '')
-      throw new Error('Body is empty');
+  try {
+    if(!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.user, req.body.structureName, req.body.companyName,req.body.fieldName, req.body.sectorName, req.body.thesis, 'SetOpt')))
+      return res.status(401).json({message: 'Unauthorized request'});
 
     if(!req.body.validFrom || !req.body.validTo || !req.body.optimalState)
       return res.status(400).json({message: 'Invalid request'});
 
     const bodyRequest = new OptStateDto(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.thesis, req.body.validFrom, req.body.validTo, req.body.optimalState)
+
+    const interpolatedPoints = await fieldService.findDistinctThesisPoints(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.thesis)
+
+    if(!checkOptState(interpolatedPoints, req.body.optimalState))
+      return res.status(400).json({error: "Opt state matrix does not match"})
 
     await fieldService.createMatrixOptState(bodyRequest)
 
@@ -67,6 +79,33 @@ fieldsRouter.put('/setOptState', async (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /fields/wateringAdvice:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get watering advice for a field
+ *     description: Get watering advice for a field
+ *     tags: [Field Operations]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/WateringAdviceDtoRequest'
+ *     responses:
+ *       '200':
+ *         description: Matrix opt state created successfully.
+ *       '400':
+ *         description: Invalid request or opt state matrix does not match.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on creating field opt matrix.
+ */
 fieldsRouter.post('/wateringAdvice', async (req, res) => {
   let requestUserData = {userId: -1, partner: ''}
   try {
@@ -80,7 +119,7 @@ fieldsRouter.post('/wateringAdvice', async (req, res) => {
       return res.status(401).json({message: 'Unauthorized request'});
 
 
-    if((!req.body && req.body === '') || (!req.body.structureName || !req.body.companyName || !req.body.fieldName || !req.body.sectorName || !req.body.thesis))
+    if(!req.body || !req.body.structureName || !req.body.companyName || !req.body.fieldName || !req.body.sectorName || !req.body.thesis)
       throw new Error('Body is not correct');
 
     const result = await fieldService.getCurrentWateringAdvice(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.thesis)
@@ -92,6 +131,33 @@ fieldsRouter.post('/wateringAdvice', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /fields/createFields:
+ *     put:
+ *       security:
+ *       - bearerAuth: []
+ *       summary: Create fields
+ *       description: Create fields based on the provided data
+ *       tags: [Field Operations]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CreateFieldDto'
+ *       responses:
+ *         '200':
+ *           description: Fields created successfully
+ *         '400':
+ *           description: Invalid request body
+ *         '401':
+ *           description: Unauthorized request
+ *         '403':
+ *           description: Authentication failed
+ *         '500':
+ *           description: Error during fields creation
+ */
 fieldsRouter.put('/createFields', async (req, res) => {
   let requestUserData = {userId: -1, partner: ''}
   try {
@@ -109,7 +175,7 @@ fieldsRouter.put('/createFields', async (req, res) => {
 
     const body = req.body
 
-    const requestDto = new CreateFieldDto(body)
+    const requestDto = new CreateFieldDto(body.structures)
 
     await fieldService.createTranscodingFields(requestUserData.affiliation, requestDto)
 
@@ -119,5 +185,16 @@ fieldsRouter.put('/createFields', async (req, res) => {
     return res.status(500).json({error: "Error during fields creation"})
   }
 });
+
+function checkOptState(dataInterpolatedPoints, list2) {
+  if (dataInterpolatedPoints.points.length !== list2.length) return false;
+
+  for (const elem1 of dataInterpolatedPoints.points) {
+    const matchingElem2 = list2.find(elem2 => elem2.x === elem1.x && elem2.y === elem1.y && elem2.z === elem1.z);
+    if (!matchingElem2) return false;
+  }
+
+  return true;
+}
 
 module.exports = fieldsRouter;

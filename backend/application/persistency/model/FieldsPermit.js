@@ -45,7 +45,7 @@ function initFieldsPermit(sequelize) {
       allowNull: false
     }
   }, {
-    modelName: 'permit_field',
+    modelName: 'permit_fields',
     timestamps: false,
     sequelize
   });

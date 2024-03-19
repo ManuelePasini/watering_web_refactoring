@@ -1,60 +1,75 @@
 const AuthenticationService = require('../../services/AuthenticationService');
-const { mock } = require('jest-mock-extended');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-const jwtSecret = 'ol/utMQ2YBlP1gOyucuWsphBOmKBQA8GiiUYGJyAvch30paQhlsT+RfB7BGU0UAl';
-
-jest.mock('bcrypt');
-jest.mock('jsonwebtoken')
+jest.mock('jsonwebtoken');
 
 describe('AuthenticationService', () => {
-    let userService;
     let authService;
+    let mockUserService;
 
     beforeEach(() => {
-        userService = mock();
-        authService = new AuthenticationService(userService);
+        mockUserService = {
+            findUser: jest.fn()
+        };
+        authService = new AuthenticationService(mockUserService);
     });
 
     describe('generateJwt', () => {
-        it('should throw an error if the email does not exist', async () => {
-            userService.findUserByEmail.mockResolvedValue(null);
+        it('should generate a valid token for user with password authentication', async () => {
+            mockUserService.findUser.mockResolvedValue({
+                dataValues: { userid: 'user123', affiliation: 'affiliation123', auth_type: 'pwd', pwd: 'hashedPassword' }
+            });
+            const request = { username: 'user@example.com', password: 'hashedPassword' };
+            // Mocking jwt.sign behavior
+            jwt.sign.mockReturnValue('generated.jwt.token');
 
-            await expect(authService.generateJwt({ email: 'nonexistent@example.com' })).rejects.toThrow('The mail does not exist');
+            const token = await authService.generateJwt(request);
+            expect(token).toBe('generated.jwt.token');
+            expect(jwt.sign).toHaveBeenCalledWith(
+              expect.any(Object),
+              expect.any(String),
+              { expiresIn: '1w' }
+            );
         });
 
-        it('should throw an error if the password is invalid', async () => {
-            const fakeUser = { id: { password: 'password' } };
-            userService.findUserByEmail.mockResolvedValue(fakeUser);
-            bcrypt.compare.mockResolvedValue(false);
+        it('should generate a valid token for user with token authentication', async () => {
+            mockUserService.findUser.mockResolvedValue({
+                dataValues: { userid: 'user123', affiliation: 'affiliation123', auth_type: 'token' }
+            });
+            const request = { username: 'user@example.com', affiliation: 'affiliation123' };
+            jwt.sign.mockReturnValue('generated.jwt.token');
 
-            await expect(authService.generateJwt({ email: 'test@example.com', password: 'wrongpassword' })).rejects.toThrow('The password is invalid');
+            const token = await authService.generateJwt(request);
+            expect(token).toBe('generated.jwt.token');
         });
 
-        it('should generate a jwt if the password is valid', async () => {
-            const fakeUser = { id: { password: 'password' } };
-            userService.findUserByEmail.mockResolvedValue(fakeUser);
-            bcrypt.compare.mockResolvedValue(true);
-            jwt.sign.mockReturnValue('FAKE_JWT');
+        it('should throw an error if password is invalid for pwd authentication user', async () => {
+            mockUserService.findUser.mockResolvedValue({
+                dataValues: { pwd: 'correctPassword', auth_type: 'pwd' }
+            });
+            const request = { username: 'user@example.com', password: 'wrongPassword' };
 
-            const generatedJwt = await authService.generateJwt({ email: 'test@example.com', password: 'password' });
-
-            expect(generatedJwt).toBe('FAKE_JWT');
+            await expect(authService.generateJwt(request))
+              .rejects.toThrow('Password is invalid');
         });
+
     });
 
     describe('validateJwt', () => {
-        it('should throw an error if the bearer token is not provided', async () => {
-            await expect(authService.validateJwt('')).rejects.toThrowError(new Error('Authentication failed: bearer header not found.'));
-        });
-
-        it('should throw an error if the jwt is invalid', async () => {
+        it('should validate a correct token', async () => {
+            const testToken = 'some.jwt.token';
+            const testDecoded = { user: '123', affiliation: 'test', auth_type: 'token' };
             jwt.verify.mockImplementation((token, secret, callback) => {
-                callback(new Error('Invalid token'));
+                callback(null, testDecoded);
             });
 
-            await expect(authService.validateJwt('Bearer INVALID_JWT')).rejects.toThrow('Authentication failed: token verify error');
+            const result = await authService.validateJwt(`Bearer ${testToken}`);
+            expect(result).toEqual(testDecoded);
         });
+
+        it('should throw an error for an undefined header', async () => {
+            await expect(authService.validateJwt(undefined))
+              .rejects.toThrow('Authentication failed: bearer header not found.');
+        });
+
     });
 });

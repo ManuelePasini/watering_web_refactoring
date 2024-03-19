@@ -24,7 +24,7 @@ function initMatrixField(sequelize) {
         type: DataTypes.STRING,
         allowNull: false
       },
-      sectorName: {
+      sectorname: {
         type: DataTypes.STRING,
         allowNull: false
       },

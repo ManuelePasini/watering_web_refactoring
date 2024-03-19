@@ -11,7 +11,7 @@ class FieldRepository {
   }
 
   async createMatrixProfile(matrixId, x, y, z, value) {
-    const model = this.MatrixProfile.build({matrixId: matrixId, xx: x, yy: y, zz: z, optValue: value})
+    const model = this.MatrixProfile.build({matrixId: matrixId, xx: x, yy: y, zz: z, optValue: value, weight: 1})
     this.MatrixProfile.removeAttribute('id')
     return await model.save()
   }
@@ -25,7 +25,7 @@ class FieldRepository {
             refStructureName: structureName,
             companyName: companyName,
             fieldName: fieldName,
-            sectorName: sectorname,
+            sectorname: sectorname,
             thesis: thesis
           }
         }
@@ -34,7 +34,7 @@ class FieldRepository {
         refStructureName: structureName,
         companyName: companyName,
         fieldName: fieldName,
-        sectorName: sectorname,
+        sectorname: sectorname,
         thesis: thesis,
         timestamp_from: Math.floor(new Date(validFrom).getTime() / 1000),
         timestamp_to: Math.floor(new Date(validTo).getTime() / 1000),
@@ -48,35 +48,55 @@ class FieldRepository {
     }
   }
 
-  async getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorName, thesis) {
-    const query = `
-        SELECT "timestamp_from", "timestamp_to", "xx", "yy", "zz", "optValue"
-        FROM field_matrix fm
-        JOIN matrix_profile mp ON fm."matrixId" = mp."matrixId"
-        WHERE fm."refStructureName" = '${refStructureName}'
-        AND fm."companyName" = '${companyName}'
-        AND fm."fieldName" = '${fieldName}'
-        AND fm."sectorName" = '${sectorName}'
-        AND fm."thesis" = '${thesis}'
-        AND fm."current" = true`;
+  async getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorname, thesis) {
 
-    const results = await this.sequelize.query(query, {
+    const query = `
+            SELECT t1.advice, timestamp, "wateringHour"
+        FROM 
+            watering_advice t1
+        INNER JOIN (
+            SELECT
+                "refStructureName",
+                "companyName",
+                "fieldName",
+                sectorname,
+                thesis,
+                MAX(timestamp) as max_timestamp
+            FROM
+                watering_advice
+            WHERE
+                "refStructureName" = '${refStructureName}' AND
+                "companyName" = '${companyName}' AND
+                "fieldName" = '${fieldName}' AND
+                sectorname = '${sectorname}' AND
+                thesis = '${thesis}'
+            GROUP BY
+                "refStructureName",
+                "companyName",
+                "fieldName",
+                sectorname, 
+                thesis
+        ) t2 ON t1."refStructureName" = t2."refStructureName"
+            AND t1."companyName" = t2."companyName"
+            AND t1."fieldName" = t2."fieldName"
+            AND t1.sectorname = t2.sectorname
+            AND t1.thesis = t2.thesis
+            AND t1.timestamp = t2.max_timestamp`
+
+    const result = await this.sequelize.query(query, {
       type: QueryTypes.SELECT,
       bind: {
         refStructureName,
         companyName,
         fieldName,
-        sectorName,
+        sectorname,
         thesis
       }
     });
 
-    if(results) {
-      const timestampFrom = results[0].timestamp_from
-      const timestampTo = results[0].timestamp_to
-      const profiles = results.map(result => new WateringAdviceProfileData(result.xx, result.yy, result.zz, result.optValue))
-      return new WateringAdviceDto(timestampFrom, timestampTo, profiles)
-    } else return new WateringAdviceDto(0, 0, [])
+    if(result && result.length === 1) {
+      return new WateringAdviceDto(result[0].advice, new Date(result[0].timestamp * 1000).toISOString(), new Date(result[0].wateringHour * 1000).toISOString())
+    } else return new WateringAdviceDto(-1, -1, -1)
   }
 
   async createTranscodingField(source, refStructureName, companyName, fieldName, coltureType, sectorname, wateringcapacity, initialwatering, maximumwatering, advicetime, wateringtype, adviceweight, thesisname, sensorNumber, sensorid, sensorname, sensortype, x, y, z) {

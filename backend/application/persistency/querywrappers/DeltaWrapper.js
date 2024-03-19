@@ -1,12 +1,12 @@
 
 class DeltaWrapper {
 
-    constructor(refStructureName, companyName, fieldName, plantNum, plantRow, value, timestamp, detectedValueTypeDescription) {
+    constructor(refStructureName, companyName, fieldName, sectorname, thesis, value, timestamp, detectedValueTypeDescription) {
         this.refStructureName = refStructureName;
         this.companyName = companyName;
         this.fieldName = fieldName;
-        this.plantNum = plantNum;
-        this.plantRow = plantRow;
+        this.sectorname = sectorname;
+        this.thesis = thesis;
         this.value = value;
         this.timestamp = timestamp;
         this.detectedValueTypeDescription = detectedValueTypeDescription;

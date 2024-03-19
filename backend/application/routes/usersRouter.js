@@ -15,6 +15,35 @@ const authorizationService = new AuthorizationService(sequelize)
 const {RegisterUsersDto, RegisterUserDto} = require('../dtos/registerUsersDto')
 const { UserGrantsDto } = require('../dtos/userGrantsDto')
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Authenticate user and generate token
+ *     tags: [User route]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserTokenRequest'
+ *     responses:
+ *       '200':
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserTokenResponse'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 usersRouter.post("/login", async  (req, res) => {
     try {
         if(!req.body && req.body === '')
@@ -31,6 +60,34 @@ usersRouter.post("/login", async  (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /validateToken:
+ *   get:
+ *     summary: Validate JWT token
+ *     tags: [User route]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successful token validation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '403':
+ *         description: Forbidden access
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 usersRouter.get("/validateToken", async (req, res) => {
     try {
         const bearerHeader = req.headers.authorization;
@@ -41,25 +98,85 @@ usersRouter.get("/validateToken", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /userFields:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve user permissions for fields
+ *     description: Retrieve the permissions for fields associated with the authenticated user.
+ *     tags: [User route]
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserFieldPermissions'
+ *       '403':
+ *         description: Authentication failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 usersRouter.get('/userFields', async (req, res) => {
     let requestUserData;
 
     try {
         requestUserData = await authenticationService.validateJwt(req.headers.authorization);
-        if(!requestUserData || requestUserData === 'undefined')
+        if(!requestUserData)
             throw new Error('User not found');
     } catch (error) {
         return res.status(403).json({message:'authentication failed'});
     }
 
     try {
-        const result = await userInPlantRepository.findAllUserFields(requestUserData.userId, req.query.timeFilterFrom, req.query.timeFilterTo);
+        const result = await userService.findUserPermissions(requestUserData.user);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({message:error.message});
     }
 });
 
+/**
+ * @swagger
+ * /registerUsers:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Register users
+ *     tags: [User route]
+ *     description: Endpoint to register users.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RegisterUsersDto'
+ *     responses:
+ *       '200':
+ *         description: Users created successfully.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on creating user.
+ */
 usersRouter.put('/registerUsers', async (req, res) => {
     let requestUserData = {userId: -1, partner: ''}
     try {
@@ -72,19 +189,19 @@ usersRouter.put('/registerUsers', async (req, res) => {
         if(!(await authorizationService.isUserAuthorized(requestUserData.user, 'partner')))
             return res.status(401).json({message: 'Unauthorized request'});
 
-        if(!req.body && req.body === '')
+        if(!req.body && req.body.users && req.body.users.length > 0)
             throw new Error('Body is empty');
 
 
-        const request = new RegisterUsersDto(req.body.map(user => new RegisterUserDto(
+        const request = new RegisterUsersDto(req.body.users.map(user => new RegisterUserDto(
           user.username,
           user.name,
-          user.affiliation,
+          requestUserData.affiliation,
           user.password,
           user.authType,
         )));
 
-        await userService.createUsers(request)
+        const result = await userService.createUsers(request)
         return res.status(200).json({message: `Users created with success`})
     } catch (error) {
         console.log(`Fail creating user caused by: ${error.message}`)
@@ -93,6 +210,31 @@ usersRouter.put('/registerUsers', async (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /createGrants:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Create grants
+ *     tags: [User route]
+ *     description: Endpoint to create grants.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserGrantsDto'
+ *     responses:
+ *       '200':
+ *         description: Grants created successfully.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on creating grants.
+ */
 usersRouter.put('/createGrants', async (req, res) => {
     let requestUserData = {userId: -1, partner: ''}
     try {
@@ -108,7 +250,7 @@ usersRouter.put('/createGrants', async (req, res) => {
         if(!req.body && req.body === '')
             throw new Error('Body is empty');
 
-        const requestDto = new UserGrantsDto(req.body)
+        const requestDto = new UserGrantsDto(req.body.grants)
 
         await userService.createUserGrants(requestUserData.affiliation, requestDto)
 

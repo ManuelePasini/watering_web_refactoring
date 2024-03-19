@@ -1,5 +1,5 @@
 
-class UserPermissionsWrapper {
+class UserFieldPermissions {
 
   constructor(user, affiliation, role, permissions) {
     this.user = user
@@ -10,13 +10,17 @@ class UserPermissionsWrapper {
 
 }
 
-class GroupPermissions {
+class UserFieldPermission {
 
-  constructor(supergroup, actions) {
-    this.supergroup = supergroup
-    this.actions = actions
+  constructor(refStructureName, companyName, fieldName, sectorname, thesis, permissions) {
+    this.refStructureName = refStructureName
+    this.companyName = companyName
+    this.fieldName = fieldName
+    this.sectorname = sectorname
+    this.thesis = thesis
+    this.permissions = permissions
   }
 
 }
 
-module.exports = {UserPermissionsWrapper, GroupPermissions}
+module.exports = {UserFieldPermissions, UserFieldPermission}

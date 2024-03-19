@@ -1,23 +1,24 @@
 
 class WateringAdviceDto {
 
-  constructor(timestampFrom, timestampTo, profiles) {
-    this.timestampFrom = timestampFrom
-    this.timestampTo = timestampTo
-    this.profiles = profiles
+  constructor(wateringAdvice, computedAt, startWatering) {
+    this.wateringAdvice = wateringAdvice
+    this.computedAt = computedAt
+    this.startWatering = startWatering
   }
 
 }
 
-class WateringAdviceProfileData {
+class WateringAdviceDtoRequest {
 
-  constructor(xx, yy, zz, optValue) {
-    this.xx  = xx
-    this.yy = yy
-    this.zz = zz
-    this.optValue = optValue
+  constructor(refStructureName, companyName, fieldName, sectorName, thesis) {
+    this.refStructureName = refStructureName
+    this.companyName = companyName
+    this.fieldName = fieldName
+    this.sectorName = sectorName
+    this.thesis = thesis
   }
 
 }
 
-module.exports = {WateringAdviceDto,WateringAdviceProfileData}
+module.exports = {WateringAdviceDto, WateringAdviceDtoRequest}

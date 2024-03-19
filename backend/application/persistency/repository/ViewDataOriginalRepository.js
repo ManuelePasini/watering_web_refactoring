@@ -2,15 +2,15 @@ const DataViewOriginalWrapper = require('../querywrappers/ViewDataOriginalWrappe
 
 const {QueryTypes} = require('sequelize');
 
-const getResults = async (calculationType, detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, sequelize) => {
+const getResults = async (calculationType, detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType, sequelize) => {
 
     const query = `
             SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             "detectedValueTypeDescription",
-                            "plantNum",
-                            "plantRow",
+                            "sectorname",
+                            "thesis",
                             "colture",
                             "coltureType",
                             ${calculationType} as value,
@@ -23,11 +23,11 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
               AND "companyName" = '${companyName}'
               AND ("fieldName" IS NULL
                OR "fieldName" = '${fieldName}')
-              AND "plantNum" = '${plantNum}'
-              AND "plantRow" = '${plantRow}'
+              AND "sectorname" = '${sectorname}'
+              AND "thesis" = '${thesis}'
               AND "colture" = '${colture}'
               AND "coltureType" = '${coltureType}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "plantNum", "plantRow", "colture", "coltureType", "timestamp"
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorname", "thesis", "colture", "coltureType", "timestamp"
             ORDER BY timestamp ASC`;
 
     const results = await sequelize.query(query,
@@ -40,8 +40,8 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
                 refStructureName,
                 companyName,
                 fieldName,
-                plantNum,
-                plantRow,
+                sectorname,
+                thesis,
                 colture,
                 coltureType,
                 calculationType
@@ -53,8 +53,8 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
         result.refStructureName,
         result.companyName,
         result.fieldName,
-        result.plantNum,
-        result.plantRow,
+        result.sectorname,
+        result.thesis,
         result.colture,
         result.coltureType,
         result.detectedValueTypeDescription,
@@ -69,16 +69,16 @@ class ViewDataOriginalRepository {
         this.sequelize = sequelize;
     }
 
-    async findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType) {
-        return getResults('AVG(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, this.sequelize);
+    async findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType) {
+        return getResults('AVG(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType, this.sequelize);
     }
 
-    async findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType) {
-        return getResults('AVG(64.3 * \"value\" -15.2)', ['ELECT_COND'], timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, this.sequelize);
+    async findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType) {
+        return getResults('AVG(64.3 * \"value\" -15.2)', ['ELECT_COND'], timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType, this.sequelize);
     }
 
-    async findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType) {
-        return getResults('SUM(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, plantNum, plantRow, colture, coltureType, this.sequelize);
+    async findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType) {
+        return getResults('SUM(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType, this.sequelize);
     }
 }
 

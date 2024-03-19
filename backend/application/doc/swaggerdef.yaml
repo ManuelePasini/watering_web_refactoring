@@ -1,0 +1,357 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+
+    DataResponse:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataValue'
+
+    DataValue:
+      type: object
+      properties:
+        refStructureName:
+          type: string
+        companyName:
+          type: string
+        fieldName:
+          type: string
+        plant:
+          $ref: '#/components/schemas/PlantDto'
+        measures:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/MeasureData'
+              - $ref: '#/components/schemas/HumidityBinMeasureData'
+
+    MeasureData:
+      type: object
+      properties:
+        detectedValueTypeDescription:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+
+    HumidityBinMeasureData:
+      type: object
+      properties:
+        humidityBin:
+          type: number
+        timestamp:
+          type: string
+          format: date-time
+        count:
+          type: number
+
+    ColtureDto:
+      type: object
+      required:
+        - colture
+        - coltureType
+      properties:
+        colture:
+          type: string
+        coltureType:
+          type: string
+
+    PlantDto:
+      type: object
+      required:
+        - plantId
+        - sectorname
+        - thesis
+        - plantName
+        - colture
+      properties:
+        plantId:
+          type: integer
+        sectorname:
+          type: string
+        thesis:
+          type: string
+        plantName:
+          type: string
+        colture:
+          type: string
+
+    WateringAdviceDto:
+      type: object
+      properties:
+        timestampFrom:
+          type: string
+          format: date-time
+        timestampTo:
+          type: string
+          format: date-time
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/WateringAdviceProfileData'
+
+    WateringAdviceProfileData:
+      type: object
+      properties:
+        xx:
+          type: string
+        yy:
+          type: string
+        zz:
+          type: string
+        optValue:
+          type: string
+
+    UserTokenRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        affiliation:
+          type: string
+        auth_type:
+          type: string
+
+    UserTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    RegisterUsersDto:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegisterUserDto'
+
+    RegisterUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        authType:
+          type: string
+
+    UserGrantsDto:
+      type: object
+      properties:
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserGrantDto'
+
+    UserGrantDto:
+      type: object
+      properties:
+        structureName:
+          type: string
+        companyName:
+          type: string
+        fieldName:
+          type: string
+        sectorName:
+          type: string
+        thesis:
+          type: string
+        applications:
+          type: array
+          items:
+            type: string
+        userId:
+          type: string
+
+    OptStateDto:
+      type: object
+      properties:
+        structureName:
+          type: string
+        companyName:
+          type: string
+        fieldName:
+          type: string
+        sectorName:
+          type: string
+        thesis:
+          type: string
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        optimalState:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatrixData'
+
+    MatrixData:
+      type: object
+      properties:
+        x:
+          type: number
+        y:
+          type: number
+        z:
+          type: number
+        optValue:
+          type: number
+
+    WateringAdviceDtoRequest:
+      type: object
+      properties:
+        refStructureName:
+          type: string
+        companyName:
+          type: string
+        fieldName:
+          type: string
+        sectorName:
+          type: string
+        thesis:
+          type: string
+
+    CreateFieldDto:
+      type: object
+      properties:
+        structures:
+          $ref: '#/components/schemas/StructureDto'
+
+    StructureDto:
+      type: object
+      properties:
+        companies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompaniesDto'
+
+    CompaniesDto:
+      type: object
+      properties:
+        structureName:
+          type: string
+        companies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyDto'
+
+    CompanyDto:
+      type: object
+      properties:
+        companyName:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldDto'
+
+    FieldDto:
+      type: object
+      properties:
+        fieldName:
+          type: string
+        coltureType:
+          type: string
+        sectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SectorDto'
+
+    SectorDto:
+      type: object
+      properties:
+        sectorName:
+          type: string
+        wateringCapacity:
+          type: number
+        initialWatering:
+          type: number
+        maximumWatering:
+          type: number
+        adviceTime:
+          type: string
+          format: date-time
+        wateringType:
+          type: string
+        theses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThesisDto'
+
+    ThesisDto:
+      type: object
+      properties:
+        adviceWeight:
+          type: number
+        thesisName:
+          type: string
+        sensorNumber:
+          type: number
+        sensors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SensorDto'
+
+    SensorDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        z:
+          type: number
+
+    UserFieldPermissions:
+      type: object
+      properties:
+        user:
+          type: string
+        affiliation:
+          type: string
+        role:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserFieldPermission'
+
+    UserFieldPermission:
+      type: object
+      properties:
+        refStructureName:
+          type: string
+        companyName:
+          type: string
+        fieldName:
+          type: string
+        sectorname:
+          type: string
+        thesis:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string

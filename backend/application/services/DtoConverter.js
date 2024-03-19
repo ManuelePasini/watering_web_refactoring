@@ -5,8 +5,8 @@ const {DataResponse, DataValue, MeasureData, HumidityBinMeasureData} = require('
 const {values} = require("pg/lib/native/query");
 class DtoConverter {
 
-    convertDataInterpolatedMeanWrapper(refStructureName, companyName, fieldName, plantNum, plantRow, wrappers) {
-        const plant = new PlantDto(plantNum, plantRow);
+    convertDataInterpolatedMeanWrapper(refStructureName, companyName, fieldName, sectorname, thesis, wrappers) {
+        const plant = new PlantDto(sectorname, thesis);
         const measures = wrappers.map(wrapper => new InterpolatedMeanMeasureData(wrapper.zz, wrapper.yy, wrapper.xx, wrapper.std, wrapper.mean));
         return new InterpolatedDataValue(refStructureName, companyName, fieldName, plant, measures);
     }
@@ -16,7 +16,7 @@ class DtoConverter {
 
         const interpolatedValues = Array.from(map, ([key, values]) => {
             const keyObject = JSON.parse(key);
-            const plant = new PlantDto(keyObject.plantNum, keyObject.plantRow);
+            const plant = new PlantDto(keyObject.sectorname, keyObject.thesis);
             const measures = values.map(value => new InterpolatedMeasureData(value.zz, value.yy, value.xx, value.timestamp, value.value));
             return new InterpolatedDataValue(keyObject.refStructureName, keyObject.companyName, keyObject.fieldName, plant, measures);
         });
@@ -33,7 +33,7 @@ class DtoConverter {
 
         const dataValues = Array.from(map, ([key, values]) => {
             const keyObject = JSON.parse(key);
-            const plant = new PlantDto(keyObject.plantNum, keyObject.plantRow);
+            const plant = new PlantDto(keyObject.sectorname, keyObject.thesis);
             const measures = values.map(value => new HumidityBinMeasureData(value.umidity_bin, value.timestamp, value.count));
             return new DataValue(keyObject.refStructureName, keyObject.companyName, keyObject.fieldName, plant, measures);
         });
@@ -51,8 +51,8 @@ class DtoConverter {
                 refStructureName: currentValue.refStructureName,
                 companyName: currentValue.companyName,
                 fieldName: currentValue.fieldName,
-                plantNum: currentValue.plantNum,
-                plantRow: currentValue.plantRow,
+                sectorname: currentValue.sectorname,
+                thesis: currentValue.thesis,
                 colture: currentValue.colture,
                 coltureType: currentValue.coltureType
             };
@@ -68,7 +68,7 @@ class DtoConverter {
         const dataValues = Array.from(map, ([key, values]) => {
             const keyObject = JSON.parse(key);
             const colture = new ColtureDto(keyObject.colture, keyObject.coltureType);
-            const plant = new PlantDto(keyObject.plantNum, keyObject.plantRow, colture);
+            const plant = new PlantDto(keyObject.sectorname, keyObject.thesis, colture);
             const measures = values.map(value => new MeasureData(value.detectedValueTypeDescription, value.timestamp, value.value));
             return new DataValue(keyObject.refStructureName, keyObject.companyName, keyObject.fieldName, plant, measures);
         });
@@ -86,8 +86,8 @@ class DtoConverter {
                 refStructureName: currentValue.refStructureName,
                 companyName: currentValue.companyName,
                 fieldName: currentValue.fieldName,
-                plantNum: currentValue.plantNum,
-                plantRow: currentValue.plantRow
+                sectorname: currentValue.sectorname,
+                thesis: currentValue.thesis
             };
             if(accumulator.has(JSON.stringify(key)))
                 accumulator.get(JSON.stringify(key)).push(currentValue);
@@ -104,7 +104,7 @@ class DtoConverter {
 
         const dataValues = Array.from(map, ([key, values]) => {
             const keyObject = JSON.parse(key);
-            const plant = new PlantDto(keyObject.plantNum, keyObject.plantRow);
+            const plant = new PlantDto(keyObject.sectorname, keyObject.thesis);
             const measures = values.map(value => new MeasureData(value.detectedValueTypeDescription, value.timestamp, value.value));
             return new DataValue(keyObject.refStructureName, keyObject.companyName, keyObject.fieldName, plant, measures);
         });

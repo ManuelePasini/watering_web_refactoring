@@ -1,16 +1,18 @@
+const {DataInterpolatedDistinctPoints, DataInterpolatedDistinctPoint} = require('../querywrappers/DataInterpolatedDistinctPoints')
+
 const DataInterpolatedWrapper = require('../querywrappers/DataInterpolatedWrapper');
 const DataInterpolatedMeanWrapper = require('../querywrappers/DataInterpolatedMeanWrapper');
 
 const {QueryTypes} = require('sequelize');
 
-const getResults = async (refStructureName, companyName, fieldName, plantNum, plantRow, timestampFrom, timestampTo, sequelize) => {
+const getResults = async (refStructureName, companyName, fieldName, sectorname, thesis, timestampFrom, timestampTo, sequelize) => {
 
     const query = `
         SELECT DISTINCT "refStructureName",
                         "companyName",
                         "fieldName",
-                        "plantNum",
-                        "plantRow",
+                        "sectorname",
+                        "thesis",
                         "zz",
                         "yy",
                         "xx",
@@ -20,12 +22,12 @@ const getResults = async (refStructureName, companyName, fieldName, plantNum, pl
         WHERE "refStructureName" = '${refStructureName}'
           AND "companyName" = '${companyName}'
           AND ("fieldName" = '' OR "fieldName" = '${fieldName}')
-          AND "plantNum" = '${plantNum}'
-          AND "plantRow" = '${plantRow}'
+          AND "sectorname" = '${sectorname}'
+          AND "thesis" = '${thesis}'
           AND "timestamp" >= '${timestampFrom}'
           AND "timestamp" <= '${timestampTo}'
           AND ("zz" = 0 OR "zz" IS NULL)
-        ORDER BY "refStructureName", "companyName", "fieldName", "plantNum", "plantRow", "timestamp", "zz", "yy", "xx"`;
+        ORDER BY "refStructureName", "companyName", "fieldName", "sectorname", "thesis", "timestamp", "zz", "yy", "xx"`;
 
     const results = await sequelize.query(query,
         {
@@ -34,8 +36,8 @@ const getResults = async (refStructureName, companyName, fieldName, plantNum, pl
                 refStructureName,
                 companyName,
                 fieldName,
-                plantNum,
-                plantRow,
+                sectorname,
+                thesis,
                 timestampFrom,
                 timestampTo
             }
@@ -46,8 +48,8 @@ const getResults = async (refStructureName, companyName, fieldName, plantNum, pl
         result.refStructureName,
         result.companyName,
         result.fieldName,
-        result.plantNum,
-        result.plantRow,
+        result.sectorname,
+        result.thesis,
         result.zz,
         result.yy,
         result.xx,
@@ -63,15 +65,15 @@ class DataInterpolatedRepository {
         this.sequelize = sequelize;
     }
 
-    async findDataInterpolated(refStructureName, companyName, fieldName, plantNum, plantRow, timestamp) {
-        return getResults(refStructureName, companyName, fieldName, plantNum, plantRow, timestamp, timestamp, this.sequelize);
+    async findDataInterpolated(refStructureName, companyName, fieldName, sectorname, thesis, timestamp) {
+        return getResults(refStructureName, companyName, fieldName, sectorname, thesis, timestamp, timestamp, this.sequelize);
     }
 
-    async findDataInterpolatedRange(refStructureName, companyName, fieldName, plantNum, plantRow, timestampFrom, timestampTo) {
-        return getResults(refStructureName, companyName, fieldName, plantNum, plantRow, timestampFrom, timestampTo, this.sequelize);
+    async findDataInterpolatedRange(refStructureName, companyName, fieldName, sectorname, thesis, timestampFrom, timestampTo) {
+        return getResults(refStructureName, companyName, fieldName, sectorname, thesis, timestampFrom, timestampTo, this.sequelize);
     }
 
-    async findInterpolatedMeans(refStructureName, companyName, fieldName, plantNum, plantRow) {
+    async findInterpolatedMeans(refStructureName, companyName, fieldName, sectorname, thesis) {
 
         const query = `
             SELECT "zz", "yy", "xx", AVG(value * -1)::numeric AS mean, STDDEV(value) ::numeric AS std
@@ -79,8 +81,8 @@ class DataInterpolatedRepository {
             WHERE "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
               AND ("fieldName" = '' OR "fieldName" = '${fieldName}')
-              AND "plantNum" = '${plantNum}'
-              AND "plantRow" = '${plantRow}'
+              AND "sectorname" = '${sectorname}'
+              AND "thesis" = '${thesis}'
               AND "value" < 0
             GROUP BY "zz", "yy", "xx"
             ORDER BY "zz", "yy", "xx"
@@ -93,8 +95,8 @@ class DataInterpolatedRepository {
                     refStructureName,
                     companyName,
                     fieldName,
-                    plantNum,
-                    plantRow
+                    sectorname,
+                    thesis
                 }
             }
         );
@@ -107,6 +109,42 @@ class DataInterpolatedRepository {
             result.mean,
             result.std
         ));
+    }
+
+    async findDistinctThesisPoints(refStructureName, companyName, fieldName, sectorname, thesis) {
+
+        const query = `
+            SELECT "zz", "yy", "xx"
+            FROM data_interpolated
+            WHERE "refStructureName" = '${refStructureName}'
+              AND "companyName" = '${companyName}'
+              AND "fieldName" = '${fieldName}'
+              AND "sectorname" = '${sectorname}'
+              AND "thesis" = '${thesis}'
+            GROUP BY "zz", "yy", "xx"
+            ORDER BY "zz", "yy", "xx"
+        `;
+
+        const results = await this.sequelize.query(query,
+          {
+              type: QueryTypes.SELECT,
+              bind: {
+                  refStructureName,
+                  companyName,
+                  fieldName,
+                  sectorname,
+                  thesis
+              }
+          }
+        );
+
+        const points = results.map(result => new DataInterpolatedDistinctPoint(
+          result.xx,
+          result.yy,
+          result.zz
+        ));
+
+        return new DataInterpolatedDistinctPoints(points)
     }
 
 }

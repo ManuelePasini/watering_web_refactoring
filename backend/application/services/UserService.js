@@ -1,5 +1,5 @@
 const UserRepository = require('../persistency/repository/UserRepository');
-const {UserPermissionsWrapper, Permissions} = require('../persistency/querywrappers/UserPermissionsWrapper')
+const {UserFieldPermission, UserFieldPermissions } = require('../persistency/querywrappers/UserPermissionsWrapper')
 const initUser = require('../persistency/model/User');
 const initFieldsPermit = require('../persistency/model/FieldsPermit');
 const initTranscodingField = require('../persistency/model/TranscodingField')
@@ -15,11 +15,19 @@ class UserService {
     }
 
     async createUsers(request) {
-        return request.users.map(async user => await this.userRepository.createUser(user.username, user.authType, user.affiliation, user.pwd, user.name))
-    }
-
-    async createUserInField(userId, source, refStructureName, companyName, fieldName, plantNum, plantRow, wateringAdvice) {
-        return await this.userRepository.createUserInPlant(userId, source, refStructureName, companyName, fieldName, plantNum, plantRow, wateringAdvice)
+        try {
+            const result = await Promise.all(request.users.map(async user => {
+                try {
+                    await this.userRepository.createUser(user.username, user.authType, user.affiliation, user.password, user.name);
+                } catch (error) {
+                    console.error(`Error creating user ${user.username}: ${error.message}`);
+                    throw error;
+                }
+            }));
+        } catch (error) {
+            console.error(`Error during creating users: ${error.message}`);
+            throw error;
+        }
     }
 
     async createUserGrants(affiliation, request) {
@@ -41,70 +49,16 @@ class UserService {
         }
     }
 
-    async createUserPermits(userId, supergroup, source, refStructureName, companyName, fieldName, plantNum, plantRow) {
-        const permits = await this.userRepository.findAllPermits()
-        const supergroups = permits.map(permit => permit.dataValues.supergroup)
-        if(!supergroups.some(v =>  v === supergroup)) throw Error('Permit not exist')
-        return this.userRepository.createUserPermits(userId, source, supergroup, refStructureName, companyName, fieldName, plantNum, plantRow)
-    }
-
-    async findUserPermissionsByEmail(email) {
-        const result = await this.userRepository.findUserPermissionsByEmail(email)
-        if(result.dataValues) {
-            const idUser = result.dataValues.userId
-            const userEmail = result.dataValues.email
-            const partner = result.dataValues.partner
-            const permissions = result.dataValues.user_permits.reduce((accumulator, currentValue) => {
-                const key = {
-                    refStructureName: currentValue.refStructureName,
-                    companyName: currentValue.companyName,
-                    fieldName: currentValue.fieldName,
-                    plantNum: currentValue.plantNum,
-                    plantRow: currentValue.plantRow
-                };
-                if(accumulator.has(JSON.stringify(key)) && currentValue.permit)
-                    accumulator.get(JSON.stringify(key)).push(currentValue.permit.permit)
-                else {
-                    accumulator.set(JSON.stringify(key), [])
-                    if(currentValue.permit)
-                        accumulator.get(JSON.stringify(key)).push(currentValue.permit.permit)
-                }
-                return accumulator;
-            }, new Map());
-            return new UserPermissionsWrapper(idUser, userEmail, partner, permissions)
-        }
-        return undefined
-    }
-
     async findUserPermissions(user) {
         try {
             const result = await this.userRepository.findUserPermissions(user)
-            if (result && result.dataValues) {
-                const user = result.dataValues.user
-                const affiliation = result.dataValues.affiliation
-                const role = result.dataValues.role
-                const permissions = result.dataValues.permit_fields.reduce((accumulator, currentValue) => {
-                    const key = {
-                        refStructureName: currentValue.dataValues.refStructureName,
-                        companyName: currentValue.dataValues.companyName,
-                        fieldName: currentValue.dataValues.fieldName,
-                        sectorName: currentValue.dataValues.sectorName,
-                        thesis: currentValue.dataValues.thesis
-                    };
-
-                    const keyString = JSON.stringify(key);
-
-                    if (!accumulator.has(keyString)) {
-                        accumulator.set(keyString, new Set());
-                    }
-
-                    if (currentValue.dataValues.permit) {
-                        accumulator.get(keyString).add(currentValue.dataValues.permit);
-                    }
-
-                    return accumulator;
-                }, new Map());
-                return new UserPermissionsWrapper(user, affiliation, role, permissions)
+            if (result && result.dataValues && result.dataValues.role === 'admin') {
+                const adminResult = await this.userRepository.findAdminPermissions()
+                if(adminResult)
+                    return this.computeAdminPermissions(user, adminResult)
+                return undefined
+            } else if(result && result.dataValues) {
+                return this.computeUserPermissions(result)
             }
             return undefined
         } catch (error) {
@@ -112,21 +66,92 @@ class UserService {
         }
     }
 
-    async findUserPermissionsById(id) {
-        const result = await this.userRepository.findUserPermissionsById(id)
-        if(result && result.dataValues) {
-            const uniquePermits = new Set();
-            result.dataValues.user_permits.forEach((value) => {
-                value.permits.forEach((p) => {
-                    uniquePermits.add(p.permit);
-                });
+    computeUserPermissions(result){
+        try {
+            const user = result.dataValues.userid
+            const affiliation = result.dataValues.affiliation
+            const role = result.dataValues.role
+            const fields = result.dataValues.permit_fields.reduce((accumulator, currentValue) => {
+                const key = {
+                    refStructureName: currentValue.dataValues.refStructureName,
+                    companyName: currentValue.dataValues.companyName,
+                    fieldName: currentValue.dataValues.fieldName,
+                    sectorName: currentValue.dataValues.sectorname,
+                    thesis: currentValue.dataValues.thesis
+                };
+
+                const keyString = JSON.stringify(key);
+
+                if (!accumulator.has(keyString)) {
+                    accumulator.set(keyString, new Set());
+                }
+
+                if (currentValue.dataValues.permit) {
+                    accumulator.get(keyString).add(currentValue.dataValues.permit);
+                }
+
+                return accumulator;
+            }, new Map());
+
+            const userFieldsPermissions = Array.from(fields, ([keyString, permissions]) => {
+                const key = JSON.parse(keyString);
+                return new UserFieldPermission(
+                  key.refStructureName,
+                  key.companyName,
+                  key.fieldName,
+                  key.sectorName,
+                  key.thesis,
+                  [...permissions] // Spread operator to convert Set to Array
+                );
             });
-            return Array.from(uniquePermits);
+
+
+            return new UserFieldPermissions(user, affiliation, role, userFieldsPermissions)
+        } catch (error) {
+            return undefined
         }
-        return undefined
     }
 
+    computeAdminPermissions(user, results) {
+        try {
+            const fields = results.reduce((accumulator, currentValue) => {
+                const key = {
+                    refStructureName: currentValue.dataValues.refStructureName,
+                    companyName: currentValue.dataValues.companyName,
+                    fieldName: currentValue.dataValues.fieldName,
+                    sectorName: currentValue.dataValues.sectorname,
+                    thesis: currentValue.dataValues.thesis
+                };
 
+                const keyString = JSON.stringify(key);
+
+                if (!accumulator.has(keyString)) {
+                    accumulator.set(keyString, new Set());
+                }
+
+                accumulator.get(keyString).add('*')
+
+                return accumulator;
+            }, new Map());
+
+            const userFieldsPermissions = Array.from(fields, ([keyString, permissions]) => {
+                const key = JSON.parse(keyString);
+                return new UserFieldPermission(
+                  key.refStructureName,
+                  key.companyName,
+                  key.fieldName,
+                  key.sectorName,
+                  key.thesis,
+                  [...permissions] // Spread operator to convert Set to Array
+                );
+            });
+
+
+            return new UserFieldPermissions(user, user, 'admin', userFieldsPermissions)
+        } catch (error) {
+            return undefined
+        }
+    }
 }
 
 module.exports = UserService

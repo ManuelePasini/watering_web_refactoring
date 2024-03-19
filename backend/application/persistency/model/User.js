@@ -6,7 +6,7 @@ class User extends Model {
 
 function initUser(sequelize) {
     User.init({
-        user: {
+        userid: {
             type: DataTypes.STRING,
             primaryKey: true
         },
