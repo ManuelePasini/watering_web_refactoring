@@ -3,16 +3,16 @@
 import '../assets/basebase.css'
 
 import {computed, onMounted, reactive, ref} from "vue";
-import AirTemperatureChart from "abs-watering-charts-components/src/components/airtemperature-chart.ce.vue"
-import DripperAndPluvChart from "abs-watering-charts-components/src/components/dripperandpluv-chart.ce.vue"
-import WaterAdviceChart from "abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
-import DeltaChart from "abs-watering-charts-components/src/components/delta-chart.ce.vue"
-import CountorMeanChart from "abs-watering-charts-components/src/components/countormean-chart.ce.vue"
-import CountorStdChart from "abs-watering-charts-components/src/components/countorstd-chart.ce.vue"
-import GroundWaterPot from "abs-watering-charts-components/src/components/groundwaterpot-chart.ce.vue"
-import HumidityHeatmap from "abs-watering-charts-components/src/components/humidityheatmap-chart.ce.vue"
-import HumidityMultiLinear from "abs-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
-import HumidityDynamicHeatmap from "abs-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
+import {AirTemperatureChart} from "abs-watering-charts-components"
+import {DripperAndPluvChart} from "abs-watering-charts-components"
+import {WaterAdviceChart} from "abs-watering-charts-components"
+import {DeltaChart} from "abs-watering-charts-components"
+import {CountorMeanChart} from "abs-watering-charts-components"
+import {CountorStdChart} from "abs-watering-charts-components"
+import {GroundWaterPotentialChart} from "abs-watering-charts-components"
+import {HumidityHeatmap} from "abs-watering-charts-components"
+import {HumidityMultiLineChart} from "abs-watering-charts-components"
+import {HumidityDynamicHeatmap} from "abs-watering-charts-components"
 import {useRouter} from "vue-router";
 
 const router = useRouter()
@@ -237,7 +237,7 @@ function enableDynamicHeatmap() {
           <button class="btn btn-sm btn-secondary" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
         </div>
         <div class="card-body">
-          <HumidityMultiLinear style="height: 300px; width: 700px" :config="JSON.stringify(connectionParams)"></HumidityMultiLinear>
+          <HumidityMultiLineChart style="height: 300px; width: 700px" :config="JSON.stringify(connectionParams)"></HumidityMultiLineChart>
           <HumidityHeatmap :config="JSON.stringify(connectionParams)"></HumidityHeatmap>
         </div>
       </div>
@@ -262,7 +262,7 @@ function enableDynamicHeatmap() {
         <div class="groundwaterpot-card card">
           <div class="card-header">Potenziale idrico</div>
           <div class="card-body">
-            <GroundWaterPot style="height: 300px" :config="JSON.stringify(connectionParams)"></GroundWaterPot>
+            <GroundWaterPotentialChart style="height: 300px" :config="JSON.stringify(connectionParams)"></GroundWaterPotentialChart>
           </div>
         </div>
       </div>
