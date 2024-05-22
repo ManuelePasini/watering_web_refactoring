@@ -11,12 +11,12 @@ class WateringAdviceDto {
 
 class WateringAdviceDtoRequest {
 
-  constructor(refStructureName, companyName, fieldName, sectorName, thesis) {
+  constructor(refStructureName, companyName, fieldName, sectorName, plantRow) {
     this.refStructureName = refStructureName
     this.companyName = companyName
     this.fieldName = fieldName
     this.sectorName = sectorName
-    this.thesis = thesis
+    this.plantRow = plantRow
   }
 
 }

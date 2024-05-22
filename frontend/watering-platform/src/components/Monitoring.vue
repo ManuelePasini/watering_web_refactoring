@@ -21,8 +21,8 @@ const props = defineProps(['token', 'userPermissions'])
 
 let showCustomizeInput = ref(false)
 
-let selectedTimestampFrom = ref(0)
-let selectedTimestampTo = ref(0)
+let selectedTimestampFrom = ref(getCurrentTimestampMinusDays(20))
+let selectedTimestampTo = ref(getCurrentTimestampMinusDays(10))
 
 let customSelectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 let customSelectedTimestampFrom = ref(getCurrentTimestampMinusDays(2))
@@ -147,7 +147,7 @@ function selectItem(item) {
 
 function createFieldName(item) {
   if(!item) return ''
-  return `${item.refStructureName}; ${item.companyName}; ${item.fieldName}; Sector: ${item.sectorname}; ${item.thesis}`
+  return `${item.refStructureName}; ${item.companyName}; ${item.fieldName}; Sector: ${item.sectorName}; ${item.plantRow}`
 }
 
 function isLabelSelected(value) {

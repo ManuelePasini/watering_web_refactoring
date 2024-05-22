@@ -16,7 +16,7 @@ class FieldRepository {
     return await model.save()
   }
 
-  async createMatrixField(structureName, companyName, fieldName, sectorname, thesis, validFrom, validTo) {
+  async createMatrixField(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo) {
     try {
       this.MatrixField.update(
         { current: false },
@@ -25,8 +25,8 @@ class FieldRepository {
             refStructureName: structureName,
             companyName: companyName,
             fieldName: fieldName,
-            sectorname: sectorname,
-            thesis: thesis
+            sectorName: sectorName,
+            plantRow: plantRow
           }
         }
       )
@@ -34,8 +34,8 @@ class FieldRepository {
         refStructureName: structureName,
         companyName: companyName,
         fieldName: fieldName,
-        sectorname: sectorname,
-        thesis: thesis,
+        sectorName: sectorName,
+        plantRow: plantRow,
         timestamp_from: Math.floor(new Date(validFrom).getTime() / 1000),
         timestamp_to: Math.floor(new Date(validTo).getTime() / 1000),
         current: true
@@ -48,7 +48,7 @@ class FieldRepository {
     }
   }
 
-  async getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorname, thesis) {
+  async getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorName, plantRow) {
 
     const query = `
             SELECT t1.advice, timestamp, "wateringHour"
@@ -59,8 +59,8 @@ class FieldRepository {
                 "refStructureName",
                 "companyName",
                 "fieldName",
-                sectorname,
-                thesis,
+                sectorName,
+                plantRow,
                 MAX(timestamp) as max_timestamp
             FROM
                 watering_advice
@@ -68,19 +68,19 @@ class FieldRepository {
                 "refStructureName" = '${refStructureName}' AND
                 "companyName" = '${companyName}' AND
                 "fieldName" = '${fieldName}' AND
-                sectorname = '${sectorname}' AND
-                thesis = '${thesis}'
+                sectorName = '${sectorName}' AND
+                plantRow = '${plantRow}'
             GROUP BY
                 "refStructureName",
                 "companyName",
                 "fieldName",
-                sectorname, 
-                thesis
+                sectorName, 
+                plantRow
         ) t2 ON t1."refStructureName" = t2."refStructureName"
             AND t1."companyName" = t2."companyName"
             AND t1."fieldName" = t2."fieldName"
-            AND t1.sectorname = t2.sectorname
-            AND t1.thesis = t2.thesis
+            AND t1.sectorName = t2.sectorName
+            AND t1.plantRow = t2.plantRow
             AND t1.timestamp = t2.max_timestamp`
 
     const result = await this.sequelize.query(query, {
@@ -89,8 +89,8 @@ class FieldRepository {
         refStructureName,
         companyName,
         fieldName,
-        sectorname,
-        thesis
+        sectorName,
+        plantRow
       }
     });
 
@@ -99,21 +99,21 @@ class FieldRepository {
     } else return new WateringAdviceDto(-1, -1, -1)
   }
 
-  async createTranscodingField(source, refStructureName, companyName, fieldName, coltureType, sectorname, wateringcapacity, initialwatering, maximumwatering, advicetime, wateringtype, adviceweight, thesisname, sensorNumber, sensorid, sensorname, sensortype, x, y, z) {
+  async createTranscodingField(source, refStructureName, companyName, fieldName, coltureType, sectorName, wateringcapacity, initialwatering, maximumwatering, advicetime, wateringtype, adviceweight, plantRowname, sensorNumber, sensorid, sensorname, sensortype, x, y, z) {
     const model = this.TranscodingField.build({
       source: source,
       refStructureName: refStructureName,
       companyName: companyName,
       fieldName: fieldName,
       coltureType: coltureType,
-      sectorname: sectorname,
+      sectorName: sectorName,
       wateringcapacity: wateringcapacity,
       initialwatering: initialwatering,
       maximumwatering: maximumwatering,
       advicetime: advicetime,
       wateringtype: wateringtype,
       adviceweight: adviceweight,
-      thesisname: thesisname,
+      plantRow: plantRowname,
       sensorNumber: sensorNumber,
       sensorid: sensorid,
       sensorname: sensorname,

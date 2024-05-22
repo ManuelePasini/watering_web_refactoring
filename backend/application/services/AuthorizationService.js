@@ -13,7 +13,7 @@ class AuthorizationService {
     return permission === userPermissions.role
   }
 
-  async isUserAuthorizedByFieldAndId(user, refStructureName, companyName, fieldName, sectorName, thesis, action) {
+  async isUserAuthorizedByFieldAndId(user, refStructureName, companyName, fieldName, sectorName, plantRow, action) {
     const userPermissions = await this.userService.findUserPermissions(user)
     if(userPermissions.role === 'admin') return true;
     if(!userPermissions.permissions || userPermissions.permissions.length === 0) return false;
@@ -23,7 +23,7 @@ class AuthorizationService {
       companyName:companyName,
       fieldName:fieldName,
       sectorName:sectorName,
-      thesis:thesis
+      plantRow: plantRow
     });
 
     for(const field of userPermissions.permissions) {
@@ -31,8 +31,8 @@ class AuthorizationService {
         refStructureName:field.refStructureName,
         companyName:field.companyName,
         fieldName:field.fieldName,
-        sectorName:field.sectorname,
-        thesis:field.thesis
+        sectorName: field.sectorName,
+        plantRow: field.plantRow
       });
 
       if(requestedFieldKey === fieldKey)

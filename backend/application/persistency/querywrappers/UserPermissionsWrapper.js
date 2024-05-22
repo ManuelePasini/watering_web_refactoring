@@ -12,12 +12,12 @@ class UserFieldPermissions {
 
 class UserFieldPermission {
 
-  constructor(refStructureName, companyName, fieldName, sectorname, thesis, permissions) {
+  constructor(refStructureName, companyName, fieldName, sectorName, plantRow, permissions) {
     this.refStructureName = refStructureName
     this.companyName = companyName
     this.fieldName = fieldName
-    this.sectorname = sectorname
-    this.thesis = thesis
+    this.sectorName = sectorName
+    this.plantRow = plantRow
     this.permissions = permissions
   }
 

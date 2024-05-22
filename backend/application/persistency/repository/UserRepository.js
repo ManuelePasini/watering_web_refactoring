@@ -55,15 +55,15 @@ class UserRepository {
         }
     }
 
-    async createFieldPermit(userId, affiliation, refStructureName, companyName, fieldName, sectorname, thesis, permit){
+    async createFieldPermit(userId, affiliation, refStructureName, companyName, fieldName, sectorName, plantRow, permit) {
         let model = this.FieldsPermit.build({
             userid: userId,
             affiliation: affiliation,
             refStructureName: refStructureName,
             companyName: companyName,
             fieldName: fieldName,
-            sectorname: sectorname,
-            thesis: thesis,
+            sectorName: sectorName,
+            plantRow: plantRow,
             permit: permit
         })
         this.FieldsPermit.removeAttribute('id')
@@ -83,11 +83,11 @@ class UserRepository {
                     refStructureName,
                     companyName,
                     fieldName,
-                    sectorname,
-                    thesisname
+                    sectorName,
+                    plantRow
                 } = model;
 
-                const key = `${refStructureName} - ${companyName} - ${fieldName} - ${sectorname} - ${thesisname}`;
+                const key = `${refStructureName} - ${companyName} - ${fieldName} - ${sectorName} - ${plantRow}`;
                 response.add(key)
             });
 

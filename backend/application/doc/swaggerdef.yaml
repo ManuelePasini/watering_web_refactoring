@@ -69,16 +69,16 @@ components:
       type: object
       required:
         - plantId
-        - sectorname
-        - thesis
+        - sectorName
+        - plantRow
         - plantName
         - colture
       properties:
         plantId:
           type: integer
-        sectorname:
+        sectorName:
           type: string
-        thesis:
+        plantrow:
           type: string
         plantName:
           type: string
@@ -168,7 +168,7 @@ components:
           type: string
         sectorName:
           type: string
-        thesis:
+        plantRow:
           type: string
         applications:
           type: array
@@ -188,7 +188,7 @@ components:
           type: string
         sectorName:
           type: string
-        thesis:
+        plantRow:
           type: string
         validFrom:
           type: string
@@ -224,7 +224,7 @@ components:
           type: string
         sectorName:
           type: string
-        thesis:
+        plantRow:
           type: string
 
     CreateFieldDto:
@@ -347,9 +347,9 @@ components:
           type: string
         fieldName:
           type: string
-        sectorname:
+        sectorName:
           type: string
-        thesis:
+        plantRow:
           type: string
         permissions:
           type: array

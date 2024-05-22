@@ -1,13 +1,13 @@
 
 class HumidityBinEventWrapper {
 
-    constructor(refStructureName, companyName, fieldName, detectedValueTypeDescription, sectorname, thesis, value, timestamp) {
+    constructor(refStructureName, companyName, fieldName, detectedValueTypeDescription, sectorName, plantRow, value, timestamp) {
         this.refStructureName = refStructureName;
         this.companyName = companyName;
         this.fieldName = fieldName;
         this.detectedValueTypeDescription = detectedValueTypeDescription;
-        this.sectorname = sectorname;
-        this.thesis = thesis;
+        this.sectorName = sectorName;
+        this.plantRow = plantRow;
         this.value = value;
         this.timestamp = timestamp;
     }

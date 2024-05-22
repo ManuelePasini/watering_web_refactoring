@@ -1,11 +1,11 @@
 class OptStateDto {
 
-  constructor(structureName, companyName, fieldName, sectorName, thesis, validFrom, validTo, optimalState) {
+  constructor(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, optimalState) {
     this.structureName = structureName
     this.companyName = companyName
     this.fieldName = fieldName
     this.sectorName = sectorName
-    this.thesis = thesis
+    this.plantRow = plantRow
     this.validFrom = validFrom
     this.validTo = validTo
     this.optimalState = optimalState

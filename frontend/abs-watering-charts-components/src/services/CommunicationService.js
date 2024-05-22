@@ -30,7 +30,7 @@ export class CommunicationService {
     }
 
     buildURL(host, paths, endpoint) {
-        return host + paths.refStructureName + '/' + paths.companyName + '/' + paths.fieldName + '/' + paths.sectorname + '/' + paths.thesis + '/' + endpoint;
+        return host + paths.refStructureName + '/' + paths.companyName + '/' + paths.fieldName + '/' + paths.sectorName + '/' + paths.plantRow + '/' + endpoint;
     }
 
 }

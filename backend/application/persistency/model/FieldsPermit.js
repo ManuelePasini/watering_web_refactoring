@@ -32,11 +32,11 @@ function initFieldsPermit(sequelize) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    sectorname: {
+    sectorName: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    thesis: {
+    plantRow: {
       type: DataTypes.STRING,
       allowNull: false
     },

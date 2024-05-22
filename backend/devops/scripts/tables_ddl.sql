@@ -25,8 +25,8 @@ create table view_data_original
     "fieldName"                    text,
     "plantId"                      double precision,
     "plantName"                    text,
-    sectorname                     text,
-    thesis                         text,
+    sectorName                     text,
+    plantRow                         text,
     colture                        text,
     "coltureType"                  text,
     "nodeId"                       text,
@@ -49,7 +49,7 @@ alter table view_data_original
     owner to postgres;
 
 create index view_data_original_index
-    on view_data_original ("refStructureName", "companyName", "fieldName", sectorname, thesis, "detectedValueTypeId");
+    on view_data_original ("refStructureName", "companyName", "fieldName", sectorName, plantRow, "detectedValueTypeId");
 
 create table data_interpolated
 (
@@ -59,34 +59,34 @@ create table data_interpolated
     "refStructureName" text,
     "companyName"      text,
     "fieldName"        text,
-    sectorname         text,
-    thesis             text,
+    sectorName         text,
+    plantRow             text,
     timestamp          bigint,
     "dumpId"           text,
     zz                 double precision default 0,
     constraint "data-interpolated-unique"
-        unique (xx, yy, "refStructureName", "companyName", "fieldName", sectorname, thesis, timestamp, zz)
+        unique (xx, yy, "refStructureName", "companyName", "fieldName", sectorName, plantRow, timestamp, zz)
 );
 
 alter table data_interpolated
     owner to postgres;
 
 create index data_interpolated_index
-    on data_interpolated ("refStructureName", "companyName", "fieldName", sectorname, thesis, timestamp);
+    on data_interpolated ("refStructureName", "companyName", "fieldName", sectorName, plantRow, timestamp);
 
 create table humidity_bins
 (
     timestamp          bigint           not null,
-    umidity_bin        text             not null,
+    humidity_bin        text             not null,
     count              bigint           not null,
     "refStructureName" text             not null,
     "companyName"      text             not null,
     "fieldName"        text             not null,
-    sectorname         double precision not null,
-    thesis             text             not null,
+    sectorName         double precision not null,
+    plantRow             text             not null,
     "dumpId"           text,
     constraint "humidity-bins-unique"
-        primary key (timestamp, umidity_bin, count, "refStructureName", "companyName", "fieldName", sectorname, thesis)
+        primary key (timestamp, humidity_bin, count, "refStructureName", "companyName", "fieldName", sectorName, plantRow)
 );
 
 alter table humidity_bins
@@ -110,8 +110,8 @@ create table watering_advice
     "refStructureName"    text,
     "companyName"         text,
     "fieldName"           text,
-    sectorname            text,
-    thesis                text,
+    sectorName            text,
+    plantRow                text,
     evapotrans            double precision,
     "wateringAdvice"      boolean,
     timestamp             double precision,
@@ -136,8 +136,8 @@ create table permit_fields
     "refStructureName" varchar(255)                                                         not null,
     "companyName"      varchar(255)                                                         not null,
     "fieldName"        varchar(255)                                                         not null,
-    sectorname         varchar(255)                                                         not null,
-    thesis             varchar(255)                                                         not null,
+    sectorName         varchar(255)                                                         not null,
+    plantRow             varchar(255)                                                         not null,
     userid             varchar(255),
     permit             varchar(20)
 );
@@ -167,8 +167,8 @@ create table field_matrix
     "refStructureName" text,
     "companyName"      text,
     "fieldName"        text,
-    sectorname         text,
-    thesis             text,
+    sectorName         text,
+    plantRow             text,
     timestamp_from     bigint,
     timestamp_to       bigint,
     current            boolean
@@ -186,14 +186,14 @@ create table transcoding_fields
     "companyName"      text,
     "fieldName"        text,
     "coltureType"      text,
-    sectorname         text,
+    sectorName         text,
     wateringcapacity   double precision,
     initialwatering    double precision,
     maximumwatering    double precision,
     advicetime         double precision,
     wateringtype       text,
     adviceweight       double precision,
-    thesisname         text,
+    plantRowname         text,
     "sensorNumber"     text,
     sensorid           text,
     sensorname         text,

@@ -5,14 +5,14 @@ const DataInterpolatedMeanWrapper = require('../querywrappers/DataInterpolatedMe
 
 const {QueryTypes} = require('sequelize');
 
-const getResults = async (refStructureName, companyName, fieldName, sectorname, thesis, timestampFrom, timestampTo, sequelize) => {
+const getResults = async (refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo, sequelize) => {
 
     const query = `
         SELECT DISTINCT "refStructureName",
                         "companyName",
                         "fieldName",
-                        "sectorname",
-                        "thesis",
+                        "sectorName",
+                        "plantRow",
                         "zz",
                         "yy",
                         "xx",
@@ -22,12 +22,12 @@ const getResults = async (refStructureName, companyName, fieldName, sectorname, 
         WHERE "refStructureName" = '${refStructureName}'
           AND "companyName" = '${companyName}'
           AND ("fieldName" = '' OR "fieldName" = '${fieldName}')
-          AND "sectorname" = '${sectorname}'
-          AND "thesis" = '${thesis}'
+          AND "sectorName" = '${sectorName}'
+          AND "plantRow" = '${plantRow}'
           AND "timestamp" >= '${timestampFrom}'
           AND "timestamp" <= '${timestampTo}'
           AND ("zz" = 0 OR "zz" IS NULL)
-        ORDER BY "refStructureName", "companyName", "fieldName", "sectorname", "thesis", "timestamp", "zz", "yy", "xx"`;
+        ORDER BY "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", "timestamp", "zz", "yy", "xx"`;
 
     const results = await sequelize.query(query,
         {
@@ -36,8 +36,8 @@ const getResults = async (refStructureName, companyName, fieldName, sectorname, 
                 refStructureName,
                 companyName,
                 fieldName,
-                sectorname,
-                thesis,
+                sectorName,
+                plantRow,
                 timestampFrom,
                 timestampTo
             }
@@ -48,8 +48,8 @@ const getResults = async (refStructureName, companyName, fieldName, sectorname, 
         result.refStructureName,
         result.companyName,
         result.fieldName,
-        result.sectorname,
-        result.thesis,
+        result.sectorName,
+        result.plantRow,
         result.zz,
         result.yy,
         result.xx,
@@ -65,15 +65,15 @@ class DataInterpolatedRepository {
         this.sequelize = sequelize;
     }
 
-    async findDataInterpolated(refStructureName, companyName, fieldName, sectorname, thesis, timestamp) {
-        return getResults(refStructureName, companyName, fieldName, sectorname, thesis, timestamp, timestamp, this.sequelize);
+    async findDataInterpolated(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp) {
+        return getResults(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp, timestamp, this.sequelize);
     }
 
-    async findDataInterpolatedRange(refStructureName, companyName, fieldName, sectorname, thesis, timestampFrom, timestampTo) {
-        return getResults(refStructureName, companyName, fieldName, sectorname, thesis, timestampFrom, timestampTo, this.sequelize);
+    async findDataInterpolatedRange(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo) {
+        return getResults(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo, this.sequelize);
     }
 
-    async findInterpolatedMeans(refStructureName, companyName, fieldName, sectorname, thesis) {
+    async findInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow) {
 
         const query = `
             SELECT "zz", "yy", "xx", AVG(value * -1)::numeric AS mean, STDDEV(value) ::numeric AS std
@@ -81,8 +81,8 @@ class DataInterpolatedRepository {
             WHERE "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
               AND ("fieldName" = '' OR "fieldName" = '${fieldName}')
-              AND "sectorname" = '${sectorname}'
-              AND "thesis" = '${thesis}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
               AND "value" < 0
             GROUP BY "zz", "yy", "xx"
             ORDER BY "zz", "yy", "xx"
@@ -95,8 +95,8 @@ class DataInterpolatedRepository {
                     refStructureName,
                     companyName,
                     fieldName,
-                    sectorname,
-                    thesis
+                    sectorName,
+                    plantRow
                 }
             }
         );
@@ -111,7 +111,7 @@ class DataInterpolatedRepository {
         ));
     }
 
-    async findDistinctThesisPoints(refStructureName, companyName, fieldName, sectorname, thesis) {
+    async findDistinctplantRowPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
 
         const query = `
             SELECT "zz", "yy", "xx"
@@ -119,8 +119,8 @@ class DataInterpolatedRepository {
             WHERE "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
               AND "fieldName" = '${fieldName}'
-              AND "sectorname" = '${sectorname}'
-              AND "thesis" = '${thesis}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
             GROUP BY "zz", "yy", "xx"
             ORDER BY "zz", "yy", "xx"
         `;
@@ -132,8 +132,8 @@ class DataInterpolatedRepository {
                   refStructureName,
                   companyName,
                   fieldName,
-                  sectorname,
-                  thesis
+                  sectorName,
+                  plantRow
               }
           }
         );

@@ -1,15 +1,15 @@
 
 class HumidityBinWrapper {
 
-    constructor(refStructureName, companyName, fieldName, sectorname, thesis, timestamp, count, umidity_bin) {
+    constructor(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp, count, humidity_bin) {
         this.refStructureName = refStructureName;
         this.companyName = companyName;
         this.fieldName = fieldName;
-        this.sectorname = sectorname;
-        this.thesis = thesis;
+        this.sectorName = sectorName;
+        this.plantRow = plantRow;
         this.timestamp = timestamp;
         this.count = count;
-        this.umidity_bin = umidity_bin;
+        this.humidity_bin = humidity_bin;
     }
 
 }

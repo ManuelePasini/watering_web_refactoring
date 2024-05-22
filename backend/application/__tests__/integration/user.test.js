@@ -45,9 +45,10 @@ describe("Integration tests", () => {
         const user1 = User.build({ userid: 'user1@example.com', auth_type: 'psw', affiliation:'abs@unibo.it', pwd: 'user1Pass', name:'User1', role:'user' });
         const user2 = User.build({ userid: 'user2@example.com', auth_type: 'token', affiliation:'ifarming@test.it', pwd: 'user2Pass', name:'User2', role:'user' });
 
-        const fieldPermit1 = FieldsPermit.build({permitid:1, userid: 'user1@example.com', affiliation: 'abs@unibo.it', refStructureName:'structure1', companyName:'company1', fieldName:'field1', sectorname:'sector1', thesis:'thesis1', permit:'permit1'})
+        const fieldPermit1 = FieldsPermit.build({ permitid: 1, userid: 'user1@example.com', affiliation: 'abs@unibo.it', refStructureName: 'structure1', companyName: 'company1', fieldName: 'field1', sectorName: 'sector1', plantRow: 'thesis1', permit: 'permit1' })
         const fieldPermit2 = FieldsPermit.build({permitid:2, userid: 'user2@example.com', affiliation: 'ifarming@unibo.it',
-            refStructureName:'structure2', companyName:'company2', fieldName:'field2', sectorname:'sector2', thesis:'thesis2', permit:'permit2'})
+            refStructureName: 'structure2', companyName: 'company2', fieldName: 'field2', sectorName: 'sector2', plantRow: 'thesis2', permit: 'permit2'
+        })
 
         await user1.save()
         await user2.save()
@@ -87,8 +88,8 @@ describe("Integration tests", () => {
         expect(user.dataValues.permit_fields[0].refStructureName).toBe('structure2')
         expect(user.dataValues.permit_fields[0].companyName).toBe('company2')
         expect(user.dataValues.permit_fields[0].fieldName).toBe('field2')
-        expect(user.dataValues.permit_fields[0].sectorname).toBe('sector2')
-        expect(user.dataValues.permit_fields[0].thesis).toBe('thesis2')
+        expect(user.dataValues.permit_fields[0].sectorName).toBe('sector2')
+        expect(user.dataValues.permit_fields[0].plantRow).toBe('thesis2')
         expect(user.dataValues.permit_fields[0].permit).toBe('permit2')
     }, 30000);
 

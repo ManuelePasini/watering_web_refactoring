@@ -56,15 +56,15 @@ fieldsRouter.put('/setOptState', async (req, res) => {
     throw new Error('Body is empty');
 
   try {
-    if(!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.user, req.body.structureName, req.body.companyName,req.body.fieldName, req.body.sectorName, req.body.thesis, 'SetOpt')))
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.user, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'SetOpt')))
       return res.status(401).json({message: 'Unauthorized request'});
 
     if(!req.body.validFrom || !req.body.validTo || !req.body.optimalState)
       return res.status(400).json({message: 'Invalid request'});
 
-    const bodyRequest = new OptStateDto(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.thesis, req.body.validFrom, req.body.validTo, req.body.optimalState)
+    const bodyRequest = new OptStateDto(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, req.body.validFrom, req.body.validTo, req.body.optimalState)
 
-    const interpolatedPoints = await fieldService.findDistinctThesisPoints(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.thesis)
+    const interpolatedPoints = await fieldService.findDistinctplantRowPoints(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
 
     if(!checkOptState(interpolatedPoints, req.body.optimalState))
       return res.status(400).json({error: "Opt state matrix does not match"})
@@ -119,10 +119,10 @@ fieldsRouter.post('/wateringAdvice', async (req, res) => {
       return res.status(401).json({message: 'Unauthorized request'});
 
 
-    if(!req.body || !req.body.structureName || !req.body.companyName || !req.body.fieldName || !req.body.sectorName || !req.body.thesis)
+    if (!req.body || !req.body.structureName || !req.body.companyName || !req.body.fieldName || !req.body.sectorName || !req.body.plantRow)
       throw new Error('Body is not correct');
 
-    const result = await fieldService.getCurrentWateringAdvice(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.thesis)
+    const result = await fieldService.getCurrentWateringAdvice(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
 
     return res.status(200).json(result)
   } catch (error) {

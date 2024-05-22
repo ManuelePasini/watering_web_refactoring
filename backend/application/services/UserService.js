@@ -34,7 +34,7 @@ class UserService {
         const affiliationFields = await this.userRepository.findFieldsByAffiliation(affiliation)
 
         request.grants.map(grant => {
-            const key = `${grant.structureName} - ${grant.companyName} - ${grant.fieldName} - ${grant.sectorName} - ${grant.thesis}`;
+            const key = `${grant.structureName} - ${grant.companyName} - ${grant.fieldName} - ${grant.sectorName} - ${grant.plantRow}`;
             if (!affiliationFields.has(key))
                 throw Error(`Affiliation ${affiliation} has no permission to create grants for field ${key}`)
         })
@@ -45,7 +45,7 @@ class UserService {
                 throw new Error(`Affiliation mismatch between user ${userToGrant.affiliation} and requestor ${affiliation}]`)
 
             for(const permit of grant.applications)
-                await this.userRepository.createFieldPermit(grant.userId, affiliation, grant.structureName, grant.companyName, grant.fieldName, grant.sectorName, grant.thesis, permit)
+                await this.userRepository.createFieldPermit(grant.userId, affiliation, grant.structureName, grant.companyName, grant.fieldName, grant.sectorName, grant.plantRow, permit)
         }
     }
 
@@ -76,8 +76,8 @@ class UserService {
                     refStructureName: currentValue.dataValues.refStructureName,
                     companyName: currentValue.dataValues.companyName,
                     fieldName: currentValue.dataValues.fieldName,
-                    sectorName: currentValue.dataValues.sectorname,
-                    thesis: currentValue.dataValues.thesis
+                    sectorName: currentValue.dataValues.sectorName,
+                    plantRow: currentValue.dataValues.plantRow
                 };
 
                 const keyString = JSON.stringify(key);
@@ -100,7 +100,7 @@ class UserService {
                   key.companyName,
                   key.fieldName,
                   key.sectorName,
-                  key.thesis,
+                    key.plantRow,
                   [...permissions] // Spread operator to convert Set to Array
                 );
             });
@@ -119,8 +119,8 @@ class UserService {
                     refStructureName: currentValue.dataValues.refStructureName,
                     companyName: currentValue.dataValues.companyName,
                     fieldName: currentValue.dataValues.fieldName,
-                    sectorName: currentValue.dataValues.sectorname,
-                    thesis: currentValue.dataValues.thesis
+                    sectorName: currentValue.dataValues.sectorName,
+                    plantRow: currentValue.dataValues.plantRow
                 };
 
                 const keyString = JSON.stringify(key);
@@ -141,7 +141,7 @@ class UserService {
                   key.companyName,
                   key.fieldName,
                   key.sectorName,
-                  key.thesis,
+                    key.plantRow,
                   [...permissions] // Spread operator to convert Set to Array
                 );
             });

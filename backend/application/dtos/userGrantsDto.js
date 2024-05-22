@@ -9,12 +9,12 @@ class UserGrantsDto {
 
 class UserGrantDto {
 
-  constructor(structureName, companyName, fieldName, sectorName, thesis, applications, userId) {
+  constructor(structureName, companyName, fieldName, sectorName, plantRow, applications, userId) {
     this.structureName = structureName;
     this.companyName = companyName;
     this.fieldName = fieldName;
     this.sectorName = sectorName;
-    this.thesis = thesis;
+    this.plantRow = plantRow;
     this.applications = applications;
     this.userId = userId;
   }

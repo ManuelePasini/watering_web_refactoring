@@ -7,19 +7,19 @@ class WateringAdviceRepository {
         this.sequelize = sequelize;
     }
 
-    async findWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, sectorname, thesis, colture, coltureType) {
+    async findWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType) {
 
         const queryString = `
             SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             "detectedValueTypeDescription",
-                            "sectorname",
-                            "thesis",
+                            "sectorName",
+                            "plantRow",
                             MAX("value") as value, rounded_timestamp
             FROM (
                 (
-                SELECT DISTINCT "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorname", "thesis", SUM ("value") as value, ((3600*24) * (timestamp / (3600*24)):: INT) as rounded_timestamp
+                SELECT DISTINCT "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", SUM ("value") as value, ((3600*24) * (timestamp / (3600*24)):: INT) as rounded_timestamp
                 FROM view_data_original
                 WHERE "detectedValueTypeId" IN ('DRIPPER', 'PLUV_CURR')
                 AND "timestamp" >= '${timefilterFrom}'
@@ -27,11 +27,11 @@ class WateringAdviceRepository {
                 AND "refStructureName" = '${refStructureName}'
                 AND "companyName" = '${companyName}'
                 AND ("fieldName" IS NULL OR "fieldName" = '${fieldName}')
-                AND "sectorname" = '${sectorname}'
-                AND "thesis" = '${thesis}'
+                AND "sectorName" = '${sectorName}'
+                AND "plantRow" = '${plantRow}'
                 AND "colture" = '${colture}'
                 AND "coltureType" = '${coltureType}'
-                GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorname", "thesis", rounded_timestamp
+                GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
                 ORDER BY rounded_timestamp ASC
                 )
             UNION
@@ -39,8 +39,8 @@ class WateringAdviceRepository {
                             "companyName",
                             "fieldName",
                             'Advice' as "detectedValueTypeDescription",
-                            "sectorname",
-                            "thesis",
+                            "sectorName",
+                            "plantRow",
                             0 as value, ((3600*24) * (timestamp / (3600*24))::INT) as rounded_timestamp
             FROM view_data_original
             WHERE "detectedValueTypeId" IN ('DRIPPER')
@@ -49,19 +49,19 @@ class WateringAdviceRepository {
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
               AND ("fieldName" IS NULL OR "fieldName" = '${fieldName}')
-              AND "sectorname" = '${sectorname}'
-              AND "thesis" = '${thesis}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
               AND "colture" = '${colture}'
               AND "coltureType" = '${coltureType}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorname", "thesis", rounded_timestamp
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
             UNION
             (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             "detectedValueTypeDescription",
-                            "sectorname",
-                            "thesis",
+                            "sectorName",
+                            "plantRow",
                             AVG(-"value") as value,
                   ((3600*24) * (timestamp / (3600*24))::INT + (3600*24)) as rounded_timestamp
             FROM view_data_original
@@ -71,19 +71,19 @@ class WateringAdviceRepository {
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
               AND ("fieldName" IS NULL OR "fieldName" = '${fieldName}')
-              AND "sectorname" = '${sectorname}'
-              AND "thesis" = '${thesis}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
               AND "colture" = '${colture}'
               AND "coltureType" = '${coltureType}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorname", "thesis", rounded_timestamp
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
             UNION
             (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
                             'Advice' as "detectedValueTypeDescription",
-                            "sectorname",
-                            "thesis",
+                            "sectorName",
+                            "plantRow",
                             CASE WHEN BOOL_OR("wateringAdvice") = true THEN "advice" ELSE AVG("evapotrans") END as value,
                   ((3600*24) * (timestamp / (3600*24))::INT) as rounded_timestamp
             FROM watering_advice
@@ -93,12 +93,12 @@ class WateringAdviceRepository {
               AND "companyName" = '${companyName}'
               AND ("fieldName" IS NULL
                OR "fieldName" = '${fieldName}')
-              AND "sectorname" = '${sectorname}'
-              AND "thesis" = '${thesis}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "advice", "sectorname", "thesis", rounded_timestamp
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "advice", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
                 ) A
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorname", "thesis", rounded_timestamp
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC, "detectedValueTypeDescription" ASC
         `;
 
@@ -110,8 +110,8 @@ class WateringAdviceRepository {
                 refStructureName,
                 companyName,
                 fieldName,
-                sectorname,
-                thesis,
+                sectorName,
+                plantRow,
                 colture,
                 coltureType
             }
@@ -122,8 +122,8 @@ class WateringAdviceRepository {
             result.companyName,
             result.fieldName,
             result.detectedValueTypeDescription,
-            result.sectorname,
-            result.thesis,
+            result.sectorName,
+            result.plantRow,
             result.value,
             result.rounded_timestamp
         ));
