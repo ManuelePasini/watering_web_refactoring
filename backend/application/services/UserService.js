@@ -1,5 +1,6 @@
 const UserRepository = require('../persistency/repository/UserRepository');
-const {UserFieldPermission, UserFieldPermissions } = require('../persistency/querywrappers/UserPermissionsWrapper')
+const FieldRepository = require('../persistency/repository/FieldRepository');
+const { UserFieldPermission, UserFieldPermissions } = require('../persistency/querywrappers/UserPermissionsWrapper');
 const initUser = require('../persistency/model/User');
 const initFieldsPermit = require('../persistency/model/FieldsPermit');
 const initTranscodingField = require('../persistency/model/TranscodingField')
@@ -8,6 +9,7 @@ class UserService {
 
     constructor(sequelize) {
         this.userRepository = new UserRepository(initUser(sequelize), initFieldsPermit(sequelize), initTranscodingField(sequelize), sequelize);
+        this.fieldRepository = new FieldRepository(undefined, undefined, initTranscodingField(sequelize), sequelize)
     }
 
     findUser(user) {
@@ -55,43 +57,45 @@ class UserService {
             if (result && result.dataValues && result.dataValues.role === 'admin') {
                 const adminResult = await this.userRepository.findAdminPermissions()
                 if(adminResult)
-                    return this.computeAdminPermissions(user, adminResult)
+                    return await this.computeAdminPermissions(user, adminResult)
                 return undefined
             } else if(result && result.dataValues) {
-                return this.computeUserPermissions(result)
+                return await this.computeUserPermissions(result)
             }
             return undefined
         } catch (error) {
+            console.error(error)
             return undefined
         }
     }
 
-    computeUserPermissions(result){
+    async computeUserPermissions(results) {
         try {
             const user = result.dataValues.userid
             const affiliation = result.dataValues.affiliation
             const role = result.dataValues.role
-            const fields = result.dataValues.permit_fields.reduce((accumulator, currentValue) => {
-                const key = {
-                    refStructureName: currentValue.dataValues.refStructureName,
-                    companyName: currentValue.dataValues.companyName,
-                    fieldName: currentValue.dataValues.fieldName,
-                    sectorName: currentValue.dataValues.sectorName,
-                    plantRow: currentValue.dataValues.plantRow
-                };
+            const fields = new Map();
 
-                const keyString = JSON.stringify(key);
+            for (const { dataValues: field } of results) {
 
-                if (!accumulator.has(keyString)) {
-                    accumulator.set(keyString, new Set());
+                const fieldDetails = await this.fieldRepository.getFieldDetails(
+                    field.refStructureName,
+                    field.companyName,
+                    field.fieldName,
+                    field.sectorName,
+                    field.plantRow
+                );
+
+                const keyString = JSON.stringify(fieldDetails.dataValues);
+
+                if (!fields.has(keyString)) {
+                    fields.set(keyString, new Set());
                 }
 
-                if (currentValue.dataValues.permit) {
-                    accumulator.get(keyString).add(currentValue.dataValues.permit);
+                if (field.permit) {
+                    fields.get(keyString).add(field.permit);
                 }
-
-                return accumulator;
-            }, new Map());
+            }
 
             const userFieldsPermissions = Array.from(fields, ([keyString, permissions]) => {
                 const key = JSON.parse(keyString);
@@ -101,6 +105,8 @@ class UserService {
                   key.fieldName,
                   key.sectorName,
                     key.plantRow,
+                    key.colture,
+                    key.coltureType,
                   [...permissions] // Spread operator to convert Set to Array
                 );
             });
@@ -108,31 +114,33 @@ class UserService {
 
             return new UserFieldPermissions(user, affiliation, role, userFieldsPermissions)
         } catch (error) {
+            console.error(error)
             return undefined
         }
     }
 
-    computeAdminPermissions(user, results) {
+    async computeAdminPermissions(user, results) {
         try {
-            const fields = results.reduce((accumulator, currentValue) => {
-                const key = {
-                    refStructureName: currentValue.dataValues.refStructureName,
-                    companyName: currentValue.dataValues.companyName,
-                    fieldName: currentValue.dataValues.fieldName,
-                    sectorName: currentValue.dataValues.sectorName,
-                    plantRow: currentValue.dataValues.plantRow
-                };
+            const fields = new Map();
 
-                const keyString = JSON.stringify(key);
+            for (const { dataValues: field } of results) {
 
-                if (!accumulator.has(keyString)) {
-                    accumulator.set(keyString, new Set());
+                const fieldDetails = await this.fieldRepository.getFieldDetails(
+                    field.refStructureName,
+                    field.companyName,
+                    field.fieldName,
+                    field.sectorName,
+                    field.plantRow
+                );
+
+                const keyString = JSON.stringify(fieldDetails.dataValues);
+
+                if (!fields.has(keyString)) {
+                    fields.set(keyString, new Set());
                 }
 
-                accumulator.get(keyString).add('*')
-
-                return accumulator;
-            }, new Map());
+                fields.get(keyString).add('*');
+            }
 
             const userFieldsPermissions = Array.from(fields, ([keyString, permissions]) => {
                 const key = JSON.parse(keyString);
@@ -142,6 +150,8 @@ class UserService {
                   key.fieldName,
                   key.sectorName,
                     key.plantRow,
+                    key.colture,
+                    key.coltureType,
                   [...permissions] // Spread operator to convert Set to Array
                 );
             });
@@ -149,6 +159,7 @@ class UserService {
 
             return new UserFieldPermissions(user, user, 'admin', userFieldsPermissions)
         } catch (error) {
+            console.error(error)
             return undefined
         }
     }

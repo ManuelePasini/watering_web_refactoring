@@ -126,6 +126,22 @@ class FieldRepository {
     return model.save()
   }
 
+  async getFieldDetails(refStructureName, companyName, fieldName, sectorName, plantRow) {
+    try {
+      this.TranscodingField.removeAttribute('id')
+      return await this.TranscodingField.findOne({
+        where: {
+          refStructureName: refStructureName,
+          companyName: companyName,
+          fieldName: fieldName,
+          sectorName: sectorName,
+          plantRow: plantRow,
+        }
+      });
+    } catch (error) {
+      console.error('Error on find field details:', error);
+    }
+  }
 }
 
 module.exports = FieldRepository

@@ -3,16 +3,16 @@
 import '../assets/basebase.css'
 
 import {computed, onMounted, reactive, ref} from "vue";
-import {AirTemperatureChart} from "abs-watering-charts-components"
-import {DripperAndPluvChart} from "abs-watering-charts-components"
-import {WaterAdviceChart} from "abs-watering-charts-components"
-import {DeltaChart} from "abs-watering-charts-components"
-import {CountorMeanChart} from "abs-watering-charts-components"
-import {CountorStdChart} from "abs-watering-charts-components"
-import {GroundWaterPotentialChart} from "abs-watering-charts-components"
-import {HumidityHeatmap} from "abs-watering-charts-components"
-import {HumidityMultiLineChart} from "abs-watering-charts-components"
-import {HumidityDynamicHeatmap} from "abs-watering-charts-components"
+import AirTemperatureChart from "../../../abs-watering-charts-components/src/components/airtemperature-chart.ce.vue"
+import DripperAndPluvChart from "../../../abs-watering-charts-components/src/components/dripperandpluv-chart.ce.vue"
+import WaterAdviceChart from "../../../abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
+import DeltaChart from "../../../abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
+import CountorMeanChart from "../../../abs-watering-charts-components/src/components/countormean-chart.ce.vue"
+import CountorStdChart from "../../../abs-watering-charts-components/src/components/countorstd-chart.ce.vue"
+import GroundWaterPotentialChart from "../../../abs-watering-charts-components/src/components/groundwaterpot-chart.ce.vue"
+import HumidityHeatmap from "../../../abs-watering-charts-components/src/components/humidityheatmap-chart.ce.vue"
+import HumidityMultiLineChart from "../../../abs-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
+import HumidityDynamicHeatmap from "../../../abs-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
 import {useRouter} from "vue-router";
 
 const router = useRouter()
@@ -22,7 +22,7 @@ const props = defineProps(['token', 'userPermissions'])
 let showCustomizeInput = ref(false)
 
 let selectedTimestampFrom = ref(getCurrentTimestampMinusDays(20))
-let selectedTimestampTo = ref(getCurrentTimestampMinusDays(10))
+let selectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 
 let customSelectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 let customSelectedTimestampFrom = ref(getCurrentTimestampMinusDays(2))
@@ -36,19 +36,7 @@ let showDynamicHeatmap = ref(false)
 const propToken = reactive(props.token)
 const propUserPermissions = reactive(props.userPermissions)
 
-let connectionParams = {
-    environment: {
-      host: 'http://localhost:8081/fieldCharts/',
-      token: propToken.value
-    },
-    paths: selectedField.value,
-    params: {
-      colture: 'Kiwi',
-      coltureType: 'G3',
-      timeFilterFrom: getCurrentTimestampMinusDays(2),
-      timeFilterTo: getCurrentTimestampMinusDays(0)
-    }
-}
+let connectionParams = {}
 
 onMounted(async () => {
   if(!props.userPermissions) {
@@ -57,18 +45,20 @@ onMounted(async () => {
 })
 
 function updateConnectionParams() {
-  connectionParams = {
+  if(selectedField.value){
+    connectionParams = {
     environment: {
       host: 'http://localhost:8081/fieldCharts/',
       token: propToken.value
     },
     paths: selectedField.value,
     params: {
-      colture: 'Kiwi',
-      coltureType: 'G3',
+      colture: selectedField.value.colture,
+      coltureType: selectedField.value.coltureType,
       timeFilterFrom: selectedTimestampFrom.value,
       timeFilterTo: selectedTimestampTo.value
     }
+  }
   }
 }
 
@@ -78,7 +68,9 @@ const selectedDateFrom = computed({
     return new Date(timestamp).toISOString().slice(0, 10);
   },
   set: (newValue) => {
-    customSelectedTimestampFrom.value = Date.parse(newValue) / 1000;
+    if(Date.parse(newValue)){
+      customSelectedTimestampFrom.value = Date.parse(newValue) / 1000;
+    }
   }
 });
 
@@ -88,7 +80,9 @@ const selectedDateTo = computed({
     return new Date(timestamp).toISOString().slice(0, 10);
   },
   set: (newValue) => {
-    customSelectedTimestampTo.value = Date.parse(newValue) / 1000;
+    if(Date.parse(newValue)){
+      customSelectedTimestampTo.value = Date.parse(newValue) / 1000;
+    }
   }
 });
 
@@ -102,19 +96,22 @@ function selectTimestamp(timeFilter) {
     case '30_day':
       showCustomizeInput.value = false;
       selectedTimestampFrom.value = getCurrentTimestampMinusDays(30);
+      selectedTimestampTo.value = getCurrentTimestampMinusHours(0)
       selectedTimeLabel.value = '30_day';
       updateConnectionParams()
       break;
     case '7_day':
       showCustomizeInput.value = false;
       selectedTimestampFrom.value = getCurrentTimestampMinusDays(7);
+      selectedTimestampTo.value = getCurrentTimestampMinusHours(0)
       selectedTimeLabel.value = '7_day';
       updateConnectionParams()
       break;
-    case '1_hour':
+    case '24_hours':
       showCustomizeInput.value = false;
-      selectedTimestampFrom.value = getCurrentTimestampMinusHours(1);
-      selectedTimeLabel.value = '1_hour';
+      selectedTimestampFrom.value = getCurrentTimestampMinusHours(24);
+      selectedTimestampTo.value = getCurrentTimestampMinusHours(0)
+      selectedTimeLabel.value = '24_hours';
       updateConnectionParams()
       break;
   }
@@ -147,7 +144,7 @@ function selectItem(item) {
 
 function createFieldName(item) {
   if(!item) return ''
-  return `${item.refStructureName}; ${item.companyName}; ${item.fieldName}; Sector: ${item.sectorName}; ${item.plantRow}`
+  return `${item.refStructureName}; ${item.companyName}; ${item.fieldName}; Settore ${item.sectorName}; Tesi ${item.plantRow}; ${item.colture}; ${item.coltureType}`
 }
 
 function isLabelSelected(value) {
@@ -156,8 +153,8 @@ function isLabelSelected(value) {
 
 function hasUserPermission(permission) {
   if(propUserPermissions && propUserPermissions.value && propUserPermissions.value.permissions) {
+    if(!selectedField.value || Object.keys(selectedField.value).length === 0) return false;
     if(propUserPermissions.value.role === 'admin') return true
-    if(selectedField.value && Object.keys(selectedField.value).length === 0) return false;
     const keySelected = createFieldName(selectedField.value)
     for(const field of propUserPermissions.value.permissions) {
       const tmpKey = createFieldName(field)
@@ -191,8 +188,8 @@ function enableDynamicHeatmap() {
           <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('7_day')}">
             <input type="radio" id="one_week_filter" name="timefilter-radio" value="7_day" autocomplete="off" @click="selectTimestamp('7_day')" checked>Ultima settimana
           </label>
-          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('1_hour')}">
-            <input type="radio" name="timefilter-radio" value="1_hour" @click="selectTimestamp('1_hour')" autocomplete="off">Ultime 24h
+          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('24_hour')}">
+            <input type="radio" name="timefilter-radio" value="24_hour" @click="selectTimestamp('24_hour')" autocomplete="off">Ultime 24h
           </label>
         </div>
       </div>
