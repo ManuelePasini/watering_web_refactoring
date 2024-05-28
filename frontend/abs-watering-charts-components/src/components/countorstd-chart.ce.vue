@@ -5,16 +5,11 @@ import {average, groupBy} from "../common/appUtils.js";
 import {CommunicationService} from "../services/CommunicationService.js";
 
 const communicationService = new CommunicationService();
-const chartRef = ref('');
+const chartRef = ref(null);
 
 const props = defineProps(['config'])
 const endpoint = 'statisticsChart'
-let showChart = ref(true)
-
-onMounted(async () => {
-  console.log("On mounted called");
-  await mountChart()
-});
+const showChart = ref(false)
 
 watchEffect(async () => {
   let value = props.config;
@@ -160,14 +155,9 @@ async function mountChart() {
       .attr("font-size", 14)
       .text("Depth");
 
-  if(!chartRef.value) {
-    chartRef.value = ''
-    chartRef.value.appendChild(svg.node());
-  } else {
-    chartRef.value.appendChild(svg.node());
+  if(chartRef.value) {
+    chartRef.value.replaceChildren(svg.node());
   }
-
-  console.log("Chart created!");
 }
 
 </script>

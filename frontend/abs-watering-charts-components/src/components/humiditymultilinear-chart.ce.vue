@@ -25,7 +25,6 @@ import * as d3 from "d3";
 
 let chartData = ref({datasets: [], labels: []})
 let options = ref({responsive: true, maintainAspectRatio: false})
-let data = []
 let showChart = ref(false)
 
 const props = defineProps(['config'])
@@ -78,10 +77,6 @@ const createDatasets = (map) => {
 }
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
-
-onMounted(async () => {
-  await mountChart()
-});
 
 watchEffect(async () => {
   let value = props.config;

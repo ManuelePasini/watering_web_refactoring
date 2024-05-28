@@ -21,10 +21,10 @@ const communicationService = new CommunicationService();
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, TimeScale)
 
-let chartData = ref({datasets: [], labels: []})
-let options = ref({responsive: true, maintainAspectRatio: false})
-let data = ref([])
-let showChart = ref(false)
+const chartData = ref({datasets: [], labels: []})
+const options = ref({responsive: true, maintainAspectRatio: false})
+const data = ref([])
+const showChart = ref(false)
 
 const props = defineProps(['config'])
 
@@ -64,11 +64,6 @@ const createDatasets = (groupedMeasures) => {
   });
 };
 
-onMounted(async () => {
-  console.log("On mounted called");
-  await mountChart()
-});
-
 watchEffect(async () => {
   let value = props.config;
   if(value) {
@@ -85,7 +80,7 @@ async function mountChart() {
   if(chartDataResponse) {
     data.value = chartDataResponse
     showChart.value = data.value.length > 0
-  } else data = []
+  } else data.value = []
 
   const values = data.value.map(item => item.value);
 

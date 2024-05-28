@@ -22,9 +22,9 @@ import {
 } from 'chart.js'
 import {LineDatasetData} from "../common/LineDatasetData.js";
 
-let chartData = ref({datasets: [], labels: []})
-let options = ref({responsive: true, maintainAspectRatio: false})
-let showChart = ref(false)
+const chartData = ref({datasets: [], labels: []})
+const options = ref({responsive: true, maintainAspectRatio: false})
+const showChart = ref(false)
 
 const props = defineProps(['config'])
 
@@ -66,10 +66,6 @@ const colorFunction = (str) => {
 }
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
-
-onMounted(async () => {
-  await mountChart()
-});
 
 watchEffect(async () => {
   let value = props.config;

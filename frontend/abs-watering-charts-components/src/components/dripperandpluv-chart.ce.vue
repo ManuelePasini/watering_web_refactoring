@@ -65,10 +65,6 @@ const colorFunction = (str) => {
     return 'rgb(0, 110, 189)'
 }
 
-onMounted(async () => {
-  await mountChart()
-});
-
 watchEffect(async () => {
   let value = props.config;
   if (value) {

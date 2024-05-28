@@ -18,10 +18,6 @@ const isDarkColor = (color) => {
   return brightness < 0.5;
 }
 
-onMounted(async () => {
-  mountChart()
-});
-
 watchEffect(async () => {
   const parsed = JSON.parse(props.config);
   if (parsed) {
@@ -136,8 +132,10 @@ async function mountChart() {
 
   svg.append("g")
       .call(d3.axisLeft(y));
-
-  chartRef.value.appendChild(svg.node());
+      
+  if(chartRef.value) {
+    chartRef.value.replaceChildren(svg.node());
+  }
 }
 
 </script>

@@ -29,9 +29,9 @@ const props = defineProps({
   color: String
 });
 
-let chartData = ref({datasets: [], labels: []})
-let options = ref({responsive: true, maintainAspectRatio: false})
-let data = ref(new Array(20).fill(0))
+const chartData = ref({datasets: [], labels: []})
+const options = ref({responsive: true, maintainAspectRatio: false})
+const data = ref(new Array(20).fill(0))
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
 

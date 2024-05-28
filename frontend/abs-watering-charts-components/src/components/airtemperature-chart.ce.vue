@@ -1,7 +1,7 @@
 <script setup>
 
 import {Line} from "vue-chartjs";
-import {onMounted, ref, watchEffect} from "vue";
+import {ref, watchEffect} from "vue";
 import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
@@ -25,20 +25,15 @@ const props = defineProps(['config'])
 
 const endpoint = 'airTemp'
 
-let chartData = ref({datasets: [], labels: []})
-let options = ref({responsive: true, maintainAspectRatio: false})
-let showChart = ref(false)
+const chartData = ref({datasets: [], labels: []})
+const options = ref({responsive: true, maintainAspectRatio: false})
+const showChart = ref(false)
 
 const getData = (measures) => {
   return measures.map(measure => ({ x: luxonDateTime(measure.timestamp), y: measure.value }));
 };
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
-
-onMounted(async () => {
-  console.log("On mounted called");
-  await mountChart()
-});
 
 watchEffect(async () => {
   let value = props.config;
@@ -58,52 +53,52 @@ async function mountChart() {
     showChart.value = data.length > 0
   } else data = []
 
-    chartData.value = {
-      datasets: [{
-        data: data,
-        borderColor: 'rgb(31, 119, 180)',
-        backgroundColor: 'rgb(31, 119, 180)',
-        label: "AirTemp"
-      }]
-    }
+  chartData.value = {
+    datasets: [{
+      data: data,
+      borderColor: 'rgb(31, 119, 180)',
+      backgroundColor: 'rgb(31, 119, 180)',
+      label: "AirTemp"
+    }]
+  }
 
-    options.value = {
-      responsive: true,
-      maintainAspectRatio: false,
-      parsing: {
-        xAxisKey: 'x',
-        yAxisKey: 'y'
-      },
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'day',
-            tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
-            displayFormats: {
-              minute: 'yyyy-MM-dd HH:mm', // Customize the display format for minutes
-              second: 'yyyy-MM-dd HH:mm', // Customize the display format for seconds,
-              hour: 'yyyy-MM-dd HH:mm:ss',
-              day: 'yyyy-MM-dd',
-              month: 'yyyy-MM-dd HH:mm:ss'
-            },
+  options.value = {
+    responsive: true,
+    maintainAspectRatio: false,
+    parsing: {
+      xAxisKey: 'x',
+      yAxisKey: 'y'
+    },
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: 'day',
+          tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+          displayFormats: {
+            minute: 'yyyy-MM-dd HH:mm', // Customize the display format for minutes
+            second: 'yyyy-MM-dd HH:mm', // Customize the display format for seconds,
+            hour: 'yyyy-MM-dd HH:mm:ss',
+            day: 'yyyy-MM-dd',
+            month: 'yyyy-MM-dd HH:mm:ss'
           },
-          ticks: {
-            stepSize: 1
-          },
-          title: {
-            display: true,
-            text: 'Tempo'
-          }
         },
-        y: {
-          title: {
-            display: true,
-            text: '°C'
-          }
+        ticks: {
+          stepSize: 1
+        },
+        title: {
+          display: true,
+          text: 'Tempo'
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: '°C'
         }
       }
     }
+  }
 
 }
 

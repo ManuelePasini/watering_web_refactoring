@@ -7,7 +7,7 @@ const communicationService = new CommunicationService();
 const chartRef = ref(null);
 
 const props = defineProps(['config'])
-let showChart = ref(true)
+const showChart = ref(true)
 const endpoint = 'heatmap'
 
 const isDarkColor = (color) => {
@@ -134,7 +134,9 @@ async function mountChart() {
   svg.append("g")
       .call(d3.axisLeft(y));
 
-  chartRef.value.appendChild(svg.node());
+  if(chartRef.value) {
+    chartRef.value.replaceChildren(svg.node());
+  }
 }
 
 </script>

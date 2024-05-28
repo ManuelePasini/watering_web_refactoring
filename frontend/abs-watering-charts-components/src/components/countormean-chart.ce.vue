@@ -9,7 +9,7 @@ const chartRef = ref(null);
 
 const props = defineProps(['config'])
 const endpoint = 'statisticsChart'
-let showChart = ref(true)
+const showChart = ref(false)
 
 onMounted(async () => {
   console.log("On mounted called");
@@ -160,8 +160,9 @@ async function mountChart() {
       .attr("font-size", 14)
       .text("Depth");
 
-  chartRef.value.appendChild(svg.node());
-  console.log("Chart created!");
+  if(chartRef.value) {
+    chartRef.value.replaceChildren(svg.node());
+  }
 }
 
 </script>

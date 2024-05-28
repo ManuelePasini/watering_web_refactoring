@@ -10,7 +10,7 @@ const router = useRouter()
 let token = reactive({});
 let userPermissions = reactive({});
 
-const checkInterval = 10000;
+const checkInterval = 3600000;
 
 onMounted(async () => {
   token.value = await authService.authHeader();
@@ -24,7 +24,7 @@ onMounted(async () => {
 });
 
 const userTokenUpdate = () => {
-  const intervalId = setInterval(async () => {
+  intervalId = setInterval(async () => {
     token.value = await authService.authHeader();
 
     if (token.value) {
@@ -33,11 +33,11 @@ const userTokenUpdate = () => {
       userPermissions.value = result
     }
   }, checkInterval);
-
-  onUnmounted(() => {
-    clearInterval(intervalId);
-  });
 };
+let intervalId = null;
+onUnmounted(() => {
+    clearInterval(intervalId);
+});
 
 </script>
 
