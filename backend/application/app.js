@@ -41,10 +41,6 @@ sequelize.authenticate().then(() => {
     console.log('Unable to connect to the database:',err);
 });
 
-sequelize.sync().then( e => {
-    console.log('Database sync completed');
-});
-
 app.listen(port, () => {
    console.log(`Server is running at http://localhost:${port}`);
 });
