@@ -11,11 +11,6 @@ const props = defineProps(['config'])
 const endpoint = 'statisticsChart'
 const showChart = ref(false)
 
-onMounted(async () => {
-  console.log("On mounted called");
-  await mountChart()
-});
-
 watchEffect(async () => {
   let value = props.config;
   if(value) {
@@ -46,8 +41,8 @@ async function mountChart() {
 
   if (z_unique.length <= 2) {
     data.forEach(d => {
-      axisX.push(d.yy * -1)
-      axisY.push(d.xx)
+      axisY.push(d.yy * -1)
+      axisX.push(d.xx)
       mean.push(d.mean)
     });
   } else {
@@ -59,11 +54,11 @@ async function mountChart() {
         let temp_y, temp_x
         dataTemp2.forEach(d => {
           means_to_mean.push(parseFloat(d.mean))
-          temp_y = d.xx;
-          temp_x = d.yy;
+          temp_x = d.xx;
+          temp_y = d.yy;
         });
-        axisX.push(temp_y * -1)
-        axisY.push(temp_x)
+        axisY.push(temp_y * -1)
+        axisX.push(temp_x)
         mean.push(average(means_to_mean))
       }
     }
@@ -82,16 +77,16 @@ async function mountChart() {
   height -= 20
 
   let x = d3.scaleLinear()
-      .domain([Math.min(...axisY), Math.max(...axisY)])
+      .domain([Math.min(...axisX), Math.max(...axisX)])
       .range([ 0, width]);
   svg.append("g").attr("transform", "translate(0," + height+ ")").call(d3.axisBottom(x));
 
   let y = d3.scaleLinear()
-      .domain([Math.max(...axisX), Math.min(...axisX)])
+      .domain([Math.max(...axisY), Math.min(...axisY)])
       .range([0, height]);
   svg.append("g").call(d3.axisLeft(y));
 
-  const contours = d3.contours().size([numCellInHeight, numCellInWidth]).thresholds(d3.range(-200, 10000));
+  const contours = d3.contours().size([numCellInWidth, numCellInHeight]).thresholds(d3.range(-200, 10000));
 
   const mycolor = function (d) {
     if (d <= 30) {
@@ -109,25 +104,34 @@ async function mountChart() {
     } else return d3.interpolateRdBu(0)
   };
 
+  // Function to scale contours coordinates
+  const scaleCoordinates = (geometry) => {
+      geometry.coordinates = geometry.coordinates.map(polygon =>
+          polygon.map(ring =>
+              ring.map(([x, y]) => [x * (width / numCellInWidth), y * (height / numCellInHeight)])
+          )
+      );
+      return geometry;
+  };
+
   svg.selectAll("path")
-      .data(contours(mean))
+      .data(contours(mean).map(feature => scaleCoordinates(feature)))
       .enter().append("path")
-      .attr("d", d3.geoPath(d3.geoIdentity().scale(height / numCellInWidth)))
-      .attr("fill", function (d) {return mycolor(d.value);});
+      .attr("d", d3.geoPath(d3.geoIdentity().scale(1))) // la scala è ora già applicata
+      .attr("fill", function (d) { return mycolor(d.value); });
 
   const ticks2 = [30, 100, 200, 300, 1500, 10000];
   const ticksLabels2 = ["[0, -30)", "[-30, -100)", "[-100, -200)", "[-200, -300)", "[-300, -1500)", "[-1500, -∞)"];
 
-  width += 50
   var size = 20
 
   svg.selectAll("mydots")
       .data(ticks2)
       .enter()
       .append("rect")
-      .attr("x", width)
+      .attr("x", width + size)
       .attr("y", function (d, i) {
-        return height / 4 + i * (size + 5)
+        return i * (size + 5)
       }) // 100 is where the first dot appears. 25 is the distance between dots
       .attr("width", size)
       .attr("height", size)
@@ -137,8 +141,8 @@ async function mountChart() {
       .data(ticksLabels2)
       .enter()
       .append("text")
-      .attr("x", width + size)
-      .attr("y", function (d, i) {return height / 4 + i * (size + 7) + (size / 2)}) // 100 is where the first dot appears. 25 is the distance between dots
+      .attr("x", width + size * 2 + 5)
+      .attr("y", function (d, i) { return i * (size + 5) + (size / 2)}) // 100 is where the first dot appears. 25 is the distance between dots
       .style("fill", function (d, i) {return mycolor(ticks2[i])})
       .text(function (d) {return d})
       .attr("text-anchor", "left")
@@ -169,7 +173,7 @@ async function mountChart() {
 
 <template>
   <div>
-    <svg  v-if="showChart" style="width: 700px; height: 350px" ref="chartRef"></svg>
+    <svg v-if="showChart" style="width: 700px; height: 350px" ref="chartRef"></svg>
     <div v-else>Nessun dato disponibile.</div>
   </div>
 </template>

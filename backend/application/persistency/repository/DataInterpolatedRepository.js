@@ -21,7 +21,7 @@ const getResults = async (refStructureName, companyName, fieldName, sectorName, 
         FROM data_interpolated
         WHERE "refStructureName" = '${refStructureName}'
           AND "companyName" = '${companyName}'
-          AND ("fieldName" = '' OR "fieldName" = '${fieldName}')
+          AND "fieldName" = '${fieldName}'
           AND "sectorName" = '${sectorName}'
           AND "plantRow" = '${plantRow}'
           AND "timestamp" >= '${timestampFrom}'
@@ -73,16 +73,18 @@ class DataInterpolatedRepository {
         return getResults(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo, this.sequelize);
     }
 
-    async findInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow) {
+    async findInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo) {
 
         const query = `
             SELECT "zz", "yy", "xx", AVG(value * -1)::numeric AS mean, STDDEV(value) ::numeric AS std
             FROM data_interpolated
             WHERE "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
-              AND ("fieldName" = '' OR "fieldName" = '${fieldName}')
+              AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
+              AND "timestamp" >= '${timestampFrom}'
+              AND "timestamp" <= '${timestampTo}'
               AND "value" < 0
             GROUP BY "zz", "yy", "xx"
             ORDER BY "zz", "yy", "xx"
@@ -111,7 +113,7 @@ class DataInterpolatedRepository {
         ));
     }
 
-    async findDistinctplantRowPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
+    async findDistinctPlantRowPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
 
         const query = `
             SELECT "zz", "yy", "xx"

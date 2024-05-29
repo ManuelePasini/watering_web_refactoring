@@ -1326,7 +1326,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
 
-        const result = await fieldService.getInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow);
+        const result = await fieldService.getInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow, req.query.timeFilterFrom, req.query.timeFilterTo);
 
         res.status(200).json(new InterpolatedDataResponse(result));
     } catch (error) {
