@@ -21,11 +21,10 @@ class InterpolatedDataValue {
 
 class InterpolatedMeasureData {
 
-    constructor(zz, yy, xx, timestamp, value) {
+    constructor(zz, yy, xx, value) {
         this.zz = zz;
         this.yy = yy;
         this.xx = xx;
-        this.timestamp = timestamp;
         this.value = value;
     }
 

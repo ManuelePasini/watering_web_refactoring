@@ -1228,10 +1228,9 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const timestamp = req.query.timeFilterFrom;
-
-        const result = await fieldService.getDataInterpolated(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp);
-
+        const timestampFrom = req.query.timeFilterFrom
+        const timestampTo = req.query.timeFilterTo
+        const result = await fieldService.getDataInterpolatedRange(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo);
         res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({message: error.message});

@@ -17,7 +17,12 @@ class DtoConverter {
         const interpolatedValues = Array.from(map, ([key, values]) => {
             const keyObject = JSON.parse(key);
             const plant = new PlantDto(keyObject.sectorName, keyObject.plantRow);
-            const measures = values.map(value => new InterpolatedMeasureData(value.zz, value.yy, value.xx, value.timestamp, value.value));
+            const measures = Array.from(values.reduce((accumulator, currentValue) => {
+                if (!accumulator.has(currentValue.timestamp))
+                    accumulator.set(currentValue.timestamp, []);
+                accumulator.get(currentValue.timestamp).push(new InterpolatedMeasureData(currentValue.zz, currentValue.yy, currentValue.xx, currentValue.value));
+                return accumulator
+            }, new Map()), ([key, values]) => { return { timestamp: key, image: values } })
             return new InterpolatedDataValue(keyObject.refStructureName, keyObject.companyName, keyObject.fieldName, plant, measures);
         });
 
@@ -34,7 +39,7 @@ class DtoConverter {
         const dataValues = Array.from(map, ([key, values]) => {
             const keyObject = JSON.parse(key);
             const plant = new PlantDto(keyObject.sectorName, keyObject.plantRow);
-            const measures = values.map(value => new HumidityBinMeasureData(value.umidity_bin, value.timestamp, value.count));
+            const measures = values.map(value => new HumidityBinMeasureData(value.humidity_bin, value.timestamp, value.count));
             return new DataValue(keyObject.refStructureName, keyObject.companyName, keyObject.fieldName, plant, measures);
         });
 

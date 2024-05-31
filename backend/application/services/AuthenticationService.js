@@ -27,7 +27,7 @@ class AuthenticationService {
             }
 
             const payload = {user: user.dataValues.userid, affiliation: user.dataValues.affiliation, auth_type: user.dataValues.auth_type}
-            return jwt.sign(payload, jwtSecret, {expiresIn: "1h"});
+            return jwt.sign(payload, jwtSecret, { expiresIn: "10h" });
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
         }

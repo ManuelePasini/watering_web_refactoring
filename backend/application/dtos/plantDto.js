@@ -1,12 +1,11 @@
 
 class PlantDto {
 
-    constructor(plantId, sectorName, plantRow, plantName, colture) {
-        this.plantId = plantId;
+    constructor(sectorName, plantRow, colture, coltureType) {
         this.sectorName = sectorName;
         this.plantRow = plantRow;
-        this.plantName = plantName;
         this.colture = colture;
+        this.coltureType = coltureType
     }
 
 }
