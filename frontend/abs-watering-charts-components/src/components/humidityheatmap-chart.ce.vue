@@ -1,20 +1,19 @@
 <script setup>
-import * as d3 from "d3";
-import {ref, onMounted, watchEffect} from "vue";
+import {nextTick, ref, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
+import VueApexCharts  from "vue3-apexcharts"
+import { luxonDateTimeToString } from "../common/dateUtils.js"
 
 const communicationService = new CommunicationService();
-const chartRef = ref(null);
+const heatmapSeries = ref([]);
+const chartOptions = ref({emitsOptions: false})
+const images = ref({})
+const selectedImage = ref({})
+const container = ref(null)
 
 const props = defineProps(['config'])
-const showChart = ref(true)
+const showChart = ref(false)
 const endpoint = 'heatmap'
-
-const isDarkColor = (color) => {
-  const rgb = d3.rgb(color);
-  const brightness = (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) / 255;
-  return brightness < 0.5;
-}
 
 watchEffect(async () => {
   let value = props.config;
@@ -23,128 +22,155 @@ watchEffect(async () => {
   }
 });
 
-async function mountChart() {
-  const parsed = JSON.parse(props.config);
-  let data = []
+async function drawImage(){
 
-  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint)
-  if(chartDataResponse) {
-    data = chartDataResponse
-    data.unshift ({
-      zz:0,
-      yy:0,
-      xx:0,
-      timestamp:0,
-      value:"G"
+  heatmapSeries.value = Array.from(images.value.get(selectedImage.value).reduce((accumulator, currentValue) => {
+    if (!accumulator.has(currentValue.yy))
+      accumulator.set(currentValue.yy, []);
+    accumulator.get(currentValue.yy).push({ x: currentValue.xx,
+      y: currentValue.value.toFixed(2)
     })
-    showChart.value = data.length > 0
-  } else data = []
+    return accumulator
+  }, new Map()), ([key, value])=> {
+    return {
+      name: key,
+      data: value.sort((a,b)=> a.x - b.x)
+    }
+  }).sort((a,b)=> b.name - a.name)
 
-  const margin = {top: 30, right: 30, bottom: 30, left: 30},
-      width = 450 - margin.left - margin.right,
-      height = 450 - margin.top - margin.bottom;
+  await nextTick()
+  const containerWidth = container.value.offsetWidth
+  const cellSize = containerWidth / heatmapSeries.value[0].data.length
+  const titleOffset = 80
+  const chartHeight = (cellSize * heatmapSeries.value.length + titleOffset) + "px"
 
-// append the svg object to the body of the page
-  const svg = d3.create("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-// Labels of row and columns
-  const myGroups = []
-  const myVars = []
-
-  data.forEach(data => {
-    myGroups.push(data.xx)
-    myVars.push(data.yy)
-  });
-
-// Build X scales and axis:
-  const x = d3.scaleBand()
-      .range([0, width])
-      .domain(myGroups)
-      .padding(0.01);
-
-// Build X scales and axis:
-  const y = d3.scaleBand()
-      .range([0, height])
-      .domain(myVars)
-      .padding(0.01);
-  
-// Build color scale
-  const mycolor = function (d) {
-    if (d < -10000) {
-      return d3.interpolateRdBu(0.0);
-    } else if (d < -1500) {
-      return d3.interpolateRdBu(0.05);
-    } else if (d < -300) {
-      return d3.interpolateRdBu(0.15);
-    } else if (d < -200) {
-      return d3.interpolateRdBu(0.30);
-    } else if (d < -100) {
-      return d3.interpolateRdBu(0.7);
-    } else if (d < -30) {
-      return d3.interpolateRdBu(0.85);
-    } else return d3.interpolateRdBu(1)
-  };
-
-  // add the squares
-  const groups = svg.selectAll()
-      .data(data, function (d) {
-        return d.xx + ':' + d.yy;
-      })
-      .enter()
-      .append("g")
-
-  groups.append("rect")
-      .attr("x", function (d) {
-        return x(d.xx)
-      })
-      .attr("y", function (d) {
-        return y(d.yy)
-      })
-      .attr("width", x.bandwidth())
-      .attr("height", y.bandwidth())
-      .style("fill", function (d) {
-        return mycolor(d.value)
-      });
-
-  groups.append("text")
-      .attr("x", function (d) {
-        return x(d.xx) + 2;
-      })
-      .attr("y", function (d) {
-        return y(d.yy) + y.bandwidth() / 2;
-      })
-      .attr("fill", function (d) {
-        // Use a contrasting color for text based on the background color
-        return isDarkColor(mycolor(d.value)) ? "white" : "black";
-      })
-      .attr("dy", ".45em")
-      .attr("font-size", 10)
-      .text(function (d) {
-        return d.value === "G" ? d.value : Math.round(d.value * 100) / 100;
-      });
-
-  svg.append("g")
-      .attr("transform", `translate(0, ${height})`)
-      .call(d3.axisBottom(x))
-
-  svg.append("g")
-      .call(d3.axisLeft(y));
-
-  if(chartRef.value) {
-    chartRef.value.replaceChildren(svg.node());
+  chartOptions.value = {
+    chart: {
+      type: 'heatmap',
+      height: chartHeight,
+      toolbar: {
+        show: true
+      },
+      zoom: {
+        enabled: false,
+      }
+    },
+    plotOptions: {
+      heatmap: {
+        enableShades: false,
+        radius: 0,
+        colorScale: {
+          ranges: [{
+            from: -29.99,
+            to: 0,
+            name: '(-30,0]',
+            color: '#053061'
+          },
+          {
+            from: -99.99,
+            to: -30,
+            name: '(-100,-30]',
+            color: '#337CB7'
+          },
+          {
+            from: -199.99,
+            to: -100,
+            name: '(-200,-100]',
+            color: '#8FC2DD'
+          },
+          {
+            from: -299.99,
+            to: -200,
+            name: '(-300,-200]',
+            color: '#F1A385'
+          },
+          {
+            from: -1499.99,
+            to: -300,
+            name: '(-1500,-300]',
+            color: '#C33D3D'
+          },
+          {
+            from: -2500,
+            to: -1500,
+            name: '(-∞,-1500]',
+            color: '#8C0D25'
+          }]
+        }
+      },
+    },
+    dataLabels: {
+      enabled: cellSize > 13,
+      style: {
+        fontSize: '8px',
+      }
+    },
+    legend: {
+      show: true,
+    },
+    stroke: {
+      width: 0.2
+    },
+    title: {
+      text: 'Interpolazione bilineare ' + luxonDateTimeToString(selectedImage.value),
+      align: 'center',
+      offsetY: 10,
+    },
+    xaxis: {
+      type: 'category',
+      categories: heatmapSeries.value[0].data.map(({x,y})=>String(x)),
+      tooltip: {
+          enabled: false,
+      },
+      tickPlacement: 'on',
+      tickAmount: heatmapSeries.value[0].data.length-1,
+      stepSize: heatmapSeries.value[0].data[1].x-heatmapSeries.value[0].data[0].x,
+      labels: {
+        show: true
+      }
+    },
+    yaxis: {
+      axisTicks: {
+        show: true,
+      },
+      labels: {
+        style: {
+          fontSize: '12px'
+        }
+      }
+    },
+    tooltip:{
+      custom: function({series, seriesIndex, dataPointIndex, w}) {
+          return ('<div class="arrow_box m-1">' +
+            '<div> <strong>x</strong>: ' + heatmapSeries.value[seriesIndex].data[dataPointIndex].x + '</div>' +
+            '<div> <strong>y</strong>: ' + heatmapSeries.value[seriesIndex].name + '</div>' +
+            '<div> <strong>val</strong>: ' + series[seriesIndex][dataPointIndex] + '</div>' +
+            '</div>')
+      }
+    }
   }
 }
 
+async function mountChart() {
+  const parsed = JSON.parse(props.config);
+
+  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint)
+
+  //get dripper position
+
+  if(chartDataResponse) {
+    images.value = new Map(chartDataResponse.map(obj => [obj.timestamp, obj.image]))
+    showChart.value = images.value.size > 0
+    const timestamps = Array.from(images.value.keys()).sort()
+    selectedImage.value = timestamps[timestamps.length - 1]
+  } else images.value = {}
+  await drawImage()
+}
 </script>
 
 <template>
-  <div>
-    <svg v-if="showChart" style="width: 600px; height: 600px" ref="chartRef"></svg>
-    <div v-else>Nessun dato disponibile.</div>
+  <div v-if="showChart" ref="container">
+    <VueApexCharts type="heatmap" :options="chartOptions" :series="heatmapSeries"></VueApexCharts>
   </div>
 </template>
 

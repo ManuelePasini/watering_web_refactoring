@@ -1,6 +1,6 @@
 <script setup>
 import * as d3 from "d3";
-import {ref, onMounted, watchEffect} from "vue";
+import {ref, nextTick, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 
 const communicationService = new CommunicationService();
@@ -133,9 +133,11 @@ async function mountChart() {
   svg.append("g")
       .call(d3.axisLeft(y));
       
-  if(chartRef.value) {
-    chartRef.value.replaceChildren(svg.node());
-  }
+  nextTick(() => {
+    if(chartRef.value) {
+      chartRef.value.replaceChildren(svg.node());
+    }
+  })
 }
 
 </script>

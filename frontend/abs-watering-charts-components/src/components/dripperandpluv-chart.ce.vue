@@ -25,9 +25,9 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
 
 
-let chartData = ref({datasets: [], labels: []})
-let options = ref({responsive: true, maintainAspectRatio: false})
-let showChart = ref(false)
+const chartData = ref({datasets: [], labels: []})
+const options = ref({responsive: true, maintainAspectRatio: false})
+const showChart = ref(false)
 
 const props = defineProps(['config'])
 
@@ -36,18 +36,12 @@ const endpoint = 'dripperAndPluv'
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {
     const key = currentValue.detectedValueTypeDescription
-    if (accumulator.has(key))
-      accumulator.get(key).push(JSON.stringify({
-        x: luxonDateTime(currentValue.timestamp),
-        y: Number(currentValue.value).toFixed(2)
-      }));
-    else {
+    if (!accumulator.has(key))
       accumulator.set(key, []);
-      accumulator.get(key, JSON.stringify({
-        x: luxonDateTime(currentValue.timestamp),
-        y: Number(currentValue.value).toFixed(2)
-      }));
-    }
+    accumulator.get(key).push(JSON.stringify({
+      x: luxonDateTime(currentValue.timestamp),
+      y: Number(currentValue.value).toFixed(2)
+    }));
     return accumulator;
   }, new Map());
 }
@@ -112,7 +106,7 @@ async function mountChart() {
           },
         },
         ticks: {
-          stepSize: 1
+          source: 'data'
         },
         title: {
           display: true,

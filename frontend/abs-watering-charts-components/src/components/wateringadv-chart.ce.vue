@@ -11,7 +11,7 @@ import {
   TimeScale
 } from 'chart.js'
 import { Bar } from 'vue-chartjs'
-import {onMounted, ref, watchEffect} from "vue";
+import { ref, watchEffect} from "vue";
 import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
@@ -23,7 +23,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 
 const chartData = ref({datasets: [], labels: []})
 const options = ref({responsive: true, maintainAspectRatio: false})
-const data = ref([])
 const showChart = ref(false)
 
 const props = defineProps(['config'])
@@ -48,12 +47,11 @@ const colorFunction = (str) => {
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {
     const key = currentValue.detectedValueTypeDescription
-    if(accumulator.has(key))
-      accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2), y1: Number(currentValue.value).toFixed(2)}));
-    else {
+    if(!accumulator.has(key))
       accumulator.set(key, []);
-      accumulator.get(key, JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2), y1: Number(currentValue.value).toFixed(2)}));
-    }
+
+    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2), y1: Number(currentValue.value).toFixed(2)}));
+
     return accumulator;
   }, new Map());
 }
@@ -67,27 +65,25 @@ const createDatasets = (groupedMeasures) => {
 watchEffect(async () => {
   let value = props.config;
   if(value) {
-    const parsed = JSON.parse(props.config);
-    console.log(`Oggetto passato ${JSON.stringify(parsed)}`)
     await mountChart()
   }
 });
 
 async function mountChart() {
   const parsed = JSON.parse(props.config);
-
+  let data = []
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint)
   if(chartDataResponse) {
-    data.value = chartDataResponse
-    showChart.value = data.value.length > 0
-  } else data.value = []
+    data = chartDataResponse
+    showChart.value = data.length > 0
+  } else data = []
 
-  const values = data.value.map(item => item.value);
+  const values = data.map(item => item.value);
 
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
 
-  const groupByData = groupByType(data.value);
+  const groupByData = groupByType(data);
 
   const datasets = createDatasets(groupByData).map(bin => bin.getDataSet())
 
@@ -113,7 +109,7 @@ async function mountChart() {
           },
         },
         ticks: {
-          stepSize: 1
+          source: 'data'
         },
         title: {
           display: true,
@@ -150,7 +146,9 @@ async function mountChart() {
 </script>
 
 <template>
-  <Bar v-if="showChart" :data="chartData" :options="options" />
+  <div v-if="showChart">
+    <Bar :data="chartData" :options="options" />
+  </div>
   <div v-else>Nessun dato disponibile.</div>
 </template>
 

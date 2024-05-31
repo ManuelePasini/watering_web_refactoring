@@ -135,7 +135,6 @@ watchEffect(async () => {
 <template>
   <div class="card">
     <div class="card-body">
-
       <div class="timeline-placeholder">
         <div class="timeline-wrapper">
           <button id="dynamic-heatmap-play-button" @click="onClickPlayButton">{{ buttonText }}</button>

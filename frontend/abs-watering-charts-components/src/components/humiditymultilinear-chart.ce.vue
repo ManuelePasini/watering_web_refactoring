@@ -1,7 +1,7 @@
 <script setup>
 
 import {Line} from "vue-chartjs";
-import {onMounted, ref, watchEffect} from "vue";
+import { ref, watchEffect} from "vue";
 import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
@@ -55,12 +55,9 @@ const cleanHumidityBin = (bin) => {
 const groupByHumidityBin = (bins) => {
   return bins.reduce((accumulator, currentValue) => {
     const key = cleanHumidityBin(currentValue.humidityBin);
-    if(accumulator.has(key))
-      accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: currentValue.count}));
-    else {
+    if(!accumulator.has(key))
       accumulator.set(key, []);
-      accumulator.get(key, JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: currentValue.count}));
-    }
+    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: currentValue.count}));
     return accumulator;
   }, new Map());
 }
@@ -111,6 +108,11 @@ async function mountChart() {
     plugins: {
       filler: {
         propagate: false
+      },
+      legend: {
+        labels: {
+          boxWidth: 2
+        }
       }
     },
     tooltips: {
@@ -140,7 +142,7 @@ async function mountChart() {
           },
         },
         ticks: {
-          stepSize: 1
+          source: 'auto'
         },
         title: {
           display: true,
@@ -157,7 +159,6 @@ async function mountChart() {
           stepSize: 20
         },
         min: 0,
-
       }
     }
   }

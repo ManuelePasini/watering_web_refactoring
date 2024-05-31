@@ -1,6 +1,6 @@
 <script setup>
 import * as d3 from "d3";
-import {ref, onMounted, watchEffect} from "vue";
+import {ref, watchEffect, nextTick} from "vue";
 import {average, groupBy} from "../common/appUtils.js";
 import {CommunicationService} from "../services/CommunicationService.js";
 
@@ -28,9 +28,9 @@ async function mountChart() {
     showChart.value = data.length > 0
   } else data = []
 
-  let width = 500
+  let width = 470
   let height = 250
-  let margin = {top: 20, bottom: 20, left: 50, right: 60}
+  let margin = {top: 10, bottom: 35, left: 47, right: 85}
 
   let axisX = [];
   let axisY = [];
@@ -68,18 +68,18 @@ async function mountChart() {
   const numCellInHeight = (((Math.min(...axisY) * -1) - (Math.max(...axisY) * -1)) / 5) + 1
 
   let svg = d3.create("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("width", width)
+      .attr("height", height)
       .append("g")
-      .attr("transform", "translate(" + (margin.left + 30) + "," + margin.top + ")");
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  width -= 65
-  height -= 20
+  width -= margin.left + margin.right
+  height -= margin.top + margin.bottom
 
   let x = d3.scaleLinear()
       .domain([Math.min(...axisX), Math.max(...axisX)])
       .range([ 0, width]);
-  svg.append("g").attr("transform", "translate(0," + height+ ")").call(d3.axisBottom(x));
+  svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
 
   let y = d3.scaleLinear()
       .domain([Math.max(...axisY), Math.min(...axisY)])
@@ -117,19 +117,19 @@ async function mountChart() {
   svg.selectAll("path")
       .data(contours(mean).map(feature => scaleCoordinates(feature)))
       .enter().append("path")
-      .attr("d", d3.geoPath(d3.geoIdentity().scale(1))) // la scala è ora già applicata
+      .attr("d", d3.geoPath(d3.geoIdentity())) // la scala è ora già applicata
       .attr("fill", function (d) { return mycolor(d.value); });
 
   const ticks2 = [30, 100, 200, 300, 1500, 10000];
   const ticksLabels2 = ["[0, -30)", "[-30, -100)", "[-100, -200)", "[-200, -300)", "[-300, -1500)", "[-1500, -∞)"];
 
-  var size = 20
+  var size = 15
 
   svg.selectAll("mydots")
       .data(ticks2)
       .enter()
       .append("rect")
-      .attr("x", width + size)
+      .attr("x", width + size/2)
       .attr("y", function (d, i) {
         return i * (size + 5)
       }) // 100 is where the first dot appears. 25 is the distance between dots
@@ -141,7 +141,7 @@ async function mountChart() {
       .data(ticksLabels2)
       .enter()
       .append("text")
-      .attr("x", width + size * 2 + 5)
+      .attr("x", width + size * 2 -2)
       .attr("y", function (d, i) { return i * (size + 5) + (size / 2)}) // 100 is where the first dot appears. 25 is the distance between dots
       .style("fill", function (d, i) {return mycolor(ticks2[i])})
       .text(function (d) {return d})
@@ -150,30 +150,32 @@ async function mountChart() {
       .style("alignment-baseline", "middle")
 
   svg.append("text")
-      .attr("transform", "translate(" + ((width / 2) - margin.left * 1.15) + " ," + (height + margin.bottom + 20) + ")")
+      .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom) + ")")
       .style("text-anchor", "middle")
       .attr("font-size", 14)
-      .text("Across the rows");
+      .text("Distanza dalla fila");
 
   svg.append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left - 30)
+      .attr("y", 0 - margin.left)
       .attr("x", 0 - (height / 2))
       .attr("dy", "1em")
       .style("text-anchor", "middle")
       .attr("font-size", 14)
-      .text("Depth");
+      .text("Profondità");
 
-  if(chartRef.value) {
-    chartRef.value.replaceChildren(svg.node());
-  }
+  nextTick(() => {
+    if(chartRef.value) {
+      chartRef.value.replaceChildren(svg.node());
+    }
+  })
 }
 
 </script>
 
 <template>
   <div>
-    <svg v-if="showChart" style="width: 700px; height: 350px" ref="chartRef"></svg>
+    <svg v-if="showChart" style="width: 470px; height: 250px" ref="chartRef"></svg>
     <div v-else>Nessun dato disponibile.</div>
   </div>
 </template>

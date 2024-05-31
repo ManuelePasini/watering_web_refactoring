@@ -21,7 +21,7 @@ const props = defineProps(['token', 'userPermissions'])
 
 let showCustomizeInput = ref(false)
 
-let selectedTimestampFrom = ref(getCurrentTimestampMinusDays(20))
+let selectedTimestampFrom = ref(getCurrentTimestampMinusDays(25))
 let selectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 
 let customSelectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
@@ -32,6 +32,8 @@ let selectedFieldName = ref('Select field')
 let selectedField = reactive({})
 let selectedTimeLabel = ref('')
 let showDynamicHeatmap = ref(false)
+let showDetailedWatering = ref(false)
+let detailedWateringButton = ref("Mostra dettaglio")
 
 const propToken = reactive(props.token)
 const propUserPermissions = reactive(props.userPermissions)
@@ -170,12 +172,17 @@ function enableDynamicHeatmap() {
   showDynamicHeatmap.value = !showDynamicHeatmap.value
 }
 
+function enableDetailedAggregate() {
+  showDetailedWatering.value = !showDetailedWatering.value
+  detailedWateringButton.value = showDetailedWatering.value ? "Mostra dettaglio": "Mostra aggregato"
+}
+
 </script>
 
 <template>
 
-  <div id="monitoring-container" class="container align-top">
-    <div class="row" style="margin-top:10px;">
+  <div class="container align-top mt-5">
+    <div class="row m-2">
       <div class="col d-flex justify-content-center">
         <div class="btn-group-toggle" data-toggle="buttons">
           <span style="margin-right:10px;">Filtro:</span>
@@ -188,13 +195,13 @@ function enableDynamicHeatmap() {
           <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('7_day')}">
             <input type="radio" id="one_week_filter" name="timefilter-radio" value="7_day" autocomplete="off" @click="selectTimestamp('7_day')" checked>Ultima settimana
           </label>
-          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('24_hour')}">
-            <input type="radio" name="timefilter-radio" value="24_hour" @click="selectTimestamp('24_hour')" autocomplete="off">Ultime 24h
+          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('24_hours')}">
+            <input type="radio" name="timefilter-radio" value="24_hour" @click="selectTimestamp('24_hours')" autocomplete="off">Ultime 24h
           </label>
         </div>
       </div>
     </div>
-    <div v-if="showCustomizeInput" class="row" id="timeperiod" style="margin-top:10px;">
+    <div v-if="showCustomizeInput" class="row m-2" id="timeperiod" >
       <div class="col d-flex justify-content-center">
         <span style="margin-right:10px; margin-left:10px;">Periodo da:</span>
         <input type="date" name="timeperiod_from" v-model="selectedDateFrom">
@@ -208,7 +215,7 @@ function enableDynamicHeatmap() {
       </div>
     </div>
 
-    <div v-if="propUserPermissions.value && propUserPermissions.value.permissions" class="dropdown align-top col-md-12">
+    <div v-if="propUserPermissions.value && propUserPermissions.value.permissions" class="m-2 align-top col-md-12">
       <div class="col d-flex justify-content-center">
         <p style="vertical-align: middle; margin-right: 10px">Campo: </p>
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -227,100 +234,96 @@ function enableDynamicHeatmap() {
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="charts-container container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
       <div class="humidity-card card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Matrice dell'umidità</span>
           <button class="btn btn-sm btn-secondary" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
         </div>
-        <div class="card-body">
-          <HumidityMultiLineChart style="height: 300px; width: 700px" :config="JSON.stringify(connectionParams)"></HumidityMultiLineChart>
-          <HumidityHeatmap :config="JSON.stringify(connectionParams)"></HumidityHeatmap>
+        <div class="card-body row">
+          <span>Seleziona un istante temporale nel grafico di sinistra per mostrare la relativa matrice di umidità (Con "<strong>G</strong>" 
+            si denota la posizione del gocciolatore):</span>
+          <div class="col-lg-6">
+            <HumidityMultiLineChart style="height: 300px" :config="JSON.stringify(connectionParams)"></HumidityMultiLineChart>
+          </div>
+          <div class="col-lg-6">
+            <HumidityHeatmap :config="JSON.stringify(connectionParams)"></HumidityHeatmap>
+          </div>          
         </div>
       </div>
     </div>
 
-    <div v-if="showDynamicHeatmap" class="charts-container container col-md-12">
+    <div v-if="showDynamicHeatmap" class="m-3 container col-md-12">
       <div class="humidity-card card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Evoluzione matrice dell'umidità</span>
         </div>
-        <div class="card-body">
           <div class="dynamic-humidity-map">
             <HumidityDynamicHeatmap v-if="hasUserPermission('MO')" :config="JSON.stringify(connectionParams)"></HumidityDynamicHeatmap>
           </div>
+      </div>
+    </div>
+
+    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+      <div class="groundwaterpot-card card">
+        <div class="card-header">Potenziale idrico</div>
+        <div class="card-body">
+          <GroundWaterPotentialChart style="height: 320px" :config="JSON.stringify(connectionParams)"></GroundWaterPotentialChart>
         </div>
       </div>
     </div>
 
-
-    <div>
-      <div v-if="hasUserPermission('MO')" class="charts-container container col-md-12">
-        <div class="groundwaterpot-card card">
-          <div class="card-header">Potenziale idrico</div>
-          <div class="card-body">
-            <GroundWaterPotentialChart style="height: 300px" :config="JSON.stringify(connectionParams)"></GroundWaterPotentialChart>
-          </div>
+    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Consiglio Irriguo, Irrigazione e Precipitazioni</span> 
+          <button class="btn btn-sm btn-secondary" type="button" @click="enableDetailedAggregate" id="dynamic-heatmap-button">{{ detailedWateringButton }}</button>
         </div>
-      </div>
-    </div>
-
-    <div >
-      <div v-if="hasUserPermission('MO')" class="charts-container container">
-        <div class="countors-card card">
-          <div class="card-header">Matrici di media e varianza</div>
-          <div class="card-body">
-                <p>Matrice dell'umidità <strong>media</strong> lungo il periodo:</p><br>
-                <CountorMeanChart :config="JSON.stringify(connectionParams)"></CountorMeanChart>
-            <p>Matrice di <strong>varianza</strong> dell'umidità lungo il periodo:</p><br>
-                <CountorStdChart :config="JSON.stringify(connectionParams)"></CountorStdChart>
-          </div>
+        <div v-if="showDetailedWatering">
+            <pre style="padding-left: 20px; padding-top: 10px;"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
+            <div class="card-body">
+              <WaterAdviceChart style="height: 300px" :config="JSON.stringify(connectionParams)"></WaterAdviceChart>
+            </div>
         </div>
-      </div>
-    </div>
-
-    <div>
-      <div v-if="hasUserPermission('MO')" class="charts-container container col-md-12">
-        <div class="airtemperature-card card">
-          <div class="card-header">Temperatura dell'aria</div>
-          <div class="card-body">
-            <AirTemperatureChart style="height: 300px" :config="JSON.stringify(connectionParams)"></AirTemperatureChart>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div v-if="hasUserPermission('MO')" class="charts-container container col-md-12">
-        <div class="airtemperature-card card">
-          <div class="card-header">Consiglio Irriguo</div>
-          <pre style="padding-left: 20px; padding-top: 10px;"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
-          <div class="card-body">
-            <WaterAdviceChart style="height: 300px; width: 900px" :config="JSON.stringify(connectionParams)"></WaterAdviceChart>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div v-if="hasUserPermission('MO')" class="charts-container container col-md-12">
-        <div class="airtemperature-card card">
-          <div class="card-header">Irrigazione e Precipitazioni</div>
+        <div v-else>
           <pre style="padding-left: 20px; padding-top: 10px;"><b>Pluv Curr</b> espresso in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
           <div class="card-body">
-            <DripperAndPluvChart style="height: 300px; width: 900px" :config="JSON.stringify(connectionParams)"></DripperAndPluvChart>
+            <DripperAndPluvChart style="height: 300px" :config="JSON.stringify(connectionParams)"></DripperAndPluvChart>
           </div>
         </div>
       </div>
     </div>
 
-    <div>
-      <div v-if="hasUserPermission('WA')" class="charts-container container col-md-12">
-        <div class="airtemperature-card card">
-          <div class="card-header">Potenziale Idrico Ottimale e Potenziale Idrico Medio Giornaliero</div>
-          <div class="card-body">
-            <DeltaChart style="height: 300px" :config="JSON.stringify(connectionParams)"></DeltaChart>
+    <div v-if="hasUserPermission('WA')" class="m-3 container col-md-12">
+      <div class=" card">
+        <div class="card-header">Potenziale Idrico Ottimale e Potenziale Idrico Medio Giornaliero</div>
+        <div class="card-body">
+          <DeltaChart style="height: 300px" :config="JSON.stringify(connectionParams)"></DeltaChart>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="hasUserPermission('MO')" class="m-3 container">
+      <div class="countors-card card">
+        <div class="card-header">Matrici di media e varianza</div>
+        <div class="card-body row">
+          <div class="col-lg-6">
+              <p>Matrice dell'umidità <strong>media</strong> lungo il periodo:</p>
+              <CountorMeanChart :config="JSON.stringify(connectionParams)"></CountorMeanChart>
           </div>
+          <div class="col-lg-6">
+            <p>Matrice di <strong>varianza</strong> dell'umidità lungo il periodo:</p>
+            <CountorStdChart :config="JSON.stringify(connectionParams)"></CountorStdChart>
+          </div>  
+        </div>
+      </div>
+    </div>
+
+    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+      <div class="card">
+        <div class="card-header">Temperatura dell'aria</div>
+        <div class="card-body">
+          <AirTemperatureChart style="height: 300px" :config="JSON.stringify(connectionParams)"></AirTemperatureChart>
         </div>
       </div>
     </div>
@@ -335,27 +338,10 @@ function enableDynamicHeatmap() {
 
 <style scoped>
 
-.charts-container {
-  margin-top: 10%;
-}
-
 input[type=radio] {
   position: absolute;
   clip: rect(0,0,0,0);
   pointer-events: none;
-}
-
-.dropdown {
-  margin-top: 20px;
-}
-
-#monitoring-container{
-  margin-top: 100px;
-}
-
-.card {
-  min-height: 400px;
-  min-width: 1000px;
 }
 
 .timefilter{

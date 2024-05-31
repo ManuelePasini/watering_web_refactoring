@@ -5,6 +5,7 @@ import {onMounted, ref, watchEffect} from "vue";
 import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
+import { Colors } from 'chart.js';
 
 const communicationService = new CommunicationService();
 
@@ -34,12 +35,9 @@ const endpoint = 'groundWaterPotential'
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {
     const key = currentValue.detectedValueTypeDescription
-    if(accumulator.has(key))
-      accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
-    else {
+    if(!accumulator.has(key))
       accumulator.set(key, []);
-      accumulator.get(key, JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
-    }
+    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
     return accumulator;
   }, new Map());
 }
@@ -65,6 +63,7 @@ const colorFunction = (str) => {
   return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
 }
 
+ChartJS.register(Colors);
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
 
 watchEffect(async () => {
@@ -96,6 +95,13 @@ async function mountChart() {
   options.value = {
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          boxWidth: 2,
+        }
+      }
+    },
     parsing: {
       xAxisKey: 'x',
       yAxisKey: 'y'
@@ -120,7 +126,7 @@ async function mountChart() {
           },
         },
         ticks: {
-          stepSize: 1
+          source: 'data'
         },
         title: {
           display: true,

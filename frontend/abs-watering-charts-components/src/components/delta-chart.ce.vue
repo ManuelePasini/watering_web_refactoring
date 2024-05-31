@@ -18,28 +18,26 @@ import {
   Filler,
   TimeScale
 } from 'chart.js'
+import {LineDatasetData} from "../common/LineDatasetData.js";
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
 
 const communicationService = new CommunicationService();
 
-const props = defineProps(['config'])
-let showChart = ref(false)
-
-const endpoint = 'delta'
-
-import {LineDatasetData} from "../common/LineDatasetData.js";
-
 let chartData = ref({datasets: [], labels: []})
 let options = ref({responsive: true, maintainAspectRatio: false})
+let showChart = ref(false)
+
+const props = defineProps(['config'])
+
+const endpoint = 'delta'
 
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {
     const key = currentValue.detectedValueTypeDescription
     if(accumulator.has(key))
-      accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
-    else {
       accumulator.set(key, []);
-      accumulator.get(key, JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
-    }
+    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
     return accumulator;
   }, new Map());
 }
@@ -57,7 +55,12 @@ const colorFunction = (str) => {
     return 'rgb(0, 110, 189)'
 }
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
+watchEffect(async () => {
+  let value = props.config;
+  if(value) {
+    await mountChart()
+  }
+});
 
 async function mountChart() {
   const parsed = JSON.parse(props.config);
@@ -95,7 +98,7 @@ async function mountChart() {
           },
         },
         ticks: {
-          stepSize: 1
+          source: 'data'
         },
         title: {
           display: true,
@@ -114,18 +117,12 @@ async function mountChart() {
   }
 }
 
-watchEffect(async () => {
-  let value = props.config;
-  if(value) {
-    await mountChart()
-  }
-});
-
-
 </script>
 
 <template>
-  <Line v-if="showChart" :data="chartData" :options="options" />
+  <div v-if="showChart">
+    <Line :data="chartData" :options="options"/>
+  </div>
   <div v-else>Nessun dato disponibile.</div>
 </template>
 

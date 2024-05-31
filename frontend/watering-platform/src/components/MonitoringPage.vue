@@ -10,7 +10,7 @@ const router = useRouter()
 let token = reactive({});
 let userPermissions = reactive({});
 
-const checkInterval = 3600000;
+const checkInterval = 36000000;
 
 onMounted(async () => {
   token.value = await authService.authHeader();

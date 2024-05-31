@@ -84,7 +84,7 @@ async function mountChart() {
           },
         },
         ticks: {
-          stepSize: 1
+          source: 'data'
         },
         title: {
           display: true,
