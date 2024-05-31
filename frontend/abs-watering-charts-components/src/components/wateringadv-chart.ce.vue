@@ -30,19 +30,16 @@ const props = defineProps(['config'])
 const endpoint = 'wateringAdvice'
 
 const colorFunction = (str) => {
-  let hash = 0;
-  if (str.length === 0) return hash;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    hash = hash & hash;
-  }
-  let rgb = [0, 0, 0];
-  for (let i = 0; i < 3; i++) {
-    let value = (hash >> (i * 8)) & 255;
-    rgb[i] = value;
-  }
-  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+  if (str === 'Dripper')
+    return 'rgb(0, 110, 189)'
+  if (str === 'Pluv Curr')
+    return 'rgb(124, 176, 244)'
+  if (str === 'Advice')
+    return 'rgb(164, 224, 61)'
+  if (str === 'Pot Evap')
+    return 'rgb(241, 163, 133)'
 }
+
 
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {

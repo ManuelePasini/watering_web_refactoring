@@ -21,8 +21,7 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
               AND "timestamp" <= '${timeFilterTo}'
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
-              AND ("fieldName" IS NULL
-               OR "fieldName" = '${fieldName}')
+              AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
               AND "colture" = '${colture}'

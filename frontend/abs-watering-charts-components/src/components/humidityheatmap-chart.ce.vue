@@ -163,8 +163,11 @@ async function mountChart() {
     showChart.value = images.value.size > 0
     const timestamps = Array.from(images.value.keys()).sort()
     selectedImage.value = timestamps[timestamps.length - 1]
-  } else images.value = {}
-  await drawImage()
+    if (showChart.value)
+      await drawImage()
+  } else {
+    showChart.value = false
+  }
 }
 </script>
 

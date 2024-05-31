@@ -54,9 +54,9 @@ const createDatasets = (groupedMeasures) => {
 
 const colorFunction = (str) => {
   if (str === 'Dripper')
-    return 'rgb(124, 176, 244)'
-  if (str === 'Pluv Curr')
     return 'rgb(0, 110, 189)'
+  if (str === 'Pluv Curr')
+    return 'rgb(124, 176, 244)'
 }
 
 watchEffect(async () => {

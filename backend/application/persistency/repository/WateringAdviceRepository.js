@@ -26,7 +26,7 @@ class WateringAdviceRepository {
                 AND "timestamp" <= '${timefilterTo}'
                 AND "refStructureName" = '${refStructureName}'
                 AND "companyName" = '${companyName}'
-                AND ("fieldName" IS NULL OR "fieldName" = '${fieldName}')
+                AND "fieldName" = '${fieldName}'
                 AND "sectorName" = '${sectorName}'
                 AND "plantRow" = '${plantRow}'
                 AND "colture" = '${colture}'
@@ -48,7 +48,7 @@ class WateringAdviceRepository {
               AND "timestamp" <= '${timefilterTo}'
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
-              AND ("fieldName" IS NULL OR "fieldName" = '${fieldName}')
+              AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
               AND "colture" = '${colture}'
@@ -70,7 +70,7 @@ class WateringAdviceRepository {
               AND "timestamp" <= '${timefilterTo}'
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
-              AND ("fieldName" IS NULL OR "fieldName" = '${fieldName}')
+              AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
               AND "colture" = '${colture}'
@@ -91,8 +91,7 @@ class WateringAdviceRepository {
               AND "timestamp" < '${timefilterTo}'
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
-              AND ("fieldName" IS NULL
-               OR "fieldName" = '${fieldName}')
+              AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "advice", "sectorName", "plantRow", rounded_timestamp
