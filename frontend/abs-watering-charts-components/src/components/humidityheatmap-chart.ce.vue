@@ -1,5 +1,5 @@
 <script setup>
-import {nextTick, ref, watchEffect} from "vue";
+import {nextTick, ref, watch, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 import VueApexCharts  from "vue3-apexcharts"
 import { luxonDateTimeToString } from "../common/dateUtils.js"
@@ -8,23 +8,39 @@ const communicationService = new CommunicationService();
 const heatmapSeries = ref([]);
 const chartOptions = ref({emitsOptions: false})
 const images = ref({})
-const selectedImage = ref({})
 const container = ref(null)
 
-const props = defineProps(['config'])
+const props = defineProps(['config', 'selectedTimestamp'])
 const showChart = ref(false)
 const endpoint = 'heatmap'
 
-watchEffect(async () => {
+watchEffect( async () => {
   let value = props.config;
   if(value) {
     await mountChart()
   }
 });
 
-async function drawImage(){
+watch( () => props.selectedTimestamp, async (timestamp) => {
+  if(timestamp){
+    await drawImage(timestamp)
+  }
+})
 
-  heatmapSeries.value = Array.from(images.value.get(selectedImage.value).reduce((accumulator, currentValue) => {
+const load = ref(false)
+
+async function drawImage(timestamp){
+  if (!(Object.keys(images.value).length == 0)){
+    return
+  }
+  timestamp = String(timestamp)
+  if(!images.value.has(timestamp)){
+    console.log("Image " + timestamp + " is missing")
+    return
+  }
+
+
+  heatmapSeries.value = Array.from(images.value.get(timestamp).reduce((accumulator, currentValue) => {
     if (!accumulator.has(currentValue.yy))
       accumulator.set(currentValue.yy, []);
     accumulator.get(currentValue.yy).push({ x: currentValue.xx,
@@ -38,7 +54,9 @@ async function drawImage(){
     }
   }).sort((a,b)=> b.name - a.name)
 
-  await nextTick()
+  if(!container.value){
+    await nextTick()
+  }
   const containerWidth = container.value.offsetWidth
   const cellSize = containerWidth / heatmapSeries.value[0].data.length
   const titleOffset = 80
@@ -112,7 +130,7 @@ async function drawImage(){
       width: 0.2
     },
     title: {
-      text: 'Interpolazione bilineare ' + luxonDateTimeToString(selectedImage.value),
+      text: 'Interpolazione bilineare ' + luxonDateTimeToString(timestamp),
       align: 'center',
       offsetY: 10,
     },
@@ -161,10 +179,10 @@ async function mountChart() {
   if(chartDataResponse) {
     images.value = new Map(chartDataResponse.map(obj => [obj.timestamp, obj.image]))
     showChart.value = images.value.size > 0
-    const timestamps = Array.from(images.value.keys()).sort()
-    selectedImage.value = timestamps[timestamps.length - 1]
-    if (showChart.value)
-      await drawImage()
+    if (showChart.value){
+      const timestamps = Array.from(images.value.keys()).sort()
+      await drawImage(timestamps[timestamps.length - 1])
+    }
   } else {
     showChart.value = false
   }

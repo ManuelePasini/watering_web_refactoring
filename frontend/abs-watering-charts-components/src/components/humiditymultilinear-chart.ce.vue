@@ -27,8 +27,8 @@ let chartData = ref({datasets: [], labels: []})
 let options = ref({responsive: true, maintainAspectRatio: false})
 let showChart = ref(false)
 
-const props = defineProps(['config'])
-
+const props = defineProps(['config','selectedTimestamp'])
+const emit = defineEmits(['selectTimestamp'])
 const endpoint = 'humidityBins'
 
 
@@ -164,6 +164,12 @@ async function mountChart() {
           stepSize: 20
         },
         min: 0,
+      }
+    },
+    onClick: function handleClick(event, array) {
+      if (array.length > 0) {
+        const timestamp = array[0].element.$context.parsed.x / 1000
+        emit('selectTimestamp',timestamp)
       }
     }
   }
