@@ -3,6 +3,7 @@ import {nextTick, ref, watch, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 import VueApexCharts  from "vue3-apexcharts"
 import { luxonDateTimeToString } from "../common/dateUtils.js"
+import { color } from "d3";
 
 const communicationService = new CommunicationService();
 const heatmapSeries = ref([]);
@@ -38,9 +39,17 @@ async function drawImage(timestamp){
     console.log("Image " + timestamp + " is missing")
     return
   }
+ 
+  const parsed = JSON.parse(props.config);
+  const dripperPos = await communicationService.getFieldInfo(parsed.environment, parsed.paths, parsed.params, "dripperInfo")
 
 
-  heatmapSeries.value = Array.from(images.value.get(timestamp).reduce((accumulator, currentValue) => {
+  const image = images.value.get(timestamp)
+
+  const dripper = image[0]
+  console.log(dripper)
+
+  const series = Array.from(image.reduce((accumulator, currentValue) => {
     if (!accumulator.has(currentValue.yy))
       accumulator.set(currentValue.yy, []);
     accumulator.get(currentValue.yy).push({ x: currentValue.xx,
@@ -54,6 +63,15 @@ async function drawImage(timestamp){
     }
   }).sort((a,b)=> b.name - a.name)
 
+  const dripperSeries = {
+    name: "0",
+    data: Array.from(series[0].data).map(el=> { return { x: el.x, y: el.x== dripperPos.x ? 0 : 100}})
+  }
+  console.log(dripperSeries)
+
+  series.push(dripperSeries)
+
+  heatmapSeries.value = series
   if(!container.value){
     await nextTick()
   }
@@ -78,7 +96,14 @@ async function drawImage(timestamp){
         enableShades: false,
         radius: 0,
         colorScale: {
-          ranges: [{
+          ranges: [
+          {
+            from: 0.01,
+            to: 1000,
+            name: " ",
+            color: '#ffffff'
+          },  
+          {
             from: -29.99,
             to: 0,
             name: '(-30,0]',
@@ -118,6 +143,13 @@ async function drawImage(timestamp){
       },
     },
     dataLabels: {
+      formatter: function(value, { seriesIndex, dataPointIndex, w }) {
+        if (value == 0){
+          return "G"
+        } else {
+          return value
+        }
+      },
       enabled: cellSize > 13,
       style: {
         fontSize: '8px',
@@ -125,6 +157,11 @@ async function drawImage(timestamp){
     },
     legend: {
       show: true,
+      markers: {
+        width: 5,
+        height: 16,
+        radius: 0
+      }
     },
     stroke: {
       width: 0.2
@@ -159,11 +196,15 @@ async function drawImage(timestamp){
     },
     tooltip:{
       custom: function({series, seriesIndex, dataPointIndex, w}) {
+        if(series[seriesIndex][dataPointIndex] <= 0){
           return ('<div class="arrow_box m-1">' +
             '<div> <strong>x</strong>: ' + heatmapSeries.value[seriesIndex].data[dataPointIndex].x + '</div>' +
             '<div> <strong>y</strong>: ' + heatmapSeries.value[seriesIndex].name + '</div>' +
             '<div> <strong>val</strong>: ' + series[seriesIndex][dataPointIndex] + '</div>' +
             '</div>')
+        } else 
+          return ""
+
       }
     }
   }
@@ -173,8 +214,6 @@ async function mountChart() {
   const parsed = JSON.parse(props.config);
 
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint)
-
-  //get dripper position
 
   if(chartDataResponse) {
     images.value = new Map(chartDataResponse.map(obj => [obj.timestamp, obj.image]))

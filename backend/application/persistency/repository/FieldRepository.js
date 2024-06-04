@@ -1,12 +1,13 @@
-const { QueryTypes, DataTypes } = require('sequelize')
+const { QueryTypes, DataTypes, Op } = require('sequelize')
 const { WateringAdviceProfileData, WateringAdviceDto } = require('../../dtos/wateringAdviceDto')
 
 class FieldRepository {
 
-  constructor(MatrixProfile, MatrixField, TranscodingField, sequelize) {
+  constructor(MatrixProfile, MatrixField, TranscodingField, WateringFields, sequelize) {
     this.MatrixProfile = MatrixProfile
     this.MatrixField = MatrixField
     this.TranscodingField = TranscodingField
+    this.WateringFields = WateringFields
     this.sequelize = sequelize
   }
 
@@ -138,6 +139,35 @@ class FieldRepository {
           plantRow: plantRow,
         }
       });
+    } catch (error) {
+      console.error('Error on find field details:', error);
+    }
+  }
+
+  async getDripperInfo(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp) {
+    try {
+      this.WateringFields.removeAttribute('id')
+      const result = await this.WateringFields.findOne({
+        where: {
+          refStructureName: refStructureName,
+          companyName: companyName,
+          fieldName: fieldName,
+          sectorName: sectorName,
+          plantRow: plantRow,
+          timestamp_from: { [Op.lt]: timestamp },
+          timestamp_to: {
+            [Op.or]: {
+              [Op.is]: null,
+              [Op.gt]: timestamp
+            },
+          }
+        }
+      });
+      const dripper = {
+        x: result.dataValues.dripper_pos,
+        y: 0
+      }
+      return dripper
     } catch (error) {
       console.error('Error on find field details:', error);
     }

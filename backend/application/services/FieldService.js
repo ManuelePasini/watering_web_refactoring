@@ -9,6 +9,7 @@ const FieldRepository = require('../persistency/repository/FieldRepository')
 const initMatrixProfile = require('../persistency/model/MatrixProfile')
 const initMatrixField = require('../persistency/model/MatrixField')
 const initTranscodingField = require('../persistency/model/TranscodingField')
+const initWateringField = require('../persistency/model/WateringField')
 
 const { FieldCreateDto } = require('../dtos/createFieldDto')
 
@@ -22,7 +23,7 @@ class FieldService {
         this.humidityBinsRepository = new HumidityBinsRepository(sequelize);
         this.viewDataOriginalRepository = new ViewDataOriginalRepository(sequelize);
         this.wateringAdviceRepository = new WateringAdviceRepository(sequelize);
-        this.fieldRepository = new FieldRepository(initMatrixProfile(sequelize), initMatrixField(sequelize), initTranscodingField(sequelize), sequelize);
+        this.fieldRepository = new FieldRepository(initMatrixProfile(sequelize), initMatrixField(sequelize), initTranscodingField(sequelize), initWateringField(sequelize), sequelize);
     }
 
     async getInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo) {
@@ -84,6 +85,10 @@ class FieldService {
 
     async getCurrentWateringAdvice(refStructureName, companyName, fieldName, sectorName, plantRow) {
         return this.fieldRepository.getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorName, plantRow)
+    }
+
+    async getDripperInfo(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp) {
+        return this.fieldRepository.getDripperInfo(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp)
     }
 
     async createTranscodingFields(affiliation, request) {
