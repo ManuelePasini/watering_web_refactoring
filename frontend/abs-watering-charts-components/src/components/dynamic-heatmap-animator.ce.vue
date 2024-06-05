@@ -4,8 +4,8 @@ import '../assets/animator.css'
 
 import {ref, onMounted, watch, reactive, watchEffect} from 'vue';
 import GenericLinearChart from "./generic-linechart.ce.vue";
-import DynamicHumidityHeatmap from "./dynamic-heatmap.ce.vue";
 import {CommunicationService} from "../services/CommunicationService.js";
+import DynamicHeatmap from "../components/dynamic-heatmap.ce.vue";
 
 const buttonTexts = {
   start: 'Start',
@@ -152,7 +152,7 @@ watchEffect(async () => {
 
       <div class="charts-wrapper row">
         <div class="heatmap-dataviz col-6">
-          <dynamic-humidity-heatmap style="margin-left: -10px" :config="animatorConfig"></dynamic-humidity-heatmap>
+          <DynamicHeatmap style="margin-left: -10px" :config="animatorConfig" :selectTimestamp="currentTimestamp"></DynamicHeatmap>
         </div>
         <div class="col-1"><p></p></div>
         <div class="line_charts col-5">

@@ -3,7 +3,6 @@ import {nextTick, ref, watch, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 import VueApexCharts  from "vue3-apexcharts"
 import { luxonDateTimeToString } from "../common/dateUtils.js"
-import { color } from "d3";
 
 const communicationService = new CommunicationService();
 const heatmapSeries = ref([]);
@@ -28,8 +27,6 @@ watch( () => props.selectedTimestamp, async (timestamp) => {
   }
 })
 
-const load = ref(false)
-
 async function drawImage(timestamp){
   if (!(Object.keys(images.value).length == 0)){
     return
@@ -47,7 +44,6 @@ async function drawImage(timestamp){
   const image = images.value.get(timestamp)
 
   const dripper = image[0]
-  console.log(dripper)
 
   const series = Array.from(image.reduce((accumulator, currentValue) => {
     if (!accumulator.has(currentValue.yy))
@@ -67,7 +63,6 @@ async function drawImage(timestamp){
     name: "0",
     data: Array.from(series[0].data).map(el=> { return { x: el.x, y: el.x== dripperPos.x ? 0 : 100}})
   }
-  console.log(dripperSeries)
 
   series.push(dripperSeries)
 
