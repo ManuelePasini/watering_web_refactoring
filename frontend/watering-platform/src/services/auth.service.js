@@ -37,11 +37,16 @@ class AuthService {
         else return undefined;
     }
 
-    async retrieveUserPermissions(token) {
+    async retrieveUserFieldPermissions(token, timeFilterFrom, timeFilterTo) {
+        let params = undefined
+        if (timeFilterFrom && timeFilterTo) {
+            params = { timeFilterFrom: timeFilterFrom, timeFilterTo: timeFilterTo }
+        }
         return axiosInstance.get('/userFields', {
             headers: {
                 'Authorization': 'Bearer ' + token
-            }
+            },
+            params: params
         }).then(response => {
             if(response.data)
                 return response.data

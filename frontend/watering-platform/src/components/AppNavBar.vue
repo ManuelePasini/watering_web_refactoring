@@ -4,13 +4,14 @@
   import {useRouter} from "vue-router";
   const router = useRouter()
 
-  const props = defineProps(['userPermissions'])
-  const reactiveUserPermissions = reactive(props.userPermissions)
+  const props = defineProps(['user'])
+  const user = reactive(props.user)
 
   const handleLogout = async () => {
     authService.logout()
     await router.push('/logout')
   }
+
 
 </script>
 
@@ -18,8 +19,8 @@
   <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark d-flex justify-content-between">
     <a class="navbar-brand flex-fill" href="#"> Monitoraggio idrico </a>
     <a class="navbar-brand" href="https://big.csr.unibo.it"> <img src="../assets/images/10simple.png" height="40" alt=""> </a>
-    <div class="navbar-user" v-if="reactiveUserPermissions && reactiveUserPermissions.value">
-      <span class="navbar-text" style="margin-right: 20px;">{{reactiveUserPermissions.value.user}}</span>
+    <div class="navbar-user" v-if="user && user.value">
+      <span class="navbar-text" style="margin-right: 20px;">{{user.value.user}}</span>
       <button class="btn btn-outline-info" @click="handleLogout" role="button">Logout</button>
     </div>
   </nav>

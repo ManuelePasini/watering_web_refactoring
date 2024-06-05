@@ -107,6 +107,15 @@ usersRouter.get("/validateToken", async (req, res) => {
  *     summary: Retrieve user permissions for fields
  *     description: Retrieve the permissions for fields associated with the authenticated user.
  *     tags: [User route]
+ *     parameters:
+ *       - in: query
+ *         name: timeFilterFrom
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: timeFilterTo
+ *         schema:
+ *           type: string
  *     responses:
  *       '200':
  *         description: Successful operation
@@ -145,7 +154,7 @@ usersRouter.get('/userFields', async (req, res) => {
     }
 
     try {
-        const result = await userService.findUserPermissions(requestUserData.user);
+        const result = await userService.findUserPermissions(requestUserData.user, req.query.timeFilterFrom, req.query.timeFilterTo);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({message:error.message});

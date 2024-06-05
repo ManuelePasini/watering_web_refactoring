@@ -8,7 +8,7 @@ import {useRouter} from "vue-router";
 const router = useRouter()
 
 let token = reactive({});
-let userPermissions = reactive({});
+let user = reactive({});
 
 const checkInterval = 36000000;
 
@@ -16,9 +16,9 @@ onMounted(async () => {
   token.value = await authService.authHeader();
 
   if (token.value) {
-    const result = await authService.retrieveUserPermissions(token.value);
+    const result = await authService.retrieveUserFieldPermissions(token.value);
     if(!result) await router.push('/logout')
-    userPermissions.value = result
+    user.value = {user: result.user, affiliation: result.affiliation, role: result.role}
   }
   userTokenUpdate()
 });
@@ -26,11 +26,10 @@ onMounted(async () => {
 const userTokenUpdate = () => {
   intervalId = setInterval(async () => {
     token.value = await authService.authHeader();
-
     if (token.value) {
-      const result = await authService.retrieveUserPermissions(token.value);
+      const result = await authService.retrieveUserFieldPermissions(token.value);
       if(!result) await router.push('/logout')
-      userPermissions.value = result
+      user.value = result
     }
   }, checkInterval);
 };
@@ -42,8 +41,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <AppNavBar :userPermissions="userPermissions"/>
-  <Monitoring :userPermissions="userPermissions" :token="token" class="justify-content-md-center col-12"></Monitoring>
+  <AppNavBar :user="user"/>
+  <Monitoring :user="user" :token="token" class="justify-content-md-center col-12"></Monitoring>
 </template>
 
 <style scoped>

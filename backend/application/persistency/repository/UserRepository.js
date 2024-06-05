@@ -1,4 +1,5 @@
 const hashPassword = require('../../commons/hashPassword')
+const { QueryTypes } = require("sequelize");
 
 class UserRepository {
 
@@ -18,14 +19,9 @@ class UserRepository {
 
     async findUserPermissions(user) {
         try {
-            return await this.User.findOne({
-                where: { userid: user },
-                include: [
-                    {
-                        model: this.FieldsPermit,
-                    },
-                ]
-            });
+            return (await this.FieldsPermit.findAll({
+                where: { userid: user }
+            })).map(el => el.dataValues);
         } catch (error) {
             console.error('Error on find user:', error);
         }
@@ -33,11 +29,66 @@ class UserRepository {
 
     async findAdminPermissions() {
         try {
-            return await this.FieldsPermit.findAll();
+            return (await this.FieldsPermit.findAll()).map(el => el.dataValues);
         } catch (error) {
             console.error('Error on find admin permissions:', error);
         }
     }
+
+    async findUserPermissionsInPeriod(user, timestamp_from, timestamp_to) {
+        try {
+            const query = `
+                SELECT DISTINCT permit.userid, permit.affiliation, permit."refStructureName", permit."companyName", permit."fieldName", permit."sectorName", permit."plantRow", permit.permit
+                    FROM public.permit_fields AS permit
+                    JOIN public.transcoding_field AS transcoding
+                        ON permit."refStructureName" = transcoding."refStructureName"
+                            AND permit."companyName" = transcoding."companyName"
+                            AND permit."fieldName" = transcoding."fieldName"
+                            AND permit."sectorName" = transcoding."sectorName"
+                            AND permit."plantRow" = transcoding."plantRow"
+                    WHERE (permit.userid = '${user}') 
+                        AND transcoding.valid_from < '${timestamp_to}' 
+                        AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)`
+
+            return await this.sequelize.query(query, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    user,
+                    timestamp_from,
+                    timestamp_to
+                }
+            });
+        } catch (error) {
+            console.error('Error on find user permissions:', error);
+        }
+    }
+
+    async findAdminPermissionsInPeriod(timestamp_from, timestamp_to) {
+        try {
+            const query = `
+                SELECT DISTINCT permit."refStructureName", permit."companyName", permit."fieldName", permit."sectorName", permit."plantRow"
+                    FROM public.permit_fields AS permit
+                    JOIN public.transcoding_field AS transcoding
+                        ON permit."refStructureName" = transcoding."refStructureName"
+                            AND permit."companyName" = transcoding."companyName"
+                            AND permit."fieldName" = transcoding."fieldName"
+                            AND permit."sectorName" = transcoding."sectorName"
+                            AND permit."plantRow" = transcoding."plantRow"
+                    WHERE transcoding.valid_from < '${timestamp_to}' 
+                        AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)`
+
+            return await this.sequelize.query(query, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    timestamp_from,
+                    timestamp_to
+                }
+            });
+        } catch (error) {
+            console.error('Error on find user permissions:', error);
+        }
+    }
+
 
     async createUser(user, auth_type, affiliation, pwd, name) {
         try {

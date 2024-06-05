@@ -51,33 +51,39 @@ class UserService {
         }
     }
 
-    async findUserPermissions(user) {
+    async findUserPermissions(userid, timeFilterFrom, timeFilterTo) {
         try {
-            const result = await this.userRepository.findUserPermissions(user)
-            if (result && result.dataValues && result.dataValues.role === 'admin') {
-                const adminResult = await this.userRepository.findAdminPermissions()
-                if(adminResult)
-                    return await this.computeAdminPermissions(user, adminResult)
-                return undefined
-            } else if(result && result.dataValues) {
-                return await this.computeUserPermissions(result)
+
+            const user = (await this.findUser(userid)).dataValues
+            let results
+            if (timeFilterFrom && timeFilterTo) {
+                if (user.role === "admin") {
+                    results = await this.userRepository.findAdminPermissionsInPeriod(timeFilterFrom, timeFilterTo)
+                } else {
+                    results = await this.userRepository.findUserPermissionsInPeriod(userid, timeFilterFrom, timeFilterTo)
+                }
+            } else {
+                if (user.role === "admin") {
+                    results = await this.userRepository.findAdminPermissions()
+                } else {
+                    results = await this.userRepository.findUserPermissions(userid)
+                }
             }
-            return undefined
+            if (results) {
+                return await this.computeUserPermissions(user, results)
+            } else {
+                throw new Error("Invalid result")
+            }
         } catch (error) {
             console.error(error)
-            return undefined
         }
     }
 
-    async computeUserPermissions(results) {
+    async computeUserPermissions(user, results) {
         try {
-            const user = result.dataValues.userid
-            const affiliation = result.dataValues.affiliation
-            const role = result.dataValues.role
             const fields = new Map();
 
-            for (const { dataValues: field } of results) {
-
+            for (const field of results) {
                 const fieldDetails = await this.fieldRepository.getFieldDetails(
                     field.refStructureName,
                     field.companyName,
@@ -94,6 +100,8 @@ class UserService {
 
                 if (field.permit) {
                     fields.get(keyString).add(field.permit);
+                } else if (user.role === "admin") {
+                    fields.get(keyString).add("*")
                 }
             }
 
@@ -110,59 +118,12 @@ class UserService {
                   [...permissions] // Spread operator to convert Set to Array
                 );
             });
-
-
-            return new UserFieldPermissions(user, affiliation, role, userFieldsPermissions)
+            return new UserFieldPermissions(user.userid, user.affiliation, user.role, userFieldsPermissions)
         } catch (error) {
             console.error(error)
-            return undefined
         }
     }
 
-    async computeAdminPermissions(user, results) {
-        try {
-            const fields = new Map();
-
-            for (const { dataValues: field } of results) {
-
-                const fieldDetails = await this.fieldRepository.getFieldDetails(
-                    field.refStructureName,
-                    field.companyName,
-                    field.fieldName,
-                    field.sectorName,
-                    field.plantRow
-                );
-
-                const keyString = JSON.stringify(fieldDetails.dataValues);
-
-                if (!fields.has(keyString)) {
-                    fields.set(keyString, new Set());
-                }
-
-                fields.get(keyString).add('*');
-            }
-
-            const userFieldsPermissions = Array.from(fields, ([keyString, permissions]) => {
-                const key = JSON.parse(keyString);
-                return new UserFieldPermission(
-                  key.refStructureName,
-                  key.companyName,
-                  key.fieldName,
-                  key.sectorName,
-                    key.plantRow,
-                    key.colture,
-                    key.coltureType,
-                  [...permissions] // Spread operator to convert Set to Array
-                );
-            });
-
-
-            return new UserFieldPermissions(user, user, 'admin', userFieldsPermissions)
-        } catch (error) {
-            console.error(error)
-            return undefined
-        }
-    }
 }
 
 module.exports = UserService

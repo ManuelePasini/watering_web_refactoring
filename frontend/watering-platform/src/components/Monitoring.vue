@@ -2,7 +2,7 @@
 
 import '../assets/basebase.css'
 
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watchEffect} from "vue";
 import AirTemperatureChart from "../../../abs-watering-charts-components/src/components/airtemperature-chart.ce.vue"
 import DripperAndPluvChart from "../../../abs-watering-charts-components/src/components/dripperandpluv-chart.ce.vue"
 import WaterAdviceChart from "../../../abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
@@ -14,14 +14,15 @@ import HumidityHeatmap from "../../../abs-watering-charts-components/src/compone
 import HumidityMultiLineChart from "../../../abs-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
 import HumidityDynamicHeatmap from "../../../abs-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
 import {useRouter} from "vue-router";
+import authService from '@/services/auth.service';
 
 const router = useRouter()
 
-const props = defineProps(['token', 'userPermissions'])
+const props = defineProps(['token', 'user'])
 
 let showCustomizeInput = ref(false)
 
-let selectedTimestampFrom = ref(getCurrentTimestampMinusDays(25))
+let selectedTimestampFrom = ref(getCurrentTimestampMinusDays(7))
 let selectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 
 let customSelectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
@@ -29,20 +30,27 @@ let customSelectedTimestampFrom = ref(getCurrentTimestampMinusDays(2))
 
 
 let selectedFieldName = ref('Select field')
-let selectedField = reactive({})
-let selectedTimeLabel = ref('')
+let selectedField = ref({})
+let selectedTimeLabel = ref("")
 let showDynamicHeatmap = ref(false)
 let showDetailedWatering = ref(false)
 let detailedWateringButton = ref("Mostra dettaglio")
 
-const propToken = reactive(props.token)
-const propUserPermissions = reactive(props.userPermissions)
+const token = reactive(props.token)
+const user = reactive(props.user)
+const userPermissions = reactive({})
 
 let connectionParams = {}
 
 onMounted(async () => {
-  if(!props.userPermissions) {
+  if(!user) {
     await router.push('/login')
+  }
+})
+
+watchEffect(()=>{
+  if(token.value){
+    updateUserPermission()
   }
 })
 
@@ -51,7 +59,7 @@ function updateConnectionParams() {
     connectionParams = {
     environment: {
       host: 'http://localhost:8081/fieldCharts/',
-      token: propToken.value
+      token: token.value
     },
     paths: selectedField.value,
     params: {
@@ -88,7 +96,7 @@ const selectedDateTo = computed({
   }
 });
 
-function selectTimestamp(timeFilter) {
+function selectTimePeriod(timeFilter) {
 
   switch (timeFilter) {
     case 'customize_day':
@@ -100,24 +108,25 @@ function selectTimestamp(timeFilter) {
       selectedTimestampFrom.value = getCurrentTimestampMinusDays(30);
       selectedTimestampTo.value = getCurrentTimestampMinusHours(0)
       selectedTimeLabel.value = '30_day';
-      updateConnectionParams()
       break;
     case '7_day':
       showCustomizeInput.value = false;
       selectedTimestampFrom.value = getCurrentTimestampMinusDays(7);
       selectedTimestampTo.value = getCurrentTimestampMinusHours(0)
       selectedTimeLabel.value = '7_day';
-      updateConnectionParams()
       break;
     case '24_hours':
       showCustomizeInput.value = false;
       selectedTimestampFrom.value = getCurrentTimestampMinusHours(24);
       selectedTimestampTo.value = getCurrentTimestampMinusHours(0)
       selectedTimeLabel.value = '24_hours';
-      updateConnectionParams()
       break;
   }
 
+  if(timeFilter != 'customize_day'){
+    updateUserPermission()
+    updateConnectionParams()
+  }
 }
 
 function getCurrentTimestampMinusDays(days) {
@@ -135,6 +144,7 @@ function getCurrentTimestampMinusHours(hours) {
 function updateCustomTimestamps(){
   selectedTimestampFrom.value = customSelectedTimestampFrom.value
   selectedTimestampTo.value = customSelectedTimestampTo.value
+  updateUserPermission()
   updateConnectionParams()
 }
 
@@ -153,12 +163,18 @@ function isLabelSelected(value) {
   return selectedTimeLabel.value === value
 }
 
+async function updateUserPermission(){
+  if (token.value){
+    userPermissions.value = await authService.retrieveUserFieldPermissions(token.value, selectedTimestampFrom.value, selectedTimestampTo.value)
+  }
+}
+
 function hasUserPermission(permission) {
-  if(propUserPermissions && propUserPermissions.value && propUserPermissions.value.permissions) {
+  if(userPermissions && userPermissions.value && userPermissions.value.permissions) {
     if(!selectedField.value || Object.keys(selectedField.value).length === 0) return false;
-    if(propUserPermissions.value.role === 'admin') return true
+    if(userPermissions.value.role === 'admin') return true
     const keySelected = createFieldName(selectedField.value)
-    for(const field of propUserPermissions.value.permissions) {
+    for(const field of userPermissions.value.permissions) {
       const tmpKey = createFieldName(field)
       if(keySelected === tmpKey) {
         return field.permissions.includes(permission)
@@ -174,7 +190,7 @@ function enableDynamicHeatmap() {
 
 function enableDetailedAggregate() {
   showDetailedWatering.value = !showDetailedWatering.value
-  detailedWateringButton.value = showDetailedWatering.value ? "Mostra dettaglio": "Mostra aggregato"
+  detailedWateringButton.value = showDetailedWatering.value ? "Mostra aggregato" : "Mostra dettaglio"
 }
 
 const selectedTimestamp = ref(null)
@@ -192,16 +208,16 @@ function selectedTime(time){
         <div class="btn-group-toggle" data-toggle="buttons">
           <span style="margin-right:10px;">Filtro:</span>
           <label :class="{ active: isLabelSelected('customize_day') }" class="btn btn-sm btn-secondary timefilter">
-            <input type="radio" name="timefilter-radio" value="customize_day" autocomplete="off" @click="selectTimestamp('customize_day')">Altro periodo
+            <input type="radio" name="timefilter-radio" value="customize_day" autocomplete="off" @click="selectTimePeriod('customize_day')">Altro periodo
           </label>
           <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('30_day')}">
-            <input type="radio" name="timefilter-radio" value="30_day" autocomplete="off" @click="selectTimestamp('30_day')">Ultimo mese
+            <input type="radio" name="timefilter-radio" value="30_day" autocomplete="off" @click="selectTimePeriod('30_day')">Ultimo mese
           </label>
           <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('7_day')}">
-            <input type="radio" id="one_week_filter" name="timefilter-radio" value="7_day" autocomplete="off" @click="selectTimestamp('7_day')" checked>Ultima settimana
+            <input type="radio" id="one_week_filter" name="timefilter-radio" value="7_day" autocomplete="off" @click="selectTimePeriod('7_day')" checked>Ultima settimana
           </label>
           <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('24_hours')}">
-            <input type="radio" name="timefilter-radio" value="24_hour" @click="selectTimestamp('24_hours')" autocomplete="off">Ultime 24h
+            <input type="radio" name="timefilter-radio" value="24_hour" @click="selectTimePeriod('24_hours')" autocomplete="off">Ultime 24h
           </label>
         </div>
       </div>
@@ -220,14 +236,14 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="propUserPermissions.value && propUserPermissions.value.permissions" class="m-2 align-top col-md-12">
+    <div v-if="userPermissions.value && userPermissions.value.permissions" class="m-2 align-top col-md-12">
       <div class="col d-flex justify-content-center">
         <p style="vertical-align: middle; margin-right: 10px">Campo: </p>
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
           {{ selectedFieldName }}
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <li v-for="(item, index) in propUserPermissions.value.permissions" :key="index">
+          <li v-for="(item, index) in userPermissions.value.permissions" :key="index">
             <a
                 class="dropdown-item"
                 href="#"
@@ -284,11 +300,11 @@ function selectedTime(time){
           <span>Consiglio Irriguo, Irrigazione e Precipitazioni</span> 
           <button class="btn btn-sm btn-secondary" type="button" @click="enableDetailedAggregate" id="dynamic-heatmap-button">{{ detailedWateringButton }}</button>
         </div>
-        <div v-if="showDetailedWatering">
-            <pre style="padding-left: 20px; padding-top: 10px;"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
-            <div class="card-body">
-              <WaterAdviceChart style="height: 300px" :config="JSON.stringify(connectionParams)"></WaterAdviceChart>
-            </div>
+        <div v-if="!showDetailedWatering">
+          <pre style="padding-left: 20px; padding-top: 10px;"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
+          <div class="card-body">
+            <WaterAdviceChart style="height: 300px" :config="JSON.stringify(connectionParams)"></WaterAdviceChart>
+          </div>
         </div>
         <div v-else>
           <pre style="padding-left: 20px; padding-top: 10px;"><b>Pluv Curr</b> espresso in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
