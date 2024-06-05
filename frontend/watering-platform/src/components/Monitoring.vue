@@ -6,7 +6,7 @@ import {computed, onMounted, reactive, ref, watchEffect} from "vue";
 import AirTemperatureChart from "../../../abs-watering-charts-components/src/components/airtemperature-chart.ce.vue"
 import DripperAndPluvChart from "../../../abs-watering-charts-components/src/components/dripperandpluv-chart.ce.vue"
 import WaterAdviceChart from "../../../abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
-import DeltaChart from "../../../abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
+import DeltaChart from "../../../abs-watering-charts-components/src/components/delta-chart.ce.vue"
 import CountorMeanChart from "../../../abs-watering-charts-components/src/components/countormean-chart.ce.vue"
 import CountorStdChart from "../../../abs-watering-charts-components/src/components/countorstd-chart.ce.vue"
 import GroundWaterPotentialChart from "../../../abs-watering-charts-components/src/components/groundwaterpot-chart.ce.vue"

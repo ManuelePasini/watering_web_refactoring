@@ -35,7 +35,7 @@ const endpoint = 'delta'
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {
     const key = currentValue.detectedValueTypeDescription
-    if(accumulator.has(key))
+    if(!accumulator.has(key))
       accumulator.set(key, []);
     accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2)}));
     return accumulator;
