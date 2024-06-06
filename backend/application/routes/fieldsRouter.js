@@ -56,7 +56,7 @@ fieldsRouter.put('/setOptState', async (req, res) => {
     throw new Error('Body is empty');
 
   try {
-    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.user, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'SetOpt')))
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'SetOpt')))
       return res.status(401).json({message: 'Unauthorized request'});
 
     if(!req.body.validFrom || !req.body.validTo || !req.body.optimalState)
@@ -115,7 +115,7 @@ fieldsRouter.post('/wateringAdvice', async (req, res) => {
   }
 
   try {
-    if(!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.user, 'WA')))
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, 'WA')))
       return res.status(401).json({message: 'Unauthorized request'});
 
 
@@ -159,7 +159,7 @@ fieldsRouter.post('/wateringAdvice', async (req, res) => {
  *           description: Error during fields creation
  */
 fieldsRouter.put('/createFields', async (req, res) => {
-  let requestUserData = {userId: -1, partner: ''}
+  let requestUserData = { userid: -1, partner: '' }
   try {
     requestUserData = await authenticationService.validateJwt(req.headers.authorization);
   } catch (error) {
@@ -170,7 +170,7 @@ fieldsRouter.put('/createFields', async (req, res) => {
     if(!req.body && req.body === '')
       throw new Error('Body is empty');
 
-    if(!(await authorizationService.isUserAuthorized(requestUserData.user, 'partner')))
+    if (!(await authorizationService.isUserAuthorized(requestUserData.userid, 'partner')))
       return res.status(401).json({message: 'Unauthorized request'});
 
     const body = req.body

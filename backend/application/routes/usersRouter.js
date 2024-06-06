@@ -92,7 +92,7 @@ usersRouter.get("/validateToken", async (req, res) => {
     try {
         const bearerHeader = req.headers.authorization;
         const requestUserData = await authenticationService.validateJwt(bearerHeader);
-        res.json({message: `UserId: ${requestUserData.user}; Partner: ${requestUserData.affiliation}; Auth_Type: ${requestUserData.auth_type}`});
+        res.json({ message: `UserId: ${requestUserData.userid}; Partner: ${requestUserData.affiliation}; Auth_Type: ${requestUserData.auth_type}` });
     } catch (error) {
         return res.status(403).json({error:error.toString()});
     }
@@ -154,7 +154,7 @@ usersRouter.get('/userFields', async (req, res) => {
     }
 
     try {
-        const result = await userService.findUserPermissions(requestUserData.user, req.query.timeFilterFrom, req.query.timeFilterTo);
+        const result = await userService.findUserPermissions(requestUserData.userid, req.query.timeFilterFrom, req.query.timeFilterTo);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({message:error.message});
@@ -195,7 +195,7 @@ usersRouter.put('/registerUsers', async (req, res) => {
     }
 
     try {
-        if(!(await authorizationService.isUserAuthorized(requestUserData.user, 'partner')))
+        if (!(await authorizationService.isUserAuthorized(requestUserData.userid, 'partner')))
             return res.status(401).json({message: 'Unauthorized request'});
 
         if(!req.body && req.body.users && req.body.users.length > 0)
@@ -253,7 +253,7 @@ usersRouter.put('/createGrants', async (req, res) => {
     }
 
     try {
-        if(!(await authorizationService.isUserAuthorized(requestUserData.user, 'partner')))
+        if (!(await authorizationService.isUserAuthorized(requestUserData.userid, 'partner')))
             return res.status(401).json({message: 'Unauthorized request'});
 
         if(!req.body && req.body === '')

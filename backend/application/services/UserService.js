@@ -12,8 +12,12 @@ class UserService {
         this.fieldRepository = new FieldRepository(undefined, undefined, initTranscodingField(sequelize), sequelize)
     }
 
-    findUser(user) {
-        return this.userRepository.findUser(user);
+    async findUser(user) {
+        return await this.userRepository.findUser(user);
+    }
+
+    async findUserByEmail(email) {
+        return await this.userRepository.findUserByEmail(email);
     }
 
     async createUsers(request) {
@@ -118,7 +122,7 @@ class UserService {
                   [...permissions] // Spread operator to convert Set to Array
                 );
             });
-            return new UserFieldPermissions(user.userid, user.affiliation, user.role, userFieldsPermissions)
+            return new UserFieldPermissions(user.email, user.affiliation, user.role, userFieldsPermissions)
         } catch (error) {
             console.error(error)
         }

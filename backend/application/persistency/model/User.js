@@ -7,8 +7,12 @@ class User extends Model {
 function initUser(sequelize) {
     User.init({
         userid: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             primaryKey: true
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false
         },
         auth_type: {
             type: DataTypes.STRING,

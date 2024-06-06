@@ -1,4 +1,5 @@
 import axios from 'axios'
+import hashPassword from '@/utils/hashPassword';
 
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:8081/'
@@ -12,9 +13,10 @@ class AuthService {
     }
 
     login(user) {
+        console.log(hashPassword("abds"))
         return axiosInstance.post('/login', {
             username: user.authUser,
-            password: user.authPass,
+            password: hashPassword(user.authPass),
             auth_type: 'pwd'
         }).then(response => {
             if(response.data.token) {

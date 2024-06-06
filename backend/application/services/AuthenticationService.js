@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const hashPassword = require('../commons/hashPassword')
 const jwtSecret = require('../commons/constants');
 
 
@@ -11,7 +10,7 @@ class AuthenticationService {
 
     async generateJwt(request) {
         try {
-            const user = await this.userService.findUser(request.username);
+            const user = await this.userService.findUserByEmail(request.username);
 
             if (!user)
                 throw new Error('The mail does not exist');
@@ -26,7 +25,7 @@ class AuthenticationService {
                     throw new Error('Password is invalid');
             }
 
-            const payload = {user: user.dataValues.userid, affiliation: user.dataValues.affiliation, auth_type: user.dataValues.auth_type}
+            const payload = { userid: user.dataValues.userid, affiliation: user.dataValues.affiliation, auth_type: user.dataValues.auth_type }
             return jwt.sign(payload, jwtSecret, { expiresIn: "10h" });
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
@@ -41,8 +40,8 @@ class AuthenticationService {
                     if (err) {
                         reject(new Error('Authentication failed: token verify error'));
                     } else {
-                        if(decoded.user !== undefined && decoded.affiliation !== undefined && decoded.auth_type !== undefined)
-                            resolve({user: decoded.user, affiliation: decoded.affiliation, auth_type: decoded.auth_type});
+                        if (decoded.userid !== undefined && decoded.affiliation !== undefined && decoded.auth_type !== undefined)
+                            resolve({ userid: decoded.userid, affiliation: decoded.affiliation, auth_type: decoded.auth_type });
                         else reject(new Error('Authentication failed: token verify error'));
                     }
                 });

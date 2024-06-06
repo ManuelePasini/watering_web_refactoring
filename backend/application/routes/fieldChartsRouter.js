@@ -103,7 +103,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -205,7 +205,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -308,7 +308,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.useridid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -411,7 +411,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -514,7 +514,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -615,7 +615,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -717,7 +717,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -819,7 +819,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -921,7 +921,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1022,7 +1022,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1121,7 +1121,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1221,7 +1221,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1317,7 +1317,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1414,7 +1414,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1509,7 +1509,7 @@ fieldChartRouter.get("/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.user, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
             return res.status(401).json({ message: 'Unauthorized request' });
     } catch (error) {
         return res.status(403).json({ message: 'Authentication failed' });

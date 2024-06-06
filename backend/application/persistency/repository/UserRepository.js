@@ -1,4 +1,3 @@
-const hashPassword = require('../../commons/hashPassword')
 const { QueryTypes } = require("sequelize");
 
 class UserRepository {
@@ -13,14 +12,18 @@ class UserRepository {
         FieldsPermit.belongsTo(User, { foreignKey: 'userid'});
     }
 
-    findUser(user) {
-        return this.User.findOne({where: {userid:user}});
+    async findUser(userid) {
+        return await this.User.findOne({ where: { userid: userid } });
     }
 
-    async findUserPermissions(user) {
+    async findUserByEmail(email) {
+        return await this.User.findOne({ where: { email: email } });
+    }
+
+    async findUserPermissions(userid) {
         try {
             return (await this.FieldsPermit.findAll({
-                where: { userid: user }
+                where: { userid: userid }
             })).map(el => el.dataValues);
         } catch (error) {
             console.error('Error on find user:', error);
@@ -35,7 +38,7 @@ class UserRepository {
         }
     }
 
-    async findUserPermissionsInPeriod(user, timestamp_from, timestamp_to) {
+    async findUserPermissionsInPeriod(userid, timestamp_from, timestamp_to) {
         try {
             const query = `
                 SELECT DISTINCT permit.userid, permit.affiliation, permit."refStructureName", permit."companyName", permit."fieldName", permit."sectorName", permit."plantRow", permit.permit
@@ -46,14 +49,14 @@ class UserRepository {
                             AND permit."fieldName" = transcoding."fieldName"
                             AND permit."sectorName" = transcoding."sectorName"
                             AND permit."plantRow" = transcoding."plantRow"
-                    WHERE (permit.userid = '${user}') 
+                    WHERE (permit.userid = '${userid}') 
                         AND transcoding.valid_from < '${timestamp_to}' 
                         AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)`
 
             return await this.sequelize.query(query, {
                 type: QueryTypes.SELECT,
                 bind: {
-                    user,
+                    userid,
                     timestamp_from,
                     timestamp_to
                 }

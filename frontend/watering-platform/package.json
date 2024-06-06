@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "abs-watering-charts-components": "file:./abs-watering-charts-components-1.0.0.tgz",
     "axios": "^1.6.2",
+    "crypto-js": "^4.2.0",
     "bootstrap": "^5.3.2",
     "chart.js": "^4.4.1",
     "vue": "^3.4.15",
