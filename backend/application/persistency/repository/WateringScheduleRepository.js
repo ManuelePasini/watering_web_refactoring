@@ -14,7 +14,7 @@ class WateringScheduleRepository {
     async getSchedule(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo) {
         try {
             this.WateringSchedule.removeAttribute('id')
-            return await this.WateringSchedule.findAll({
+            return (await this.WateringSchedule.findAll({
                 attributes: ['refStructureName', 'companyName', 'fieldName', 'sectorName', 'plantRow', 'date',
                     ['watering_start', 'wateringStart'], ['watering_end', 'wateringEnd'], 'duration',
                     'enabled', ['expected_water', 'expectedWater'], 'advice', ['advice_timestamp', 'adviceTimestamp'],
@@ -35,7 +35,7 @@ class WateringScheduleRepository {
                     model: this.Users,
                     attributes: [['email', 'updatedBy']]
                 },
-            });
+            })).map(el => el.dataValues);
         } catch (error) {
             console.error('Error on find user:', error);
         }

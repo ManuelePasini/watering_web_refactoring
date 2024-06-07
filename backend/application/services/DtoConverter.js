@@ -97,13 +97,13 @@ class DtoConverter {
             };
             if (!accumulator.has(JSON.stringify(key)))
                 accumulator.set(JSON.stringify(key), []);
-            accumulator.get(JSON.stringify(key)).push(currentValue.dataValues);
+            accumulator.get(JSON.stringify(key)).push(currentValue);
             return accumulator;
         }, new Map())
 
         if (schedules.size > 0) {
             const [key, events] = schedules.entries().next().value
-            const { refStructureName, companyName, fieldName, sectorName, plantRow } = key;
+            const { refStructureName, companyName, fieldName, sectorName, plantRow } = JSON.parse(key);
             const eventsRes = events.map(event => new WateringEventDto(
                 event.date,
                 event.wateringStart,
