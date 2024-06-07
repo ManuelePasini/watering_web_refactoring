@@ -339,6 +339,16 @@ components:
             $ref: '#/components/schemas/UserFieldPermission'
 
     UserFieldPermission:
+      allOf:
+        - $ref: '#/components/schemas/ThesisIdentifier'
+        - type: object
+          properties:
+            permissions:
+              type: array
+              items:
+                type: string
+    
+    ThesisIdentifier:
       type: object
       properties:
         refStructureName:
@@ -351,7 +361,49 @@ components:
           type: string
         plantRow:
           type: string
-        permissions:
-          type: array
-          items:
-            type: string
+
+    WateringEventDto:
+      type: object
+      properties:
+        date: 
+          type: string
+          format: date
+        wateringStart:
+          type: string
+          format: date-time
+        wateringEnd:
+          type: string
+          format: date-time
+        duration:
+          type: number
+        enabled:
+          type: boolean
+        expectedWater:
+          type: number
+        advice:
+          type: number
+        adviceTimestamp:
+          type: string
+          format: date-time
+        updatedBy: 
+          type: string
+        updateTimestamp:
+          type: string
+          format: date-time
+        note:
+          type: string
+    
+    WateringScheduleResponse:
+      allOf:
+        - $ref: '#/components/schemas/ThesisIdentifier'
+        - type: object
+          properties:
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/WateringEventDto'
+    
+    WateringEventUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/ThesisIdentifier'
+        - $ref: '#/components/schemas/WateringEventDto'

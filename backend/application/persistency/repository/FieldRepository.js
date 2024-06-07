@@ -1,5 +1,5 @@
-const { QueryTypes, DataTypes, Op } = require('sequelize')
-const { WateringAdviceProfileData, WateringAdviceDto } = require('../../dtos/wateringAdviceDto')
+const { QueryTypes, Op } = require('sequelize')
+const { WateringAdviceDto } = require('../../dtos/wateringAdviceDto')
 
 class FieldRepository {
 

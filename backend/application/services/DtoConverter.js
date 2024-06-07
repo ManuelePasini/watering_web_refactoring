@@ -3,6 +3,7 @@ const PlantDto = require("../dtos/plantDto");
 const ColtureDto = require("../dtos/coltureDto");
 const {DataResponse, DataValue, MeasureData, HumidityBinMeasureData} = require('../dtos/dataDto');
 const {values} = require("pg/lib/native/query");
+const { WateringScheduleResponse, WateringEventDto } = require("../dtos/wateringScheduleDto");
 class DtoConverter {
 
     convertDataInterpolatedMeanWrapper(refStructureName, companyName, fieldName, sectorName, plantRow, wrappers) {
@@ -83,6 +84,41 @@ class DtoConverter {
 
     convertDeltaWrapper(wrappers) {
         return this.#convertGenericReferenceData(wrappers);
+    }
+
+    convertWateringScheduleWrapper(wrappers) {
+        const schedules = wrappers.reduce((accumulator, currentValue) => {
+            const key = {
+                refStructureName: currentValue.refStructureName,
+                companyName: currentValue.companyName,
+                fieldName: currentValue.fieldName,
+                sectorName: currentValue.sectorName,
+                plantRow: currentValue.plantRow
+            };
+            if (!accumulator.has(JSON.stringify(key)))
+                accumulator.set(JSON.stringify(key), []);
+            accumulator.get(JSON.stringify(key)).push(currentValue.dataValues);
+            return accumulator;
+        }, new Map())
+
+        if (schedules.size > 0) {
+            const [key, events] = schedules.entries().next().value
+            const { refStructureName, companyName, fieldName, sectorName, plantRow } = key;
+            const eventsRes = events.map(event => new WateringEventDto(
+                event.date,
+                event.wateringStart,
+                event.wateringEnd,
+                event.duration,
+                event.enabled,
+                event.expectedWater,
+                event.advice,
+                event.adviceTimestamp,
+                event.updatedBy,
+                event.updateTimestamp,
+                event.note
+            ));
+            return new WateringScheduleResponse(refStructureName, companyName, fieldName, sectorName, plantRow, eventsRes)
+        }
     }
 
     #buildGenericReferenceMap(wrappers) {

@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const userRouter = require('./routes/usersRouter');
 const fieldRouter = require('./routes/fieldsRouter');
 const fieldChartRouter = require('./routes/fieldChartsRouter');
+const wateringScheduleRouter = require('./routes/wateringScheduleRouter')
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
@@ -50,4 +51,5 @@ app.use(cors());
 app.use('/', userRouter);
 app.use('/fields', fieldRouter)
 app.use('/fieldCharts', fieldChartRouter);
+app.use('/wateringSchedule', wateringScheduleRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
