@@ -2,20 +2,20 @@ import axios from "axios";
 
 export class CommunicationService {
 
-    async getChartData(environment, paths, params, endpoint) {
-        const response = await this.getAPI(environment, paths, params, endpoint)
+    async getChartData(environment, pathsParams, queryParams, endpoint) {
+        const response = await this.getAPI(environment, "/fieldCharts", pathsParams, queryParams, endpoint)
         if (response && response.values.length > 0)
             return response.values[0].measures;
         return null;
     }
 
-    async getAPI(environment, paths, params, endpoint) {
-        return axios.get(this.buildURL(environment.host, paths, endpoint), {
+    async getAPI(environment, primaryPath, pathsParams, queryParams, endpoint) {
+        return axios.get(this.buildURL(environment.host, primaryPath, pathsParams, endpoint), {
             params: {
-                timeFilterFrom: params ? params.timeFilterFrom : null,
-                timeFilterTo: params ? params.timeFilterTo : null,
-                colture: params ? params.colture : null,
-                coltureType: params ? params.coltureType : null
+                timeFilterFrom: queryParams ? queryParams.timeFilterFrom : null,
+                timeFilterTo: queryParams ? queryParams.timeFilterTo : null,
+                colture: queryParams ? queryParams.colture : null,
+                coltureType: queryParams ? queryParams.coltureType : null
             },
             headers: {
                 Authorization: 'Bearer ' + environment.token
@@ -32,13 +32,18 @@ export class CommunicationService {
         })
     }
 
-    async getFieldInfo(environment, paths, params, endpoint) {
-        const response = await this.getAPI(environment, paths, params, endpoint)
+    async getFieldInfo(environment, pathsParams, params, endpoint) {
+        const response = await this.getAPI(environment, "/fields", pathsParams, params, endpoint)
         return response;
     }
 
-    buildURL(host, paths, endpoint) {
-        return host + paths.refStructureName + '/' + paths.companyName + '/' + paths.fieldName + '/' + paths.sectorName + '/' + paths.plantRow + '/' + endpoint;
+    async getWateringSchedule(environment, pathsParams, params, endpoint) {
+        const response = await this.getAPI(environment, "/wateringSchedule", pathsParams, params, endpoint)
+        return response;
+    }
+
+    buildURL(host, primaryPath, pathsParams, endpoint) {
+        return host + primaryPath + '/' + pathsParams.refStructureName + '/' + pathsParams.companyName + '/' + pathsParams.fieldName + '/' + pathsParams.sectorName + '/' + pathsParams.plantRow + '/' + endpoint;
     }
 
 }

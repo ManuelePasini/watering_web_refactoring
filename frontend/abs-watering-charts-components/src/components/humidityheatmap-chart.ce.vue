@@ -43,8 +43,6 @@ async function drawImage(timestamp){
 
   const image = images.value.get(timestamp)
 
-  const dripper = image[0]
-
   const series = Array.from(image.reduce((accumulator, currentValue) => {
     if (!accumulator.has(currentValue.yy))
       accumulator.set(currentValue.yy, []);
@@ -191,7 +189,7 @@ async function drawImage(timestamp){
     },
     tooltip:{
       custom: function({series, seriesIndex, dataPointIndex, w}) {
-        if(series[seriesIndex][dataPointIndex] <= 0){
+        if(series[seriesIndex][dataPointIndex] < 0){
           return ('<div class="arrow_box m-1">' +
             '<div> <strong>x</strong>: ' + heatmapSeries.value[seriesIndex].data[dataPointIndex].x + '</div>' +
             '<div> <strong>y</strong>: ' + heatmapSeries.value[seriesIndex].name + '</div>' +

@@ -13,6 +13,7 @@ import GroundWaterPotentialChart from "../../../abs-watering-charts-components/s
 import HumidityHeatmap from "../../../abs-watering-charts-components/src/components/humidityheatmap-chart.ce.vue"
 import HumidityMultiLineChart from "../../../abs-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
 import HumidityDynamicHeatmap from "../../../abs-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
+import Calendar from "../../../abs-watering-charts-components/src/components/calendar.vue"
 import {useRouter} from "vue-router";
 import authService from '@/services/auth.service';
 
@@ -58,7 +59,7 @@ function updateConnectionParams() {
   if(selectedField.value){
     connectionParams = {
     environment: {
-      host: 'http://localhost:8081/fieldCharts/',
+      host: 'http://localhost:8081',
       token: token.value
     },
     paths: selectedField.value,
@@ -291,6 +292,17 @@ function selectedTime(time){
         <div class="card-body">
           <GroundWaterPotentialChart style="height: 320px" :config="JSON.stringify(connectionParams)"></GroundWaterPotentialChart>
         </div>
+      </div>
+    </div>
+
+    <div v-if="hasUserPermission('WA')" class="m-3 container col-md-12">
+      <div class="humidity-card card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Calendario Irrigazione</span>
+        </div>
+          <div class="dynamic-humidity-map">
+            <Calendar :config="JSON.stringify(connectionParams)"></Calendar>
+          </div>
       </div>
     </div>
 
