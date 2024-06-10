@@ -1,5 +1,4 @@
-
-class DataInterpolatedMeanWrapper {
+export class DataInterpolatedMeanWrapper {
 
     constructor(zz, yy, xx, mean, std) {
         this.zz = zz;
@@ -10,5 +9,3 @@ class DataInterpolatedMeanWrapper {
     }
 
 }
-
-module.exports = DataInterpolatedMeanWrapper;

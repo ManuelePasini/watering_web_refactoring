@@ -1,4 +1,4 @@
-class WateringScheduleResponse {
+export class WateringScheduleResponse {
 
     constructor(refStructureName, companyName, fieldName, sectorName, plantRow, events) {
         this.refStructureName = refStructureName
@@ -11,7 +11,7 @@ class WateringScheduleResponse {
 
 }
 
-class WateringEventDto {
+export class WateringEventDto {
 
     constructor(date, wateringStart, wateringEnd, duration, enabled, expectedWater, advice, adviceTimestamp, updatedBy, updateTimestamp, note) {
         this.date = date;
@@ -27,5 +27,3 @@ class WateringEventDto {
         this.note = note;
     }
 }
-
-module.exports = { WateringScheduleResponse, WateringEventDto }

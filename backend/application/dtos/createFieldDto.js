@@ -1,5 +1,4 @@
-
-class CreateFieldDto {
+export class CreateFieldDto {
 
   constructor(structures) {
     this.structures = structures
@@ -7,7 +6,7 @@ class CreateFieldDto {
 
 }
 
-class StructureDto {
+export class StructureDto {
 
   constructor(companies) {
     this.companies = companies
@@ -15,7 +14,7 @@ class StructureDto {
 
 }
 
-class CompaniesDto {
+export class CompaniesDto {
 
   constructor(structureName, companies) {
     this.structureName = structureName
@@ -24,7 +23,7 @@ class CompaniesDto {
 
 }
 
-class CompanyDto {
+export class CompanyDto {
 
   constructor(companyName, fields) {
     this.companyName = companyName
@@ -33,7 +32,7 @@ class CompanyDto {
 
 }
 
-class FieldDto {
+export class FieldDto {
 
   constructor(fieldName, coltureType, sectors) {
     this.fieldName = fieldName;
@@ -43,7 +42,7 @@ class FieldDto {
 
 }
 
-class SectorDto {
+export class SectorDto {
 
   constructor(sectorName, wateringCapacity, initialWatering, maximumWatering, adviceTime, wateringType, theses) {
     this.sectorName = sectorName;
@@ -57,7 +56,7 @@ class SectorDto {
 
 }
 
-class ThesisDto {
+export class ThesisDto {
 
   constructor(adviceWeight, thesisName, sensorNumber, sensors) {
     this.adviceWeight = adviceWeight
@@ -68,7 +67,7 @@ class ThesisDto {
 
 }
 
-class SensorDto {
+export class SensorDto {
 
   constructor(id, name, type, x, y, z) {
     this.id = id
@@ -80,5 +79,3 @@ class SensorDto {
   }
 
 }
-
-module.exports = {CreateFieldDto, StructureDto, CompaniesDto, CompanyDto, FieldDto, SectorDto, ThesisDto, SensorDto}

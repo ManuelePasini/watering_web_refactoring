@@ -1,7 +1,4 @@
-
-
-
-class UserField {
+export class UserField {
 
     constructor(refStructureName, companyName, fields) {
         this.refStructureName=refStructureName;
@@ -11,12 +8,10 @@ class UserField {
 
 }
 
-class UserFieldsDto {
+export class UserFieldsDto {
 
     constructor(fieldList) {
         this.fieldList=fieldList;
     }
 
 }
-
-module.exports = {UserField, UserFieldsDto}

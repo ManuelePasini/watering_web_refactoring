@@ -1,4 +1,4 @@
-const { Model, DataTypes } = require('sequelize')
+import { Model, DataTypes } from 'sequelize'
 
 class MatrixField extends Model {
 
@@ -54,4 +54,4 @@ function initMatrixField(sequelize) {
   return MatrixField
 }
 
-module.exports = initMatrixField
+export default initMatrixField

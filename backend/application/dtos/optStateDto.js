@@ -1,4 +1,4 @@
-class OptStateDto {
+export class OptStateDto {
 
   constructor(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, optimalState) {
     this.structureName = structureName
@@ -13,7 +13,7 @@ class OptStateDto {
 
 }
 
-class MatrixData {
+export class MatrixData {
 
   constructor(x, y, z, value) {
     this.x = x
@@ -23,5 +23,3 @@ class MatrixData {
   }
 
 }
-
-module.exports = {OptStateDto, MatrixData}

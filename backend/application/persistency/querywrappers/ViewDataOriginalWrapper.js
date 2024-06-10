@@ -1,5 +1,4 @@
-
-class ViewDataOriginalWrapper {
+export class ViewDataOriginalWrapper {
 
     constructor(refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType, detectedValueTypeDescription, value, timestamp) {
         this.refStructureName = refStructureName;
@@ -15,5 +14,3 @@ class ViewDataOriginalWrapper {
     }
 
 }
-
-module.exports = ViewDataOriginalWrapper;

@@ -1,5 +1,4 @@
-
-class HumidityBinWrapper {
+export class HumidityBinWrapper {
 
     constructor(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp, count, humidity_bin) {
         this.refStructureName = refStructureName;
@@ -13,5 +12,3 @@ class HumidityBinWrapper {
     }
 
 }
-
-module.exports = HumidityBinWrapper;

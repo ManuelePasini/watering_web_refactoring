@@ -1,5 +1,5 @@
 
-const UserService = require('./UserService')
+import UserService from './UserService.js';
 
 class AuthorizationService {
 
@@ -43,4 +43,4 @@ class AuthorizationService {
 
 }
 
-module.exports = AuthorizationService
+export default AuthorizationService

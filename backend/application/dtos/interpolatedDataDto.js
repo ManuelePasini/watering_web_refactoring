@@ -1,5 +1,4 @@
-
-class InterpolatedDataResponse {
+export class InterpolatedDataResponse {
 
     constructor(values) {
         this.values = values;
@@ -7,7 +6,7 @@ class InterpolatedDataResponse {
 
 }
 
-class InterpolatedDataValue {
+export class InterpolatedDataValue {
 
     constructor(refStructureName, companyName, fieldName, plant, measures) {
         this.refStructureName = refStructureName;
@@ -19,7 +18,7 @@ class InterpolatedDataValue {
 
 }
 
-class InterpolatedMeasureData {
+export class InterpolatedMeasureData {
 
     constructor(zz, yy, xx, value) {
         this.zz = zz;
@@ -30,7 +29,7 @@ class InterpolatedMeasureData {
 
 }
 
-class InterpolatedMeanMeasureData {
+export class InterpolatedMeanMeasureData {
 
     constructor(zz, yy, xx, std, mean) {
         this.zz = zz;
@@ -41,5 +40,3 @@ class InterpolatedMeanMeasureData {
     }
 
 }
-
-module.exports = {InterpolatedDataResponse, InterpolatedDataValue, InterpolatedMeanMeasureData, InterpolatedMeasureData}

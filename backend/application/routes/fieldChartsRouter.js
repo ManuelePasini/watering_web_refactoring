@@ -1,15 +1,15 @@
-const express = require('express');
-const sequelize = require('../configs/dbConfig');
+import { Router } from 'express';
+import sequelize from '../configs/dbConfig.js';
 
-const fieldChartRouter = express.Router();
-const UserService =  require('../services/UserService');
+const fieldChartRouter = Router();
+import UserService from '../services/UserService.js';
 const userService = new UserService(sequelize);
-const AuthenticationService = require('../services/AuthenticationService');
-const AuthorizationService = require('../services/AuthorizationService')
-const FieldService = require('../services/FieldService');
+import AuthenticationService from '../services/AuthenticationService.js';
+import AuthorizationService from '../services/AuthorizationService.js';
+import FieldService from '../services/FieldService.js';
 
 const authenticationService = new AuthenticationService(userService);
-const { InterpolatedDataResponse } = require('../dtos/interpolatedDataDto')
+import { InterpolatedDataResponse } from '../dtos/interpolatedDataDto.js';
 const authorizationService = new AuthorizationService(sequelize)
 const fieldService = new FieldService(sequelize);
 
@@ -1433,4 +1433,4 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
 });
 
-module.exports = fieldChartRouter;
+export default fieldChartRouter;

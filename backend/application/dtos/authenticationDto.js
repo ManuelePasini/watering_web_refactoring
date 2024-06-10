@@ -1,5 +1,4 @@
-
-class UserTokenRequest {
+export class UserTokenRequest {
 
     constructor(username, password, affiliation, auth_type) {
         this.username = username;
@@ -10,12 +9,10 @@ class UserTokenRequest {
 
 }
 
-class UserTokenResponse {
+export class UserTokenResponse {
 
     constructor(token) {
         this.token = token;
     }
 
 }
-
-module.exports = { UserTokenResponse, UserTokenRequest};

@@ -1,5 +1,5 @@
-const { QueryTypes, Op } = require('sequelize')
-const { WateringAdviceDto } = require('../../dtos/wateringAdviceDto')
+import { QueryTypes, Op } from 'sequelize'
+import { WateringAdviceDto } from '../../dtos/wateringAdviceDto.js'
 
 class FieldRepository {
 
@@ -174,4 +174,4 @@ class FieldRepository {
   }
 }
 
-module.exports = FieldRepository
+export default FieldRepository

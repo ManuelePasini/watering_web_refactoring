@@ -1,5 +1,6 @@
-const jwt = require("jsonwebtoken");
-const jwtSecret = require('../commons/constants');
+import pkg from 'jsonwebtoken';
+const { sign, verify } = pkg;
+import { jwtSecret } from '../commons/constants.js';
 
 
 class AuthenticationService {
@@ -26,7 +27,7 @@ class AuthenticationService {
             }
 
             const payload = { userid: user.dataValues.userid, affiliation: user.dataValues.affiliation, auth_type: user.dataValues.auth_type }
-            return jwt.sign(payload, jwtSecret, { expiresIn: "10h" });
+            return sign(payload, jwtSecret, { expiresIn: "10h" });
         } catch (error) {
             throw new Error(`Error on generating jwt caused by: ${error}`);
         }
@@ -36,7 +37,7 @@ class AuthenticationService {
         if (typeof header !== 'undefined' && header !== '') {
             const bearerToken = header.split(' ')[1];
             return new Promise( (resolve, reject) => {
-                jwt.verify(bearerToken, jwtSecret, (err, decoded) => {
+                verify(bearerToken, jwtSecret, (err, decoded) => {
                     if (err) {
                         reject(new Error('Authentication failed: token verify error'));
                     } else {
@@ -54,4 +55,4 @@ class AuthenticationService {
 
 }
 
-module.exports = AuthenticationService;
+export default AuthenticationService;

@@ -1,5 +1,4 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../configs/dbConfig');
+import { Model, DataTypes } from 'sequelize';
 
 class WateringSchedule extends Model { }
 
@@ -30,4 +29,4 @@ function initWateringSchedule(sequelize) {
     return WateringSchedule;
 }
 
-module.exports = initWateringSchedule;
+export default initWateringSchedule;

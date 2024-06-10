@@ -1,4 +1,4 @@
-const {Sequelize} = require('sequelize')
+import { Sequelize } from 'sequelize';
 
 const config = {
     database: 'postgres',
@@ -19,4 +19,4 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     },
 });
 
-module.exports = sequelize
+export default sequelize

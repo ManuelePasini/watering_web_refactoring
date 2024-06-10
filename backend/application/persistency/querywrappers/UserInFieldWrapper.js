@@ -1,5 +1,4 @@
-
-class UserInFieldWrapper {
+export class UserInFieldWrapper {
 
     constructor(refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType) {
         this.refStructureName = refStructureName;
@@ -12,5 +11,3 @@ class UserInFieldWrapper {
     }
 
 }
-
-module.exports = UserInFieldWrapper;

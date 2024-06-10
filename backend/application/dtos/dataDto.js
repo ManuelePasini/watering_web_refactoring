@@ -1,5 +1,4 @@
-
-class DataResponse {
+export class DataResponse {
 
     constructor(values) {
         this.values = values;
@@ -7,7 +6,7 @@ class DataResponse {
 
 }
 
-class DataValue {
+export class DataValue {
 
     constructor(refStructureName, companyName, fieldName, plant, measures) {
         this.refStructureName = refStructureName;
@@ -19,7 +18,7 @@ class DataValue {
 
 }
 
-class MeasureData {
+export class MeasureData {
 
     constructor(detectedValueTypeDescription, timestamp, value) {
         this.detectedValueTypeDescription = detectedValueTypeDescription;
@@ -29,7 +28,7 @@ class MeasureData {
 
 }
 
-class HumidityBinMeasureData {
+export class HumidityBinMeasureData {
 
     constructor(humidityBin, timestamp, count) {
         this.humidityBin = humidityBin;
@@ -38,5 +37,3 @@ class HumidityBinMeasureData {
     }
 
 }
-
-module.exports = {DataResponse, DataValue, MeasureData, HumidityBinMeasureData}

@@ -1,9 +1,9 @@
-const {InterpolatedDataResponse, InterpolatedDataValue, InterpolatedMeanMeasureData, InterpolatedMeasureData} = require("../dtos/interpolatedDataDto");
-const PlantDto = require("../dtos/plantDto");
-const ColtureDto = require("../dtos/coltureDto");
-const {DataResponse, DataValue, MeasureData, HumidityBinMeasureData} = require('../dtos/dataDto');
-const {values} = require("pg/lib/native/query");
-const { WateringScheduleResponse, WateringEventDto } = require("../dtos/wateringScheduleDto");
+import { InterpolatedDataResponse, InterpolatedDataValue, InterpolatedMeanMeasureData, InterpolatedMeasureData } from "../dtos/interpolatedDataDto.js";
+import { PlantDto } from "../dtos/plantDto.js";
+import { ColtureDto } from "../dtos/coltureDto.js";
+import { DataResponse, DataValue, MeasureData, HumidityBinMeasureData } from '../dtos/dataDto.js';
+import { WateringScheduleResponse, WateringEventDto } from "../dtos/wateringScheduleDto.js";
+
 class DtoConverter {
 
     convertDataInterpolatedMeanWrapper(refStructureName, companyName, fieldName, sectorName, plantRow, wrappers) {
@@ -155,4 +155,4 @@ class DtoConverter {
 
 }
 
-module.exports = DtoConverter;
+export default DtoConverter;

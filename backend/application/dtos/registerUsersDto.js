@@ -1,5 +1,4 @@
-
-class RegisterUsersDto {
+export class RegisterUsersDto {
 
   constructor(users) {
     this.users = users;
@@ -7,7 +6,7 @@ class RegisterUsersDto {
 
 }
 
-class RegisterUserDto {
+export class RegisterUserDto {
 
   constructor(username, name, affiliation, password, authType) {
     this.username = username
@@ -18,5 +17,3 @@ class RegisterUserDto {
   }
 
 }
-
-module.exports = {RegisterUsersDto, RegisterUserDto}

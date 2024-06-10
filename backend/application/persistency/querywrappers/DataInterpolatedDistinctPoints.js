@@ -1,5 +1,4 @@
-
-class DataInterpolatedDistinctPoints {
+export class DataInterpolatedDistinctPoints {
 
   constructor(points) {
     this.points = points
@@ -7,7 +6,7 @@ class DataInterpolatedDistinctPoints {
 
 }
 
-class DataInterpolatedDistinctPoint {
+export class DataInterpolatedDistinctPoint {
 
   constructor(x, y, z) {
     this.x = x
@@ -16,5 +15,3 @@ class DataInterpolatedDistinctPoint {
   }
 
 }
-
-module.exports = {DataInterpolatedDistinctPoints, DataInterpolatedDistinctPoint}

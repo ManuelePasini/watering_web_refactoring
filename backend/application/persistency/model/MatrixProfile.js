@@ -1,4 +1,4 @@
-const { Model, DataTypes } = require('sequelize')
+import { Model, DataTypes } from 'sequelize';
 
 class MatrixProfile extends Model {
 
@@ -41,4 +41,4 @@ function initMatrixProfile(sequelize) {
   return MatrixProfile;
 }
 
-module.exports = initMatrixProfile
+export default initMatrixProfile

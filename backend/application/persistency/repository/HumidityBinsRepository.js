@@ -1,7 +1,7 @@
-const HumidityBinWrapper = require('../querywrappers/HumidityBinWrapper');
-const HumidityBinEventWrapper = require('../querywrappers/HumidityBinEventWrapper');
+import { HumidityBinWrapper } from '../querywrappers/HumidityBinWrapper.js';
+import { HumidityBinEventWrapper } from '../querywrappers/HumidityBinEventWrapper.js';
 
-const {QueryTypes, DataTypes} = require('sequelize');
+import { QueryTypes, DataTypes } from 'sequelize';
 
 class HumidityBinsRepository {
 
@@ -137,4 +137,4 @@ class HumidityBinsRepository {
 
 }
 
-module.exports = HumidityBinsRepository;
+export default HumidityBinsRepository;

@@ -1,17 +1,15 @@
-const DataInterpolatedRepository = require('../persistency/repository/DataInterpolatedRepository');
-const DeltaRepository = require('../persistency/repository/DeltaRepository');
-const HumidityBinsRepository = require('../persistency/repository/HumidityBinsRepository');
-const ViewDataOriginalRepository = require('../persistency/repository/ViewDataOriginalRepository');
-const WateringAdviceRepository = require('../persistency/repository/WateringAdviceRepository');
-const DtoConverter = require('./DtoConverter');
-const FieldRepository = require('../persistency/repository/FieldRepository')
+import DataInterpolatedRepository from '../persistency/repository/DataInterpolatedRepository.js';
+import DeltaRepository from '../persistency/repository/DeltaRepository.js';
+import HumidityBinsRepository from '../persistency/repository/HumidityBinsRepository.js';
+import ViewDataOriginalRepository from '../persistency/repository/ViewDataOriginalRepository.js';
+import WateringAdviceRepository from '../persistency/repository/WateringAdviceRepository.js';
+import DtoConverter from './DtoConverter.js';
+import FieldRepository from '../persistency/repository/FieldRepository.js';
 
-const initMatrixProfile = require('../persistency/model/MatrixProfile')
-const initMatrixField = require('../persistency/model/MatrixField')
-const initTranscodingField = require('../persistency/model/TranscodingField')
-const initWateringField = require('../persistency/model/WateringField')
-
-const { FieldCreateDto } = require('../dtos/createFieldDto')
+import initMatrixProfile from '../persistency/model/MatrixProfile.js';
+import initMatrixField from '../persistency/model/MatrixField.js';
+import initTranscodingField from '../persistency/model/TranscodingField.js';
+import initWateringField from '../persistency/model/WateringField.js';
 
 const dtoConverter = new DtoConverter();
 
@@ -113,4 +111,4 @@ class FieldService {
 
 }
 
-module.exports = FieldService;
+export default FieldService;

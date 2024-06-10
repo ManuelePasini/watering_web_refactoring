@@ -1,5 +1,5 @@
-const DeltaWrapper = require('../querywrappers/DeltaWrapper');
-const {QueryTypes} = require("sequelize");
+import { DeltaWrapper } from '../querywrappers/DeltaWrapper.js';
+import { QueryTypes } from "sequelize";
 
 class DeltaRepository {
 
@@ -112,4 +112,4 @@ class DeltaRepository {
 
 }
 
-module.exports = DeltaRepository;
+export default DeltaRepository;

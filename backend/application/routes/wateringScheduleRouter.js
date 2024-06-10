@@ -1,13 +1,13 @@
-const express = require('express');
+import { Router } from 'express';
 
-const sequelize = require('../configs/dbConfig');
+import sequelize from '../configs/dbConfig.js';
 
-const WateringScheduleService = require('../services/WateringScheduleService');
-const AuthenticationService = require('../services/AuthenticationService');
-const AuthorizationService = require('../services/AuthorizationService')
+import WateringScheduleService from '../services/WateringScheduleService.js';
+import AuthenticationService from '../services/AuthenticationService.js';
+import AuthorizationService from '../services/AuthorizationService.js';
 
 
-const wateringScheduleRouter = express.Router();
+const wateringScheduleRouter = Router();
 const wateringScheduleService = new WateringScheduleService(sequelize);
 const authenticationService = new AuthenticationService(sequelize);
 const authorizationService = new AuthorizationService(sequelize)
@@ -148,4 +148,4 @@ wateringScheduleRouter.put("/updateWateringEvent", async (req, res) => {
 })
 
 
-module.exports = wateringScheduleRouter;
+export default wateringScheduleRouter;

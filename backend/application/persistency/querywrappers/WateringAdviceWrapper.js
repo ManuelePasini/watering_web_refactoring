@@ -1,5 +1,4 @@
-
-class WateringAdviceWrapper {
+export class WateringAdviceWrapper {
 
     constructor(refStructureName, companyName, fieldName, detectedValueTypeDescription, sectorName, plantRow, value, timestamp) {
         this.refStructureName = refStructureName;
@@ -13,5 +12,3 @@ class WateringAdviceWrapper {
     }
 
 }
-
-module.exports = WateringAdviceWrapper;

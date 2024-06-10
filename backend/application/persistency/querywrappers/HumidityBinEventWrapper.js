@@ -1,5 +1,4 @@
-
-class HumidityBinEventWrapper {
+export class HumidityBinEventWrapper {
 
     constructor(refStructureName, companyName, fieldName, detectedValueTypeDescription, sectorName, plantRow, value, timestamp) {
         this.refStructureName = refStructureName;
@@ -13,5 +12,3 @@ class HumidityBinEventWrapper {
     }
 
 }
-
-module.exports = HumidityBinEventWrapper;

@@ -1,20 +1,20 @@
-const express = require('express');
-const sequelize = require('../configs/dbConfig');
+import { Router } from 'express';
+import sequelize from '../configs/dbConfig.js';
 
-const {OptStateDto} = require('../dtos/optStateDto')
+import { OptStateDto } from '../dtos/optStateDto.js';
 
-const UserService = require('../services/UserService');
-const AuthenticationService = require('../services/AuthenticationService');
-const AuthorizationService = require('../services/AuthorizationService')
-const FieldService = require('../services/FieldService')
+import UserService from '../services/UserService.js';
+import AuthenticationService from '../services/AuthenticationService.js';
+import AuthorizationService from '../services/AuthorizationService.js';
+import FieldService from '../services/FieldService.js';
 
-const fieldsRouter = express.Router();
+const fieldsRouter = Router();
 const userService = new UserService(sequelize);
 const authenticationService = new AuthenticationService(userService);
 const authorizationService = new AuthorizationService(sequelize)
 const fieldService = new FieldService(sequelize)
 
-const { CreateFieldDto } = require('../dtos/createFieldDto')
+import { CreateFieldDto } from '../dtos/createFieldDto.js';
 
 
 /**
@@ -290,4 +290,4 @@ function checkOptState(dataInterpolatedPoints, list2) {
   return true;
 }
 
-module.exports = fieldsRouter;
+export default fieldsRouter;

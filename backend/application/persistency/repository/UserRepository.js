@@ -1,4 +1,4 @@
-const { QueryTypes } = require("sequelize");
+import { QueryTypes } from "sequelize";
 
 class UserRepository {
 
@@ -153,4 +153,4 @@ class UserRepository {
 
 }
 
-module.exports = UserRepository;
+export default UserRepository;

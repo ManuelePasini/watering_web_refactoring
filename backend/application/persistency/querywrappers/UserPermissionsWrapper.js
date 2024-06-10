@@ -1,5 +1,4 @@
-
-class UserFieldPermissions {
+export class UserFieldPermissions {
 
   constructor(user, affiliation, role, permissions) {
     this.user = user
@@ -10,7 +9,7 @@ class UserFieldPermissions {
 
 }
 
-class UserFieldPermission {
+export class UserFieldPermission {
 
   constructor(refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType, permissions) {
     this.refStructureName = refStructureName
@@ -24,5 +23,3 @@ class UserFieldPermission {
   }
 
 }
-
-module.exports = {UserFieldPermissions, UserFieldPermission}

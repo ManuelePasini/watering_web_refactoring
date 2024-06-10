@@ -1,5 +1,4 @@
-
-class DeltaWrapper {
+export class DeltaWrapper {
 
     constructor(refStructureName, companyName, fieldName, sectorName, plantRow, value, timestamp, detectedValueTypeDescription) {
         this.refStructureName = refStructureName;
@@ -13,5 +12,3 @@ class DeltaWrapper {
     }
 
 }
-
-module.exports = DeltaWrapper;

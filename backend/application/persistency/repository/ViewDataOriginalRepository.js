@@ -1,6 +1,6 @@
-const DataViewOriginalWrapper = require('../querywrappers/ViewDataOriginalWrapper');
+import { ViewDataOriginalWrapper } from '../querywrappers/ViewDataOriginalWrapper.js';
 
-const {QueryTypes} = require('sequelize');
+import { QueryTypes } from 'sequelize';
 
 const getResults = async (calculationType, detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType, sequelize) => {
 
@@ -48,7 +48,7 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
         }
     );
 
-    return results.map(result => new DataViewOriginalWrapper(
+    return results.map(result => new ViewDataOriginalWrapper(
         result.refStructureName,
         result.companyName,
         result.fieldName,
@@ -81,5 +81,5 @@ class ViewDataOriginalRepository {
     }
 }
 
-module.exports = ViewDataOriginalRepository;
+export default ViewDataOriginalRepository;
 

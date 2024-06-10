@@ -1,5 +1,5 @@
 
-class WateringAdviceDto {
+export class WateringAdviceDto {
 
   constructor(wateringAdvice, computedAt, startWatering) {
     this.wateringAdvice = wateringAdvice
@@ -9,7 +9,7 @@ class WateringAdviceDto {
 
 }
 
-class WateringAdviceDtoRequest {
+export class WateringAdviceDtoRequest {
 
   constructor(refStructureName, companyName, fieldName, sectorName, plantRow) {
     this.refStructureName = refStructureName
@@ -20,5 +20,3 @@ class WateringAdviceDtoRequest {
   }
 
 }
-
-module.exports = {WateringAdviceDto, WateringAdviceDtoRequest}

@@ -1,9 +1,9 @@
-const {DataInterpolatedDistinctPoints, DataInterpolatedDistinctPoint} = require('../querywrappers/DataInterpolatedDistinctPoints')
+import { DataInterpolatedDistinctPoints, DataInterpolatedDistinctPoint } from '../querywrappers/DataInterpolatedDistinctPoints.js';
 
-const DataInterpolatedWrapper = require('../querywrappers/DataInterpolatedWrapper');
-const DataInterpolatedMeanWrapper = require('../querywrappers/DataInterpolatedMeanWrapper');
+import { DataInterpolatedWrapper } from '../querywrappers/DataInterpolatedWrapper.js';
+import { DataInterpolatedMeanWrapper } from '../querywrappers/DataInterpolatedMeanWrapper.js';
 
-const {QueryTypes} = require('sequelize');
+import { QueryTypes } from 'sequelize';
 
 const getResults = async (refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo, sequelize) => {
 
@@ -151,4 +151,4 @@ class DataInterpolatedRepository {
 
 }
 
-module.exports = DataInterpolatedRepository;
+export default DataInterpolatedRepository;

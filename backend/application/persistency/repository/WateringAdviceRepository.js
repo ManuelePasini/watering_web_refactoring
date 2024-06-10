@@ -1,5 +1,5 @@
-const WateringAdviceWrapper = require('../querywrappers/WateringAdviceWrapper');
-const {QueryTypes} = require("sequelize");
+import { WateringAdviceWrapper } from '../querywrappers/WateringAdviceWrapper.js';
+import { QueryTypes } from "sequelize";
 
 class WateringAdviceRepository {
 
@@ -130,4 +130,4 @@ class WateringAdviceRepository {
 
 }
 
-module.exports = WateringAdviceRepository;
+export default WateringAdviceRepository;

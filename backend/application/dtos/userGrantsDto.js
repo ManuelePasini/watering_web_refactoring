@@ -1,5 +1,5 @@
 
-class UserGrantsDto {
+export class UserGrantsDto {
 
   constructor(grants) {
     this.grants = grants
@@ -7,7 +7,7 @@ class UserGrantsDto {
 
 }
 
-class UserGrantDto {
+export class UserGrantDto {
 
   constructor(structureName, companyName, fieldName, sectorName, plantRow, applications, userId) {
     this.structureName = structureName;
@@ -20,5 +20,3 @@ class UserGrantDto {
   }
 
 }
-
-module.exports = {UserGrantsDto, UserGrantDto}

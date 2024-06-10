@@ -1,5 +1,4 @@
-
-class DataInterpolatedWrapper {
+export class DataInterpolatedWrapper {
 
     constructor(refStructureName, companyName, fieldName, sectorName, plantRow, zz, yy, xx, timestamp, value) {
         this.refStructureName = refStructureName;
@@ -15,5 +14,3 @@ class DataInterpolatedWrapper {
     }
 
 }
-
-module.exports = DataInterpolatedWrapper;

@@ -1,19 +1,19 @@
-const express = require('express');
+import { Router } from 'express';
 
-const sequelize = require('../configs/dbConfig');
+import sequelize from '../configs/dbConfig.js';
 
-const UserService =  require('../services/UserService');
-const { UserTokenResponse, UserTokenRequest } = require('../dtos/authenticationDto')
-const AuthenticationService = require('../services/AuthenticationService');
-const AuthorizationService = require('../services/AuthorizationService')
+import UserService from '../services/UserService.js';
+import { UserTokenResponse, UserTokenRequest } from '../dtos/authenticationDto.js';
+import AuthenticationService from '../services/AuthenticationService.js';
+import AuthorizationService from '../services/AuthorizationService.js';
 
-const usersRouter = express.Router();
+const usersRouter = Router();
 const userService = new UserService(sequelize);
 const authenticationService = new AuthenticationService(userService);
 const authorizationService = new AuthorizationService(sequelize)
 
-const {RegisterUsersDto, RegisterUserDto} = require('../dtos/registerUsersDto')
-const { UserGrantsDto } = require('../dtos/userGrantsDto')
+import { RegisterUsersDto, RegisterUserDto } from '../dtos/registerUsersDto.js';
+import { UserGrantsDto } from '../dtos/userGrantsDto.js';
 
 /**
  * @swagger
@@ -271,4 +271,4 @@ usersRouter.put('/createGrants', async (req, res) => {
 
 });
 
-module.exports = usersRouter;
+export default usersRouter;

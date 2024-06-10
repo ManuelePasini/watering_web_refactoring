@@ -1,5 +1,4 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../configs/dbConfig');
+import { Model, DataTypes } from 'sequelize';
 
 class WateringField extends Model {
 
@@ -26,4 +25,4 @@ function initWateringField(sequelize) {
     return WateringField;
 }
 
-module.exports = initWateringField;
+export default initWateringField;

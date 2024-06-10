@@ -1,9 +1,9 @@
-const UserRepository = require('../persistency/repository/UserRepository');
-const FieldRepository = require('../persistency/repository/FieldRepository');
-const { UserFieldPermission, UserFieldPermissions } = require('../persistency/querywrappers/UserPermissionsWrapper');
-const initUser = require('../persistency/model/User');
-const initFieldsPermit = require('../persistency/model/FieldsPermit');
-const initTranscodingField = require('../persistency/model/TranscodingField')
+import UserRepository from '../persistency/repository/UserRepository.js';
+import FieldRepository from '../persistency/repository/FieldRepository.js';
+import { UserFieldPermission, UserFieldPermissions } from '../persistency/querywrappers/UserPermissionsWrapper.js';
+import initUser from '../persistency/model/User.js';
+import initFieldsPermit from '../persistency/model/FieldsPermit.js';
+import initTranscodingField from '../persistency/model/TranscodingField.js';
 
 class UserService {
 
@@ -130,4 +130,4 @@ class UserService {
 
 }
 
-module.exports = UserService
+export default UserService

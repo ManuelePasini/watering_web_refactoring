@@ -1,5 +1,4 @@
-const {Model, DataTypes} = require('sequelize')
-const sequelize = require('../../configs/dbConfig')
+import { Model, DataTypes } from 'sequelize';
 
 class FieldsPermit extends Model {
 
@@ -53,4 +52,4 @@ function initFieldsPermit(sequelize) {
   return FieldsPermit;
 }
 
-module.exports = initFieldsPermit;
+export default initFieldsPermit;

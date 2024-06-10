@@ -1,5 +1,4 @@
-
-class PlantDto {
+export class PlantDto {
 
     constructor(sectorName, plantRow, colture, coltureType) {
         this.sectorName = sectorName;
@@ -9,5 +8,3 @@ class PlantDto {
     }
 
 }
-
-module.exports = PlantDto

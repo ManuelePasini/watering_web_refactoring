@@ -1,5 +1,4 @@
-
-class ColtureDto {
+export class ColtureDto {
 
     constructor(colture, coltureType) {
         this.colture=colture;
@@ -7,5 +6,3 @@ class ColtureDto {
     }
 
 }
-
-module.exports = ColtureDto;

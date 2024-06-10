@@ -1,5 +1,4 @@
-const {Model, DataTypes} = require('sequelize');
-const sequelize = require('../../configs/dbConfig');
+import { Model, DataTypes } from 'sequelize';
 
 class TranscodingField extends Model {
 
@@ -25,4 +24,4 @@ function initTranscodingField(sequelize) {
     return TranscodingField;
 }
 
-module.exports = initTranscodingField;
+export default initTranscodingField;
