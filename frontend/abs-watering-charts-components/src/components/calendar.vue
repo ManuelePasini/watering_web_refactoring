@@ -91,7 +91,7 @@ async function mountChart(timeFilter) {
       <p><strong>Quantità d'acqua attesa:</strong> ${e.expectedWater ? e.expectedWater : 0} L</p>
       <p><strong>Consiglio irriguo:</strong> ${e.advice ? e.advice + "L" : "Non calcolato"} </p>
       ${ e.adviceTimestamp ? "<p><strong>Orario di calcolo:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
-      ${e.note ? ("<p><strong>Note:</strong>" + e.note + "</p>") : ""}
+      ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
       ${ e.wateringStart > Date.now()/1000 ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
 
       const event = {
