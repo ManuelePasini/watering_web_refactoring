@@ -5,7 +5,10 @@
   const router = useRouter()
 
   const props = defineProps(['user'])
-  const user = reactive(props.user)
+  if(props.user) {
+    const user = reactive(props.user)
+  }
+
 
   const handleLogout = async () => {
     authService.logout()

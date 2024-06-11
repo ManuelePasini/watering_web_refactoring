@@ -6,7 +6,7 @@ function initWateringSchedule(sequelize) {
     WateringSchedule.init({
         refStructureName: DataTypes.TEXT,
         companyName: DataTypes.TEXT,
-        fieldname: DataTypes.TEXT,
+        fieldName: DataTypes.TEXT,
         sectorName: DataTypes.TEXT,
         plantRow: DataTypes.TEXT,
         date: DataTypes.DATEONLY,
@@ -14,12 +14,19 @@ function initWateringSchedule(sequelize) {
         watering_end: DataTypes.DOUBLE,
         duration: DataTypes.DOUBLE,
         enabled: DataTypes.BOOLEAN,
+        latest: DataTypes.BOOLEAN,
         expected_water: DataTypes.DOUBLE,
         advice: DataTypes.DOUBLE,
         advice_timestamp: DataTypes.DOUBLE,
         userId: DataTypes.INTEGER,
         update_timestamp: DataTypes.DOUBLE,
         note: DataTypes.TEXT,
+        evapotrans: DataTypes.DOUBLE,
+        r: DataTypes.DOUBLE,
+        pluv: DataTypes.DOUBLE,
+        delta: DataTypes.DOUBLE,
+        kp: DataTypes.DOUBLE,
+        ki: DataTypes.DOUBLE
     }, {
         modelName: 'watering_schedule',
         timestamps: false,

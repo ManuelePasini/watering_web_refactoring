@@ -42,8 +42,34 @@ export class CommunicationService {
         return response;
     }
 
+    async updateEvent(environment, endpoint, thesisIdentifier, newEvent) {
+        return axios.put(this.buildURL(environment.host, "/wateringSchedule", undefined, endpoint), {
+            ...thesisIdentifier,
+            ...newEvent
+        }, {
+            headers: {
+                Authorization: 'Bearer ' + environment.token
+            }
+        }
+        ).then(response => {
+            console.log(`Success response: ${response.data}`)
+            if (response.data)
+                return response.data;
+            return null;
+        }).catch(error => {
+            console.error(`Error response: ${error}`)
+            console.error(`Error on communication service: ${error.message}`)
+            throw new Error(error.message);
+        })
+    }
+
     buildURL(host, primaryPath, pathsParams, endpoint) {
-        return host + primaryPath + '/' + pathsParams.refStructureName + '/' + pathsParams.companyName + '/' + pathsParams.fieldName + '/' + pathsParams.sectorName + '/' + pathsParams.plantRow + '/' + endpoint;
+        let path = ""
+        if (pathsParams) {
+            path = '/' + pathsParams.refStructureName + '/' + pathsParams.companyName + '/' + pathsParams.fieldName + '/' + pathsParams.sectorName + '/' + pathsParams.plantRow
+        }
+        return host + primaryPath + path + '/' + endpoint;
+
     }
 
 }

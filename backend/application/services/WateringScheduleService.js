@@ -1,9 +1,9 @@
-const WateringScheduleRepository = require('../persistency/repository/WateringScheduleRepository');
-const DtoConverter = require('./DtoConverter');
+import WateringScheduleRepository from '../persistency/repository/WateringScheduleRepository.js';
+import DtoConverter from './DtoConverter.js';
 
-const initUser = require('../persistency/model/User');
-const initWateringSchedule = require('../persistency/model/WateringSchedule');
-const { WateringScheduleResponse } = require('../dtos/wateringScheduleDto');
+import initUser from '../persistency/model/User.js';
+import initWateringSchedule from '../persistency/model/WateringSchedule.js';
+import { WateringScheduleResponse } from '../dtos/wateringScheduleDto.js';
 const dtoConverter = new DtoConverter();
 
 class WateringScheduleService {
@@ -20,6 +20,12 @@ class WateringScheduleService {
         return dtoConverter.convertWateringScheduleWrapper(results)
     }
 
+    async updateWateringEvent(event, userId) {
+        const updated = await this.wateringScheduleRepository.updateWateringEvent(event.refStructureName, event.companyName, event.fieldName, event.sectorName, event.plantRow, event.date,
+            event.wateringStart, event.wateringEnd, event.duration, event.enabled, event.expectedWater, event.advice, event.adviceTimestamp, userId, event.note)
+        return updated
+    }
+
 }
 
-module.exports = WateringScheduleService;
+export default WateringScheduleService;

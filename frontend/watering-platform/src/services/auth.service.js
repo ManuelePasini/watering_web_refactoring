@@ -13,7 +13,6 @@ class AuthService {
     }
 
     login(user) {
-        console.log(hashPassword("abds"))
         return axiosInstance.post('/login', {
             username: user.authUser,
             password: hashPassword(user.authPass),

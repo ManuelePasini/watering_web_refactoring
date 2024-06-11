@@ -130,17 +130,22 @@ wateringScheduleRouter.get("/:refStructureName/:companyName/:fieldName/:sectorNa
  *         description: Error on update data.
  */
 wateringScheduleRouter.put("/updateWateringEvent", async (req, res) => {
+    let user
     try {
-        const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
-            return res.status(401).json({ message: 'Unauthorized request' });
+        user = await authenticationService.validateJwt(req.headers.authorization);
     } catch (error) {
+        console.log(error)
         return res.status(403).json({ message: 'Authentication failed' });
     }
 
-    try {
+    if (!req.body && req.body === '')
+        return res.status(400).json({ message: 'Invalid request' })
 
-        //TODO const result = await fieldService.getDripperInfo(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp);
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'WA')))
+        return res.status(401).json({ message: 'Unauthorized request' });
+
+    try {
+        const result = await wateringScheduleService.updateWateringEvent(req.body, user.userid)
         res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({ message: error.message });
