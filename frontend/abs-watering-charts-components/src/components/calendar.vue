@@ -151,10 +151,8 @@ async function submitForm(){
 
   const parsed = JSON.parse(props.config);
   await communicationService.updateEvent(parsed.environment, updateEventEndpoint, parsed.paths, updatedEvent)
-  
   await mountChart()
   activeModal.hide()
-  selectedEvent.value = null
 }
 
 function isValidTime(time){

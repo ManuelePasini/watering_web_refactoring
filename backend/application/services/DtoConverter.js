@@ -113,7 +113,7 @@ class DtoConverter {
                 event.expectedWater,
                 event.advice,
                 event.adviceTimestamp,
-                event.updatedBy,
+                event.user !== null ? event.user.dataValues.updatedBy : null,
                 event.updateTimestamp,
                 event.note
             ));
