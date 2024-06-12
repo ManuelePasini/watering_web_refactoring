@@ -22,6 +22,7 @@ class AuthService {
                 localStorage.setItem('appToken', JSON.stringify(response.data.token))
             }
         }).catch(error => {
+            console.log(error)
             throw Error(`Authentication failed: ${error.message}`);
         });
     }
@@ -51,11 +52,10 @@ class AuthService {
         }).then(response => {
             if(response.data)
                 return response.data
-            return undefined;
         }).catch(error => {
+            console.log(error)
             console.error(`Get fields request failed: ${error.message}`)
             this.logout()
-            return undefined;
         });
     }
 

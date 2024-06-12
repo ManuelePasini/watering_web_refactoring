@@ -56,8 +56,8 @@ async function mountChart() {
   chartData.value = {
     datasets: [{
       data: data,
-      borderColor: 'rgb(0, 110, 189)',
-      backgroundColor: 'rgb(0, 110, 189)',
+      borderColor: '#339CFF',
+      backgroundColor: '#339CFF',
       label: "AirTemp"
     }]
   }

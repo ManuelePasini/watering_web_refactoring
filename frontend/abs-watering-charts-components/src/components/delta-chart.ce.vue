@@ -50,9 +50,9 @@ const createDatasets = (groupedMeasures) => {
 
 const colorFunction = (str) => {
   if(str === 'Media Pot. Idr. Ottimale')
-    return 'rgb(124, 176, 244)'
+    return '#6064C8'
   if(str === 'Media Pot. Idr. Giornaliera')
-    return 'rgb(0, 110, 189)'
+    return '#339CFF'
 }
 
 watchEffect(async () => {

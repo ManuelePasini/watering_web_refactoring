@@ -96,6 +96,26 @@ class WateringAdviceRepository {
               AND "plantRow" = '${plantRow}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "advice", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
+            UNION
+            (SELECT DISTINCT "refStructureName",
+                            "companyName",
+                            "fieldName",
+                            'Expected Water' as "detectedValueTypeDescription",
+                            "sectorName",
+                            "plantRow",
+                            "expected_water" as value,
+                            ((3600*24) * (watering_start / (3600*24))::INT) as rounded_timestamp
+            FROM watering_schedule
+            WHERE "watering_start" >= '${timefilterFrom}'
+              AND "watering_start" < '${timefilterTo}'
+              AND "latest" = true
+              AND "refStructureName" = '${refStructureName}'
+              AND "companyName" = '${companyName}'
+              AND "fieldName" = '${fieldName}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "expected_water", "sectorName", "plantRow", rounded_timestamp
+            ORDER BY rounded_timestamp ASC)
                 ) A
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC, "detectedValueTypeDescription" ASC

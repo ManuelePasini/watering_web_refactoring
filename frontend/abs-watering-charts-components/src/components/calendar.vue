@@ -94,7 +94,7 @@ async function mountChart(timeFilter) {
       ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
       ${ e.wateringStart > Date.now()/1000 ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
 
-      const event = {
+      const event = { 
         title: titleFunction(e),
         with: e.updatedBy,
         time: { start: startDate, end: endDate},
@@ -146,7 +146,10 @@ async function submitForm(){
   const updatedEvent = selectedEvent.value
   updatedEvent.enabled = updateForm.value.enabled
   updatedEvent.wateringStart = wateringStart
-  updatedEvent.expectedWater = updateForm.value.expectedWater
+  const expectedWater = parseFloat(updateForm.value.expectedWater)
+  if(!isNaN(expectedWater)){
+    updatedEvent.expectedWater = expectedWater
+  }
   updatedEvent.note = updateForm.value.note
 
   const parsed = JSON.parse(props.config);

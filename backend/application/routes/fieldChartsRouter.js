@@ -100,10 +100,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -112,8 +114,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['GRND_WATER_G', 'GRND_WATER_W', 'GRND_WATER'];
 
         const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -202,10 +202,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -214,8 +216,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR'];
 
         const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -305,10 +305,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.useridid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.useridid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -317,8 +319,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['DRIPPER'];
 
         const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -408,10 +408,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -420,8 +422,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['PLUV_CURR'];
 
         const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -511,10 +511,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -523,8 +525,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
 
         const result = await fieldService.getWaterAdvice(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
 
@@ -612,10 +612,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -624,8 +626,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['AIR_TEMP', 'AIR_TEMP_FOL'];
 
         const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -714,10 +714,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -726,8 +728,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['GRND_TEMP'];
 
         const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -816,10 +816,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -828,8 +830,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
         const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR', 'IGA'];
 
         const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
@@ -918,10 +918,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -930,8 +932,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const colture = req.query.colture;
         const coltureType = req.query.coltureType;
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
 
         const result = await fieldService.getEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
 
@@ -1019,18 +1019,18 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
 
     try {
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
 
         const result = await fieldService.getHumidityBins(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
@@ -1118,18 +1118,19 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
     
     try {
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
+
 
         const result = await fieldService.getDataInterpolatedRange(refStructureName, companyName, fieldName, sectorName, plantRow, timeFilterFrom, timeFilterTo);
 
@@ -1218,18 +1219,19 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timestampFrom = req.query.timeFilterFrom
+    const timestampTo = req.query.timeFilterTo
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timestampFrom, timestampTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
 
     try {
-        const timestampFrom = req.query.timeFilterFrom
-        const timestampTo = req.query.timeFilterTo
+
         const result = await fieldService.getDataInterpolatedRange(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo);
         res.status(200).json(result);
     } catch (error) {
@@ -1314,10 +1316,12 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
@@ -1325,7 +1329,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
 
-        const result = await fieldService.getInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow, req.query.timeFilterFrom, req.query.timeFilterTo);
+        const result = await fieldService.getInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow, timeFilterFrom, timeFilterTo);
 
         res.status(200).json(new InterpolatedDataResponse(result));
     } catch (error) {
@@ -1411,18 +1415,19 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
+    const timeFilterFrom = req.query.timeFilterFrom;
+    const timeFilterTo = req.query.timeFilterTo;
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
         return res.status(403).json({message: 'Authentication failed'});
     }
 
     try {
-        const timeFilterFrom = req.query.timeFilterFrom;
-        const timeFilterTo = req.query.timeFilterTo;
+
 
         const result = await fieldService.getDelta(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 

@@ -35,7 +35,7 @@ let selectedField = ref({})
 let selectedTimeLabel = ref("")
 let showDynamicHeatmap = ref(false)
 let showDetailedWatering = ref(false)
-let detailedWateringButton = ref("Mostra dettaglio")
+let detailedWateringButton = ref("Mostra puntuale")
 
 const token = reactive(props.token)
 const user = reactive(props.user)
@@ -191,7 +191,7 @@ function enableDynamicHeatmap() {
 
 function enableDetailedAggregate() {
   showDetailedWatering.value = !showDetailedWatering.value
-  detailedWateringButton.value = showDetailedWatering.value ? "Mostra aggregato" : "Mostra dettaglio"
+  detailedWateringButton.value = showDetailedWatering.value ? "Mostra giornaliero" : "Mostra puntuale"
 }
 
 const selectedTimestamp = ref(null)

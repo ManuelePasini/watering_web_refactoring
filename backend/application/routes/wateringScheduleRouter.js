@@ -82,18 +82,19 @@ wateringScheduleRouter.get("/:refStructureName/:companyName/:fieldName/:sectorNa
     const fieldName = req.params.fieldName;
     const sectorName = req.params.sectorName;
     const plantRow = req.params.plantRow;
-
+    const timestampFrom = req.query.timeFilterFrom
+    const timestampTo = req.query.timeFilterTo
     try {
+
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA', timestampFrom, timestampTo)))
             return res.status(401).json({ message: 'Unauthorized request' });
     } catch (error) {
         return res.status(403).json({ message: 'Authentication failed' });
     }
 
     try {
-        const timestampFrom = req.query.timeFilterFrom
-        const timestampTo = req.query.timeFilterTo
+
 
         const result = await wateringScheduleService.getSchedule(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo);
         res.status(200).json(result);

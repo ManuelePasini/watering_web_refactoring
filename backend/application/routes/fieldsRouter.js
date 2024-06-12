@@ -260,17 +260,17 @@ fieldsRouter.get("/:refStructureName/:companyName/:fieldName/:sectorName/:plantR
   const fieldName = req.params.fieldName;
   const sectorName = req.params.sectorName;
   const plantRow = req.params.plantRow;
+  const timestamp = req.query.timestamp ? req.query.timestamp : Date.now();
 
   try {
     const user = await authenticationService.validateJwt(req.headers.authorization);
-    if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO')))
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timestamp, timestamp)))
       return res.status(401).json({ message: 'Unauthorized request' });
   } catch (error) {
     return res.status(403).json({ message: 'Authentication failed' });
   }
 
   try {
-    const timestamp = req.query.timestamp ? req.query.timestamp : Date.now();
 
     const result = await fieldService.getDripperInfo(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp);
     res.status(200).json(result);

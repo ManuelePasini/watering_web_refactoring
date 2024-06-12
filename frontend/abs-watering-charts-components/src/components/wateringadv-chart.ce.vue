@@ -31,15 +31,16 @@ const endpoint = 'wateringAdvice'
 
 const colorFunction = (str) => {
   if (str === 'Dripper')
-    return 'rgb(0, 110, 189)'
+    return '#339CFF'
   if (str === 'Pluv Curr')
-    return 'rgb(124, 176, 244)'
+    return '#FFCD3D'
   if (str === 'Advice')
-    return 'rgb(164, 224, 61)'
+    return '#6064C8'
   if (str === 'Pot Evap')
-    return 'rgb(241, 163, 133)'
+    return '#FFB533'
+  if (str === 'Expected Water')
+    return '#4CAF50'
 }
-
 
 const groupByType = (measures) => {
   return measures.reduce((accumulator, currentValue) => {
@@ -117,7 +118,7 @@ async function mountChart() {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'L'
+          text: 'Advice, Dripper, Expected Water (L)'
         },
         position: 'left',
         max: maxValue,
@@ -128,7 +129,7 @@ async function mountChart() {
         position: 'right',
         title: {
           display: true,
-          text: 'mm'
+          text: 'Pluv Curr, Pot Evap (mm)'
         },
         max: maxValue,
         min: minValue

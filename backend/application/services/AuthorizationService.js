@@ -7,14 +7,14 @@ class AuthorizationService {
     this.userService = new UserService(sequelize)
   }
 
-  async isUserAuthorized(userid, permission) {
-    const userPermissions = await this.userService.findUserPermissions(userid)
+  async isUserAuthorized(userid, permission, timestampFrom, timestampTo) {
+    const userPermissions = await this.userService.findUserPermissions(userid, timestampFrom, timestampTo)
     if(userPermissions.role === 'admin') return true;
     return permission === userPermissions.role
   }
 
-  async isUserAuthorizedByFieldAndId(userid, refStructureName, companyName, fieldName, sectorName, plantRow, action) {
-    const userPermissions = await this.userService.findUserPermissions(userid)
+  async isUserAuthorizedByFieldAndId(userid, refStructureName, companyName, fieldName, sectorName, plantRow, action, timestampFrom, timestampTo) {
+    const userPermissions = await this.userService.findUserPermissions(userid, timestampFrom, timestampTo)
     if(userPermissions.role === 'admin') return true;
     if(!userPermissions.permissions || userPermissions.permissions.length === 0) return false;
 

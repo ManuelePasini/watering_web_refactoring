@@ -74,10 +74,12 @@ class WateringScheduleRepository {
                     plantRow: plantRow,
                     latest: true,
                     date: date,
-                    update_timestamp: activeEvent.dataValues.update_timestamp
+                        update_timestamp: {
+                            [Op.gte]: Math.floor(activeEvent.dataValues.update_timestamp),
+                            [Op.lt]: Math.ceil(activeEvent.dataValues.update_timestamp)
+                        }
                 }
             })
-            console.log(wateringStart)
             const newEventModel = this.WateringSchedule.build({
                 refStructureName: refStructureName,
                 companyName: companyName,

@@ -49,7 +49,7 @@ const createDatasets = (groupedMeasures) => {
 };
 
 const colorFunction = (str) => {
-  let hash = 0;
+  let hash = 200;
   if (str.length === 0) return hash;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -86,7 +86,11 @@ async function mountChart() {
 
   const groupByData = groupByType(data);
 
-  const datasets = createDatasets(groupByData).map(bin => bin.getDataSet(colorFunction))
+  const datasets = createDatasets(groupByData).map(bin => bin.getDataSet(colorFunction)).sort( (a,b) => {
+    if (a.label < b.label) return -1;
+    if (a.label > b.label) return 1;
+    return 0;
+  })
 
   chartData.value = {
     datasets: datasets

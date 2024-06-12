@@ -54,9 +54,9 @@ const createDatasets = (groupedMeasures) => {
 
 const colorFunction = (str) => {
   if (str === 'Dripper')
-    return 'rgb(0, 110, 189)'
+    return '#339CFF'
   if (str === 'Pluv Curr')
-    return 'rgb(124, 176, 244)'
+    return '#FFCD3D'
 }
 
 watchEffect(async () => {
@@ -117,7 +117,7 @@ async function mountChart() {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'L'
+          text: 'Dripper (L)'
         },
         position: 'left',
         min: minValue
@@ -127,7 +127,7 @@ async function mountChart() {
         position: 'right',
         title: {
           display: true,
-          text: 'mm'
+          text: 'Pluv Curr (mm)'
         },
         min: minValue
       }
