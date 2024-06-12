@@ -106,7 +106,6 @@ async function mountChart() {
         }
       },
       y: {
-        beginAtZero: true,
         position: 'left',
         title: {
           display: true,

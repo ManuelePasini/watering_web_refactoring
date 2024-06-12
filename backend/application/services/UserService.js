@@ -73,6 +73,7 @@ class UserService {
                     results = await this.userRepository.findUserPermissions(userid)
                 }
             }
+
             if (results) {
                 return await this.computeUserPermissions(user, results)
             } else {
@@ -96,16 +97,18 @@ class UserService {
                     field.plantRow
                 );
 
-                const keyString = JSON.stringify(fieldDetails.dataValues);
+                if (fieldDetails) {
+                    const keyString = JSON.stringify(fieldDetails.dataValues);
 
-                if (!fields.has(keyString)) {
-                    fields.set(keyString, new Set());
-                }
+                    if (!fields.has(keyString)) {
+                        fields.set(keyString, new Set());
+                    }
 
-                if (field.permit) {
-                    fields.get(keyString).add(field.permit);
-                } else if (user.role === "admin") {
-                    fields.get(keyString).add("*")
+                    if (field.permit) {
+                        fields.get(keyString).add(field.permit);
+                    } else if (user.role === "admin") {
+                        fields.get(keyString).add("*")
+                    }
                 }
             }
 

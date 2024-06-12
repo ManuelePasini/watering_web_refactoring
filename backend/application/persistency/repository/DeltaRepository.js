@@ -23,9 +23,9 @@ class DeltaRepository {
                 ELSE LN(ABS(-300)) * weighted."weight" END) as "value", di."xx", di."yy"
                 FROM data_interpolated as di
                 JOIN (
-                SELECT DISTINCT "timestamp", "refStructureName", "companyName", "fieldName", "sectorName", "plantRow"
-                FROM watering_advice
-                WHERE "timestamp" BETWEEN '${timestampFrom}' AND '${timestampTo}') as wa ON wa."timestamp" + 9 * 3600 = di."timestamp"
+                SELECT DISTINCT "watering_start", "refStructureName", "companyName", "fieldName", "sectorName", "plantRow"
+                FROM watering_schedule
+                WHERE "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}') as wa ON ((wa.\"watering_start\" / 3600)::INT * 3600) - 3600  = di.\"timestamp\"
                 AND di."refStructureName" = wa."refStructureName"
                 AND di."companyName" = wa."companyName"
                 AND di."fieldName" = wa."fieldName"
@@ -53,7 +53,7 @@ class DeltaRepository {
                 AND di."fieldName" = '${fieldName}'
                 AND di."sectorName" = '${sectorName}'
                 AND di."plantRow" = '${plantRow}'
-                AND wa."timestamp" BETWEEN '${timestampFrom}' AND '${timestampTo}'
+                AND wa."watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}'
                 GROUP BY wa."refStructureName", wa."companyName", wa."fieldName", wa."sectorName", wa."plantRow", di."timestamp", di."xx", di."yy"
                 ) as q1
             GROUP BY q1."refStructureName", q1."companyName", q1."fieldName", q1."sectorName", q1."plantRow", q1."timestamp"
@@ -74,12 +74,12 @@ class DeltaRepository {
                 GROUP BY "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", fm."matrixId"
                 ) as sq1
                 CROSS JOIN (
-                SELECT DISTINCT EXTRACT (EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP("timestamp"))):: INT AS timestamp
-                FROM watering_advice
-                WHERE TO_CHAR(TO_TIMESTAMP("timestamp"), 'YYYY-MM-DD') IN (
-                SELECT DISTINCT TO_CHAR(TO_TIMESTAMP("timestamp"), 'YYYY-MM-DD') as "timestamp"
-                FROM watering_advice
-                WHERE "timestamp" BETWEEN '${timestampFrom}' AND '${timestampTo}')
+                SELECT DISTINCT EXTRACT (EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP("watering_start"))):: INT AS timestamp
+                FROM watering_schedule
+                WHERE TO_CHAR(TO_TIMESTAMP("watering_start"), 'YYYY-MM-DD') IN (
+                SELECT DISTINCT TO_CHAR(TO_TIMESTAMP("watering_start"), 'YYYY-MM-DD') as "timestamp"
+                FROM watering_schedule
+                WHERE "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}')
                 ) as sq2)
             ORDER BY "timestamp" DESC
         `;

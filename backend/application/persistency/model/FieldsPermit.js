@@ -6,11 +6,6 @@ class FieldsPermit extends Model {
 
 function initFieldsPermit(sequelize) {
   FieldsPermit.init({
-    permitid: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     userid: {
       type: DataTypes.STRING,
       allowNull: false

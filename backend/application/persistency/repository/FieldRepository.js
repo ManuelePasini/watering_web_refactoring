@@ -164,7 +164,7 @@ class FieldRepository {
         }
       });
       const dripper = {
-        x: result.dataValues.dripper_pos,
+        x: result ? result.dataValues.dripper_pos : 0,
         y: 0
       }
       return dripper

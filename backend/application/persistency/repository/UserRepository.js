@@ -22,6 +22,7 @@ class UserRepository {
 
     async findUserPermissions(userid) {
         try {
+            this.FieldsPermit.removeAttribute('id')
             return (await this.FieldsPermit.findAll({
                 where: { userid: userid }
             })).map(el => el.dataValues);
@@ -32,7 +33,13 @@ class UserRepository {
 
     async findAdminPermissions() {
         try {
-            return (await this.FieldsPermit.findAll()).map(el => el.dataValues);
+            this.FieldsPermit.removeAttribute('id')
+            const res = (await this.FieldsPermit.findAll({
+                attributes: ['refStructureName', 'companyName', 'fieldName', 'sectorName', 'plantRow'],
+                group: ['refStructureName', 'companyName', 'fieldName', 'sectorName', 'plantRow']
+            })).map(el => el.dataValues);
+            //console.error(res)
+            return res
         } catch (error) {
             console.error('Error on find admin permissions:', error);
         }

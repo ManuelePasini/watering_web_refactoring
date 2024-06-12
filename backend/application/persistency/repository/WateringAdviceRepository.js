@@ -84,11 +84,11 @@ class WateringAdviceRepository {
                             'Advice' as "detectedValueTypeDescription",
                             "sectorName",
                             "plantRow",
-                            CASE WHEN BOOL_OR("wateringAdvice") = true THEN "advice" ELSE AVG("evapotrans") END as value,
-                  ((3600*24) * (timestamp / (3600*24))::INT) as rounded_timestamp
-            FROM watering_advice
-            WHERE "timestamp" >= '${timefilterFrom}'
-              AND "timestamp" < '${timefilterTo}'
+                            "advice" as value,
+                            ((3600*24) * (watering_start / (3600*24))::INT) as rounded_timestamp
+            FROM watering_schedule
+            WHERE "watering_start" >= '${timefilterFrom}'
+              AND "watering_start" < '${timefilterTo}'
               AND "refStructureName" = '${refStructureName}'
               AND "companyName" = '${companyName}'
               AND "fieldName" = '${fieldName}'
