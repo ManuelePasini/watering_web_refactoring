@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   watering-web-frontend:
-    build: 127.0.0.0:5000/watering-web-frontend
+    image: 127.0.0.0:5000/watering-web-frontend
     ports:
       - "80:80"
     deploy:
