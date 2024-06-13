@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  vue-app:
+    build: ./frontend
+    ports:
+      - "80:80"
+    deploy:
+      placement:
+        constraints:
+            - node.role == worker
+            - node.hostname != CB-Mass-Node1
+    networks:
+      - BIG-dataplatform-network
+  
+  backend:
+    build: ./backend
+    ports:
+      - "8081:8081"
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+          - node.hostname != CB-Mass-Node1
+    networks:
+      - BIG-dataplatform-network
+
+networks:
+  BIG-dataplatform-network:
+    external: true
+    name: BIG-dataplatform-network
