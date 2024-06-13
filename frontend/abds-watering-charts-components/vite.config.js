@@ -17,8 +17,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: './src/main.js',
-      name: 'abs-chart-components',
-      fileName: 'abs-chart-components'
+      name: 'abds-chart-components',
+      fileName: 'abds-chart-components'
     }
   },
   define: {

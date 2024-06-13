@@ -3,17 +3,17 @@
 import '../assets/basebase.css'
 
 import {computed, onMounted, reactive, ref, watchEffect} from "vue";
-import AirTemperatureChart from "../../../abs-watering-charts-components/src/components/airtemperature-chart.ce.vue"
-import DripperAndPluvChart from "../../../abs-watering-charts-components/src/components/dripperandpluv-chart.ce.vue"
-import WaterAdviceChart from "../../../abs-watering-charts-components/src/components/wateringadv-chart.ce.vue"
-import DeltaChart from "../../../abs-watering-charts-components/src/components/delta-chart.ce.vue"
-import CountorMeanChart from "../../../abs-watering-charts-components/src/components/countormean-chart.ce.vue"
-import CountorStdChart from "../../../abs-watering-charts-components/src/components/countorstd-chart.ce.vue"
-import GroundWaterPotentialChart from "../../../abs-watering-charts-components/src/components/groundwaterpot-chart.ce.vue"
-import HumidityHeatmap from "../../../abs-watering-charts-components/src/components/humidityheatmap-chart.ce.vue"
-import HumidityMultiLineChart from "../../../abs-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
-import HumidityDynamicHeatmap from "../../../abs-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
-import Calendar from "../../../abs-watering-charts-components/src/components/calendar.vue"
+import AirTemperatureChart from "../../../abds-watering-charts-components/src/components/airtemperature-chart.ce.vue"
+import DripperAndPluvChart from "../../../abds-watering-charts-components/src/components/dripperandpluv-chart.ce.vue"
+import WaterAdviceChart from "../../../abds-watering-charts-components/src/components/wateringadv-chart.ce.vue"
+import DeltaChart from "../../../abds-watering-charts-components/src/components/delta-chart.ce.vue"
+import CountorMeanChart from "../../../abds-watering-charts-components/src/components/countormean-chart.ce.vue"
+import CountorStdChart from "../../../abds-watering-charts-components/src/components/countorstd-chart.ce.vue"
+import GroundWaterPotentialChart from "../../../abds-watering-charts-components/src/components/groundwaterpot-chart.ce.vue"
+import HumidityHeatmap from "../../../abds-watering-charts-components/src/components/humidityheatmap-chart.ce.vue"
+import HumidityMultiLineChart from "../../../abds-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
+import HumidityDynamicHeatmap from "../../../abds-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
+import Calendar from "../../../abds-watering-charts-components/src/components/calendar.vue"
 import {useRouter} from "vue-router";
 import authService from '@/services/auth.service';
 

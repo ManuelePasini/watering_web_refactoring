@@ -1,5 +1,5 @@
 {
-  "name": "abs-watering-charts-components",
+  "name": "abds-watering-charts-components",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -28,12 +28,12 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/abs-chart-components.umd.cjs",
-  "module": "./dist/abs-chart-components.js",
+  "main": "./dist/abds-chart-components.umd.cjs",
+  "module": "./dist/abds-chart-components.js",
   "exports": {
     ".": {
-      "import": "./dist/abs-chart-components.js",
-      "require": "./dist/abs-chart-components.umd.cjs"
+      "import": "./dist/abds-chart-components.js",
+      "require": "./dist/abds-chart-components.umd.cjs"
     }
   }
 }
