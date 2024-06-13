@@ -38,17 +38,21 @@ async function drawImage(timestamp){
 
   const image = images.value.get(timestamp)
 
+  let xValues = []
   const series = Array.from(image.reduce((accumulator, currentValue) => {
     if (!accumulator.has(currentValue.yy))
       accumulator.set(currentValue.yy, []);
     accumulator.get(currentValue.yy).push({ x: currentValue.xx,
-      y: currentValue.value.toFixed(2)
+      value: currentValue.value.toFixed(2)
     })
     return accumulator
   }, new Map()), ([key, value])=> {
+    if (xValues.length === 0) {
+      xValues = value.map(e => e.x)
+    }
     return {
       name: key,
-      data: value.sort((a,b)=> a.x - b.x)
+      data: value.sort((a, b) => a.x - b.x).map(e => e.value)
     }
   }).sort((a,b)=> b.name - a.name)
 
@@ -57,14 +61,27 @@ async function drawImage(timestamp){
     await nextTick()
   }
   const containerWidth = container.value.offsetWidth
-  const cellSize = containerWidth / heatmapSeries.value[0].data.length
-  const titleOffset = 80
-  const chartHeight = (cellSize * heatmapSeries.value.length + titleOffset) + "px"
+
+  let cellSize
+  if (heatmapSeries.value[0].data.length > heatmapSeries.value.length) {
+    cellSize = containerWidth / heatmapSeries.value[0].data.length
+  } else {
+    cellSize = containerWidth / heatmapSeries.value.length * 0.7
+  }
+
+  cellSize = Math.min(cellSize, 40)
+
+  const verticalOffset = 60
+  const horizontalOffset = 10
+  const chartHeight = (cellSize * heatmapSeries.value.length + verticalOffset)
+  const chartWidth = (cellSize * heatmapSeries.value[0].data.length + horizontalOffset)
 
   chartOptions.value = {
     chart: {
+      offsetX: (containerWidth - chartWidth) / 2,
       type: 'heatmap',
-      height: chartHeight,
+      height: (chartHeight + "px"),
+      width: (chartWidth + "px"),
       toolbar: {
         show: false
       },
@@ -133,17 +150,15 @@ async function drawImage(timestamp){
       show: false,
     },
     stroke: {
-      width: 0.2
+      width: 0
     },
     xaxis: {
       type: 'category',
-      categories: heatmapSeries.value[0].data.map(({x,y})=>String(x)),
+      categories: xValues,
       tooltip: {
           enabled: false,
       },
       tickPlacement: 'on',
-      tickAmount: heatmapSeries.value[0].data.length-1,
-      stepSize: heatmapSeries.value[0].data[1].x-heatmapSeries.value[0].data[0].x,
       labels: {
         show: true
       }

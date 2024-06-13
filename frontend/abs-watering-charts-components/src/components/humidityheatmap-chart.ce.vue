@@ -86,8 +86,6 @@ async function drawImage(timestamp){
 
   cellSize = Math.min(cellSize, 40)
 
-
-
   const verticalOffset = 60
   const horizontalOffset = 10
   const chartHeight = (cellSize * heatmapSeries.value.length + verticalOffset) 
@@ -100,7 +98,7 @@ async function drawImage(timestamp){
       height: (chartHeight + "px"),
       width: (chartWidth + "px"),
       toolbar: {
-        offsetX: chartWidth < containerWidth ? chartWidth/2 : 0,
+        offsetX: chartWidth < containerWidth * 0.7 ? chartWidth * 0.7 : 0,
         show: true
       },
       zoom: {
@@ -210,9 +208,13 @@ async function drawImage(timestamp){
     },
     tooltip:{
       custom: function({series, seriesIndex, dataPointIndex, w}) {
-        if(series[seriesIndex][dataPointIndex] < 0){
+        let value = series[seriesIndex][dataPointIndex]
+        if (value <= 0) {
+          if (value == 0) {
+            value = "G"
+          }
           return ('<div class="arrow_box m-1">' +
-            '<div> <strong>val</strong>: ' + series[seriesIndex][dataPointIndex] + '</div>' +
+            '<div> <strong>val</strong>: ' + value + '</div>' +
             '<div> <strong>x</strong>: ' + xValues[dataPointIndex] + '</div>' +
             '<div> <strong>y</strong>: ' + heatmapSeries.value[seriesIndex].name + '</div>' +
             '</div>')

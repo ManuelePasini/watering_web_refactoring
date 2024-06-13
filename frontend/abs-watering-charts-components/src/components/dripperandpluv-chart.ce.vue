@@ -46,16 +46,24 @@ const groupByType = (measures) => {
   }, new Map());
 }
 
+function addUnitMeasure(key) {
+  if (key === 'Dripper')
+    return 'Dripper (L)'
+  if (key === 'Pluv Curr')
+    return 'Pluv Curr (mm)'
+}
+
 const createDatasets = (groupedMeasures) => {
   return Array.from(groupedMeasures, ([key, jsonValues]) => {
-    return new MultiAxisLineDatasetData(key, jsonValues, key === 'Dripper' ? 'y1' : 'y', colorFunction);
+    key = addUnitMeasure(key)
+    return new MultiAxisLineDatasetData(key, jsonValues, key.includes("(mm)") ? 'y1' : 'y', colorFunction);
   });
 };
 
 const colorFunction = (str) => {
-  if (str === 'Dripper')
+  if (str === 'Dripper (L)')
     return '#339CFF'
-  if (str === 'Pluv Curr')
+  if (str === 'Pluv Curr (mm)')
     return '#FFCD3D'
 }
 
@@ -117,19 +125,21 @@ async function mountChart() {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Dripper (L)'
+          text: 'L'
         },
         position: 'left',
-        min: minValue
+        suggestedMax: Math.max(...datasets.flatMap(d => d.data).map(e => e.y)) * 1.1,
+        suggestedMin: Math.min(...datasets.flatMap(d => d.data).map(e => e.y)) * 1.1
       },
       y1: {
         beginAtZero: true,
         position: 'right',
         title: {
           display: true,
-          text: 'Pluv Curr (mm)'
+          text: 'mm'
         },
-        min: minValue
+        suggestedMax: Math.max(...datasets.flatMap(d => d.data).map(e => e.y1)) * 1.1,
+        suggestedMin: Math.min(...datasets.flatMap(d => d.data).map(e => e.y1)) * 1.1
       }
     }
   }

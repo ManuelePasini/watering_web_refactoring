@@ -30,15 +30,15 @@ const props = defineProps(['config'])
 const endpoint = 'wateringAdvice'
 
 const colorFunction = (str) => {
-  if (str === 'Dripper')
+  if (str === 'Dripper (L)')
     return '#339CFF'
-  if (str === 'Pluv Curr')
+  if (str === 'Pluv Curr (mm)')
     return '#FFCD3D'
-  if (str === 'Advice')
+  if (str === 'Advice (L)')
     return '#6064C8'
-  if (str === 'Pot Evap')
+  if (str === 'Pot Evap (mm)')
     return '#FFB533'
-  if (str === 'Expected Water')
+  if (str === 'Expected Water (L)')
     return '#4CAF50'
 }
 
@@ -48,7 +48,7 @@ const groupByType = (measures) => {
     if(!accumulator.has(key))
       accumulator.set(key, []);
 
-    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2), y1: Number(currentValue.value).toFixed(2)}));
+    accumulator.get(key).push(JSON.stringify({ x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2) }));
 
     return accumulator;
   }, new Map());
@@ -56,7 +56,7 @@ const groupByType = (measures) => {
 
 const createDatasets = (groupedMeasures) => {
   return Array.from(groupedMeasures, ([key, jsonValues]) => {
-    return new BarDatasetData(key, jsonValues, key === 'Dripper' ? 'y1':'y', colorFunction);
+    return new BarDatasetData(key, jsonValues, key.includes("(mm)") ? 'y1' : 'y', colorFunction);
   });
 };
 
@@ -118,25 +118,24 @@ async function mountChart() {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Advice, Dripper, Expected Water (L)'
+          text: 'L'
         },
         position: 'left',
-        max: maxValue,
-        min: minValue
+        suggestedMax: maxValue,
+        suggestedMin: minValue,
       },
       y1: {
         beginAtZero: true,
         position: 'right',
         title: {
           display: true,
-          text: 'Pluv Curr, Pot Evap (mm)'
+          text: 'mm'
         },
-        max: maxValue,
-        min: minValue
+        suggestedMax: maxValue,
+        suggestedMin: minValue
       }
     }
   }
-
 }
 
 

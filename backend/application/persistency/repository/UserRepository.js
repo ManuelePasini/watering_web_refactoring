@@ -58,7 +58,8 @@ class UserRepository {
                             AND permit."plantRow" = transcoding."plantRow"
                     WHERE (permit.userid = '${userid}') 
                         AND transcoding.valid_from < '${timestamp_to}' 
-                        AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)`
+                        AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)
+                    ORDER BY permit."refStructureName", permit."companyName", permit."fieldName", permit."sectorName", permit."plantRow"`
 
             return await this.sequelize.query(query, {
                 type: QueryTypes.SELECT,
@@ -85,7 +86,10 @@ class UserRepository {
                             AND permit."sectorName" = transcoding."sectorName"
                             AND permit."plantRow" = transcoding."plantRow"
                     WHERE transcoding.valid_from < '${timestamp_to}' 
-                        AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)`
+                        AND (transcoding.validto > '${timestamp_from}' OR transcoding.validto IS NULL)
+                    ORDER BY permit."refStructureName", permit."companyName", permit."fieldName", permit."sectorName", permit."plantRow"
+                    `
+
 
             return await this.sequelize.query(query, {
                 type: QueryTypes.SELECT,

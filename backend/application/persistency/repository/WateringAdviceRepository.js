@@ -19,9 +19,9 @@ class WateringAdviceRepository {
                             MAX("value") as value, rounded_timestamp
             FROM (
                 (
-                SELECT DISTINCT "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", SUM ("value") as value, ((3600*24) * (timestamp / (3600*24)):: INT) as rounded_timestamp
+                SELECT DISTINCT "refStructureName", "companyName", "fieldName", 'Pluv Curr (mm)' "detectedValueTypeDescription", "sectorName", "plantRow", SUM ("value") as value, ((3600*24) * (timestamp / (3600*24)):: INT) as rounded_timestamp
                 FROM view_data_original
-                WHERE "detectedValueTypeId" IN ('DRIPPER', 'PLUV_CURR')
+                WHERE "detectedValueTypeId" IN ('PLUV_CURR')
                 AND "timestamp" >= '${timefilterFrom}'
                 AND "timestamp" <= '${timefilterTo}'
                 AND "refStructureName" = '${refStructureName}'
@@ -38,10 +38,10 @@ class WateringAdviceRepository {
             (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
-                            'Advice' as "detectedValueTypeDescription",
+                            'Dripper (L)' as "detectedValueTypeDescription",
                             "sectorName",
                             "plantRow",
-                            0 as value, ((3600*24) * (timestamp / (3600*24))::INT) as rounded_timestamp
+                            SUM("value") as value, ((3600*24) * (timestamp / (3600*24))::INT) as rounded_timestamp
             FROM view_data_original
             WHERE "detectedValueTypeId" IN ('DRIPPER')
               AND "timestamp" >= '${timefilterFrom}'
@@ -59,7 +59,7 @@ class WateringAdviceRepository {
             (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
-                            "detectedValueTypeDescription",
+                            'Pot Evap (mm)' AS "detectedValueTypeDescription",
                             "sectorName",
                             "plantRow",
                             AVG(-"value") as value,
@@ -81,10 +81,10 @@ class WateringAdviceRepository {
             (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
-                            'Advice' as "detectedValueTypeDescription",
+                            'Advice (L)' as "detectedValueTypeDescription",
                             "sectorName",
                             "plantRow",
-                            "advice" as value,
+                            AVG("advice") as value,
                             ((3600*24) * (watering_start / (3600*24))::INT) as rounded_timestamp
             FROM watering_schedule
             WHERE "watering_start" >= '${timefilterFrom}'
@@ -94,13 +94,14 @@ class WateringAdviceRepository {
               AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "advice", "sectorName", "plantRow", rounded_timestamp
+              AND "latest" = true
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
             UNION
             (SELECT DISTINCT "refStructureName",
                             "companyName",
                             "fieldName",
-                            'Expected Water' as "detectedValueTypeDescription",
+                            'Expected Water (L)' as "detectedValueTypeDescription",
                             "sectorName",
                             "plantRow",
                             "expected_water" as value,
