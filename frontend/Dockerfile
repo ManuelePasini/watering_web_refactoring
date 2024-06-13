@@ -18,7 +18,7 @@ WORKDIR /app/watering-platform
 RUN npm install
 
 # Compila l'app per la produzione
-CMD npm run build
+RUN npm run build
 
 # Fase 2: Servire i file statici con Nginx
 # Usa un'immagine base di Nginx
