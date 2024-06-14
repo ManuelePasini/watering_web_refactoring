@@ -48,7 +48,11 @@ function colorFunction(event) {
     return "red"
   }
   if( event.wateringStart < Date.now()/1000) {
-    return "green"
+    if( event.advice === 0){
+      return "pink"
+    } else {
+      return "green"
+    }
   }
   return "yellow"
 }
@@ -58,7 +62,11 @@ function titleFunction(event) {
     return "Irrigazione disabilitata"
   }
   if( event.wateringStart < Date.now()/1000) {
-    return "Irrigazione eseguita"
+    if( event.advice === 0){
+      return "Irrigazione cancellata da consiglio irriguo"
+    } else {
+      return "Irrigazione eseguita"
+    }
   }
   return "Irrigazione programmata"
 }
@@ -86,10 +94,10 @@ async function mountChart(timeFilter) {
         endDate = startDate
       }
 
-      const eventDescription = `<p><strong>Durata:</strong> ${e.duration ? e.duration : "Non calcolata"}</p>
-      <p><strong>Stato:</strong> ${e.enabled ? "Abilitato" : "Disabilitato"}</span></p>
+      const eventDescription = `<p><strong>Stato:</strong> ${e.enabled ? "Abilitato" : "Disabilitato"}</span></p>
       <p><strong>Quantità d'acqua attesa:</strong> ${e.expectedWater ? e.expectedWater : 0} L</p>
-      <p><strong>Consiglio irriguo:</strong> ${e.advice ? e.advice + "L" : "Non calcolato"} </p>
+      <p><strong>Consiglio irriguo:</strong> ${e.advice !== null ? e.advice + "L" : "Non calcolato"} </p>
+      <p><strong>Durata:</strong> ${e.duration !== null ? e.duration : "Non calcolata"}</p>
       ${ e.adviceTimestamp ? "<p><strong>Orario di calcolo:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
       ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
       ${ e.wateringStart > Date.now()/1000 ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
