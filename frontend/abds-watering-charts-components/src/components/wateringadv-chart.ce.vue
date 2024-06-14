@@ -37,7 +37,7 @@ const colorFunction = (str) => {
   if (str === 'Advice (L)')
     return '#6064C8'
   if (str === 'Pot Evap (mm)')
-    return '#FFB533'
+    return '#FA4443'
   if (str === 'Expected Water (L)')
     return '#4CAF50'
 }
