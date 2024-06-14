@@ -59,7 +59,7 @@ function updateConnectionParams() {
   if(selectedField.value){
     connectionParams = {
     environment: {
-      host: 'http://localhost:8081',
+      host: 'http://localhost:43080/api',
       token: token.value
     },
     paths: selectedField.value,

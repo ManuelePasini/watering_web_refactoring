@@ -1,5 +1,5 @@
 # Utilizza un'immagine di base Node.js
-FROM node:latest
+FROM node:22.3-slim
 
 # Imposta la directory di lavoro
 WORKDIR /backend
@@ -11,6 +11,8 @@ COPY ./application .
 RUN npm install
 
 WORKDIR /backend/application
+
+EXPOSE 8081
 
 # Compila l'app per la produzione
 CMD npm run start
