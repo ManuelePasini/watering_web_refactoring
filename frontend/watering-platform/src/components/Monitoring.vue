@@ -30,8 +30,8 @@ let customSelectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 let customSelectedTimestampFrom = ref(getCurrentTimestampMinusDays(2))
 
 
-let selectedFieldName = ref('Select field')
-let selectedField = ref({})
+let selectedFieldName = ref("Seleziona una tesi")
+let selectedField = ref(null)
 let selectedTimeLabel = ref("")
 let showDynamicHeatmap = ref(false)
 let showDetailedWatering = ref(false)
@@ -49,9 +49,12 @@ onMounted(async () => {
   }
 })
 
-watchEffect(()=>{
+watchEffect(async ()=>{
   if(token.value){
-    updateUserPermission()
+    await updateUserPermission()
+    if (!selectedField.value && userPermissions.value.permissions[0]){
+      selectItem(userPermissions.value.permissions[0])
+    }
   }
 })
 
