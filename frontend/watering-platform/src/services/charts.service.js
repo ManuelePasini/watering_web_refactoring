@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = 'http://localhost:8081/fieldCharts/';
+const API_URL = import.meta.env.VITE_BACKEND_ADDRESS;
 
 export class ChartsService {
 

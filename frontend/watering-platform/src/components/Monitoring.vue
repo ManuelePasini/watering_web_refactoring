@@ -59,7 +59,7 @@ function updateConnectionParams() {
   if(selectedField.value){
     connectionParams = {
     environment: {
-      host: 'http://localhost:43080/api',
+      host: import.meta.env.VITE_BACKEND_ADDRESS,
       token: token.value
     },
     paths: selectedField.value,

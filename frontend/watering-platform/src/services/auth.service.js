@@ -2,7 +2,7 @@ import axios from 'axios'
 import hashPassword from '@/utils/hashPassword';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:43080/api'
+    baseURL: import.meta.env.VITE_BACKEND_ADDRESS
 });
 
 class AuthService {
