@@ -298,7 +298,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('WA')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('WAS')" class="m-3 container col-md-12">
       <div class="humidity-card card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Calendario Irrigazione</span>
