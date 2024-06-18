@@ -170,7 +170,7 @@ async function drawImage(timestamp){
       }
     },
     legend: {
-      show: true,
+      show: verticalOffset/chartHeight < 0.3,
       markers: {
         width: 5,
         height: 16,
