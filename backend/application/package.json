@@ -20,7 +20,8 @@
     "pg": "^8.11.3",
     "sequelize": "^6.35.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "dotenv": "16.4.5"
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^10.3.2",

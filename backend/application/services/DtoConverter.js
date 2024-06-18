@@ -92,8 +92,7 @@ class DtoConverter {
                 refStructureName: currentValue.refStructureName,
                 companyName: currentValue.companyName,
                 fieldName: currentValue.fieldName,
-                sectorName: currentValue.sectorName,
-                plantRow: currentValue.plantRow
+                sectorName: currentValue.sectorName
             };
             if (!accumulator.has(JSON.stringify(key)))
                 accumulator.set(JSON.stringify(key), []);
@@ -103,8 +102,9 @@ class DtoConverter {
 
         if (schedules.size > 0) {
             const [key, events] = schedules.entries().next().value
-            const { refStructureName, companyName, fieldName, sectorName, plantRow } = JSON.parse(key);
+            const { refStructureName, companyName, fieldName, sectorName } = JSON.parse(key);
             const eventsRes = events.map(event => new WateringEventDto(
+                event.plantRow,
                 event.date,
                 event.wateringStart,
                 event.wateringEnd,
@@ -117,7 +117,7 @@ class DtoConverter {
                 event.updateTimestamp,
                 event.note
             ));
-            return new WateringScheduleResponse(refStructureName, companyName, fieldName, sectorName, plantRow, eventsRes)
+            return new WateringScheduleResponse(refStructureName, companyName, fieldName, sectorName, eventsRes)
         }
     }
 

@@ -1,11 +1,10 @@
 export class WateringScheduleResponse {
 
-    constructor(refStructureName, companyName, fieldName, sectorName, plantRow, events) {
+    constructor(refStructureName, companyName, fieldName, sectorName, events) {
         this.refStructureName = refStructureName
         this.companyName = companyName
         this.fieldName = fieldName
         this.sectorName = sectorName
-        this.plantRow = plantRow
         this.events = events
     }
 
@@ -13,7 +12,8 @@ export class WateringScheduleResponse {
 
 export class WateringEventDto {
 
-    constructor(date, wateringStart, wateringEnd, duration, enabled, expectedWater, advice, adviceTimestamp, updatedBy, updateTimestamp, note) {
+    constructor(plantRow, date, wateringStart, wateringEnd, duration, enabled, expectedWater, advice, adviceTimestamp, updatedBy, updateTimestamp, note) {
+        this.plantRow = plantRow;
         this.date = date;
         this.wateringStart = wateringStart;
         this.wateringEnd = wateringEnd;

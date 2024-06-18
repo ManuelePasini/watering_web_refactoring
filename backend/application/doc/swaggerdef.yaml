@@ -365,6 +365,8 @@ components:
     WateringEventDto:
       type: object
       properties:
+        plantRow: 
+          type: string
         date: 
           type: string
           format: date

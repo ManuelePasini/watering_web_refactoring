@@ -9,6 +9,10 @@ import { serve, setup } from 'swagger-ui-express';
 import sequelize from './configs/dbConfig.js';
 import cors from 'cors';
 
+import dotenv from 'dotenv'
+
+dotenv.config();
+
 const app = express();
 const port = 8081;
 
@@ -22,7 +26,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${port}`,
+        url: process.env.BACKEND_ADDRESS,
         description: 'Local server',
       },
     ],
@@ -42,7 +46,7 @@ sequelize.authenticate().then(() => {
 });
 
 app.listen(port, () => {
-   console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at ${process.env.BACKEND_ADDRESS}`);
 });
 
 app.use(express.json());

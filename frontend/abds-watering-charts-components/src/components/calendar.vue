@@ -95,6 +95,7 @@ async function mountChart(timeFilter) {
       }
 
       const eventDescription = `<p><strong>Stato:</strong> ${e.enabled ? "Abilitato" : "Disabilitato"}</span></p>
+      <p><strong>Tesi Considerata:</strong> ${e.plantRow}</span></p>
       <p><strong>Quantità d'acqua attesa:</strong> ${e.expectedWater ? e.expectedWater : 0} L</p>
       <p><strong>Consiglio irriguo:</strong> ${e.advice !== null ? e.advice + "L" : "Non calcolato"} </p>
       <p><strong>Durata:</strong> ${e.duration !== null ? e.duration : "Non calcolata"}</p>
