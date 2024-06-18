@@ -18,7 +18,10 @@ class LogRepository {
                     companyName: companyName,
                     fieldName: fieldName,
                     sectorName: sectorName,
-                    plantRow: plantRow,
+                    [Op.or]: {
+                        plantRow: plantRow,
+                        [Op.is]: null
+                    },
                     timestamp: {
                         [Op.gt]: timestampFrom,
                         [Op.lt]: timestampTo
