@@ -3,6 +3,7 @@ import userRouter from './routes/usersRouter.js';
 import fieldRouter from './routes/fieldsRouter.js';
 import fieldChartRouter from './routes/fieldChartsRouter.js';
 import wateringScheduleRouter from './routes/wateringScheduleRouter.js';
+import logsRouter from './routes/logsRouter.js'
 import swaggerJsdoc from 'swagger-jsdoc';
 import { serve, setup } from 'swagger-ui-express';
 
@@ -55,4 +56,5 @@ app.use('/', userRouter);
 app.use('/fields', fieldRouter)
 app.use('/fieldCharts', fieldChartRouter);
 app.use('/wateringSchedule', wateringScheduleRouter);
+app.use('/logs', logsRouter)
 app.use('/api-docs', serve, setup(swaggerSpec));

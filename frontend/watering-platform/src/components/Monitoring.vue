@@ -14,6 +14,7 @@ import HumidityHeatmap from "../../../abds-watering-charts-components/src/compon
 import HumidityMultiLineChart from "../../../abds-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
 import HumidityDynamicHeatmap from "../../../abds-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
 import Calendar from "../../../abds-watering-charts-components/src/components/calendar.vue"
+import LogComponent from './LogComponent.vue';
 import {useRouter} from "vue-router";
 import authService from '@/services/auth.service';
 
@@ -362,6 +363,15 @@ function selectedTime(time){
           <AirTemperatureChart style="height: 300px" :config="JSON.stringify(connectionParams)"></AirTemperatureChart>
         </div>
       </div>
+    </div>
+
+    <div v-if="hasUserPermission('*')" class="m-3 container col-md-12">
+      <div class="card">
+        <div class="card-header">Anomalie riscontrate</div>
+        <div class="card-body">
+          <LogComponent :config="JSON.stringify(connectionParams)"></LogComponent>
+        </div>
+      </div> 
     </div>
 
     <div style="visibility: hidden">
