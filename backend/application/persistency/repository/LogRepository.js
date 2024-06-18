@@ -18,18 +18,20 @@ class LogRepository {
                     companyName: companyName,
                     fieldName: fieldName,
                     sectorName: sectorName,
-                    [Op.or]: {
-                        plantRow: plantRow,
-                        [Op.is]: null
-                    },
                     timestamp: {
                         [Op.gt]: timestampFrom,
                         [Op.lt]: timestampTo
+                    },
+                    plantRow: {
+                        [Op.or]: {
+                            [Op.like]: plantRow,
+                            [Op.is]: null
+                        },
                     }
                 }
             }));
         } catch (error) {
-            console.error('Error on find watering events:', error);
+            console.error('Error on find logs:', error);
         }
     }
 }
