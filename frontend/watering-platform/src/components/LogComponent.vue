@@ -35,17 +35,20 @@ const groupByType = (logs) => {
     <div class="accordion" id="logsAccordion">
         <div v-for="[type, logs] in groupedLogs" :key="type" class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + type" aria-expanded="true" :aria-controls="'collapse' + type">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    :data-bs-target="'#collapse' + type.replaceAll(' ', '')" aria-expanded="true"
+                    :aria-controls="'collapse' + type.replaceAll(' ', '')">
                     <span class="position-relative p-1">
                         {{ type }}
                         <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
-                            {{ logs.length }}    
+                            {{ logs.length }}
                         </span>
                     </span>
                 </button>
             </h2>
 
-            <div :id="'collapse' + type" class="accordion-collapse collapse" data-bs-parent="#logsAccordion">
+            <div :id="'collapse' + type.replaceAll(' ', '')" class="accordion-collapse collapse"
+                data-bs-parent="#logsAccordion">
                 <div class="p-2">
                     <table class="table table-striped">
                         <thead>
