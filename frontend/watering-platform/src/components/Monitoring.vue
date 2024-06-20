@@ -365,7 +365,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('*')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
       <div class="card">
         <div class="card-header">Anomalie riscontrate</div>
         <div class="card-body">
