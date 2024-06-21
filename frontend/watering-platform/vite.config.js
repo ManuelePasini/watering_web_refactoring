@@ -14,6 +14,6 @@ export default defineConfig({
     }
   },
   devServer: {
-    proxy: 'http://localhost:8081',
+    proxy: process.env.VITE_BACKEND_ADDRESS,
   }
 })

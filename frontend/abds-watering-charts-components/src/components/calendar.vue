@@ -5,35 +5,46 @@ import {CommunicationService} from "../services/CommunicationService.js";
 import { luxonDateTimeToString, luxonDateTimeToStringCalendar } from "../common/dateUtils.js";
 import { Modal } from 'bootstrap'
 
+const SCHEDULE_SAFE_PERIOD = 3600000
+
 const communicationService = new CommunicationService();
 const props = defineProps(['config'])
 const getEventsEndpoint = "calendar"
 const updateEventEndpoint = "updateWateringEvent"
 
-// Define events as a reactive reference
 const events = ref([]);
 const selectedEvent = ref(null);
 let eventsData = []
 
-// Define config as a reactive reference
 const config = ref({
   month: {
-    // Hide leading and trailing dates in the month view (defaults to true when not set)
     showTrailingAndLeadingDates: true,
   },
-  // Takes any valid locale that the browser understands. However, not all locales have been thorougly tested in Qalendar
-  // If no locale is set, the preferred browser locale will be used
   locale: 'it-IT',
-  style: {
-    // When adding a custom font, please also set the fallback(s) yourself
-    fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif"
-  },
-  // if not set, the mode defaults to 'week'. The three available options are 'month', 'week' and 'day'
-  // Please note, that only day and month modes are available for the calendar in mobile-sized wrappers (~700px wide or less, depending on your root font-size)
   defaultMode: 'month',
-  // The silent flag can be added, to disable the development warnings. This will also bring a slight performance boost
   isSilent: true,
-  disableModes: ['week','day']
+  disableModes: ['week','day'],
+  style: {
+    fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+    colorSchemes: {
+      sent: {
+        color: "#fff",
+        backgroundColor: "#a3c2c2",
+      },
+      disabled: {
+        color: "#fff",
+        backgroundColor: "#ff3336",
+      },
+      updated:{
+        color: "#fff",
+        backgroundColor: "#9966ff",
+      },
+      planned:{
+        color: "#fff",
+        backgroundColor: "#339CFF",
+      }
+    },
+  },
 });
 
 watchEffect(async () => {
@@ -44,29 +55,30 @@ watchEffect(async () => {
 });
 
 function colorFunction(event) {
-  if(!event.enabled){
-    return "red"
+  if(!event.enabled || event.advice === 0){
+    return "disabled"
   }
-  if( event.wateringStart < Date.now()/1000) {
-    if( event.advice === 0){
-      return "pink"
-    } else {
-      return "green"
-    }
+  if(event.updatedBy !== null){
+    return "updated"
   }
-  return "yellow"
+  if( event.wateringStart < Date.now()/1000 && event.advice > 0) {
+      return "sent"
+  }
+  return "planned"
 }
 
 function titleFunction(event) {
   if(!event.enabled){
     return "Irrigazione disabilitata"
   }
-  if( event.wateringStart < Date.now()/1000) {
-    if( event.advice === 0){
-      return "Irrigazione cancellata da consiglio irriguo"
-    } else {
-      return "Irrigazione eseguita"
-    }
+  if (event.advice === 0){
+    return "Irrigazione disabilitata (Consiglio di non irrigare)"
+  }
+  if(event.updatedBy !== null){
+    return "Irrigazione modificata"
+  }
+  if( event.wateringStart < Date.now()/1000 && event.advice > 0) {
+      return "Irrigazione inviata"
   }
   return "Irrigazione programmata"
 }
@@ -94,20 +106,21 @@ async function mountChart(timeFilter) {
         endDate = startDate
       }
 
-      const eventDescription = `<p><strong>Stato:</strong> ${e.enabled ? "Abilitato" : "Disabilitato"}</span></p>
+      const eventDescription = `<p><strong>Stato:</strong> ${e.enabled ? "Abilitata" : "Disabilitata"}</span></p>
       <p><strong>Tesi Considerata:</strong> ${e.plantRow}</span></p>
-      <p><strong>Quantità d'acqua attesa:</strong> ${e.expectedWater ? e.expectedWater : 0} L</p>
-      <p><strong>Consiglio irriguo:</strong> ${e.advice !== null ? e.advice + "L" : "Non calcolato"} </p>
+      <p class="mb-0"><strong>Acqua extra sistema:</strong> ${e.expectedWater ? e.expectedWater : 0} L</p>
+      <p class="form-text">Es.(fertirrigazione, pioggia prevista)</p>
+      <p><strong>Consiglio irriguo:</strong> ${e.advice !== null ? e.advice + " L" : "Non calcolato"} </p>
       <p><strong>Durata:</strong> ${e.duration !== null ? e.duration : "Non calcolata"}</p>
       ${ e.adviceTimestamp ? "<p><strong>Orario di calcolo:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
       ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
-      ${ e.wateringStart > Date.now()/1000 ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
+      ${ e.wateringStart < Date.now() + SCHEDULE_SAFE_PERIOD ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
 
       const event = { 
         title: titleFunction(e),
-        with: e.updatedBy,
+        with: e.updatedBy !== null ? "Modificato da: " + e.updatedBy : null,
         time: { start: startDate, end: endDate},
-        color: colorFunction(e),
+        colorScheme: colorFunction(e),
         isEditable: false,
         id: e.date,
         description: eventDescription
@@ -169,12 +182,12 @@ async function submitForm(){
 
 function isValidTime(time){
   const wateringStart = new Date(selectedEvent.value.date +" "+ time)
-  return wateringStart > Date.now() + 3600000
+  return wateringStart > Date.now() + SCHEDULE_SAFE_PERIOD
 }
 </script>
 
 <template>
-  <Qalendar 
+  <Qalendar class="is-light-mode"
   :events="events"
   :config="config" @updated-period="refreshPeriod" @edit-event="openModal" @click="openModal"/>
   <div v-if="selectedEvent" class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -225,4 +238,9 @@ function isValidTime(time){
 
 <style>
 @import "qalendar/dist/style.css";
+
+.calendar-month__event .calendar-month__event-color{
+  height: 20px !important;
+  width: 20px !important;
+}
 </style>
