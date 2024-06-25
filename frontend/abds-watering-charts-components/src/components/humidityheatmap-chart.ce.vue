@@ -81,10 +81,10 @@ async function drawImage(timestamp){
   if(heatmapSeries.value[0].data.length > heatmapSeries.value.length){
     cellSize = containerWidth / heatmapSeries.value[0].data.length
   } else {
-    cellSize = containerWidth / heatmapSeries.value.length * 0.7
+    cellSize = containerWidth / heatmapSeries.value.length * 0.9
   }
 
-  cellSize = Math.min(cellSize, 40)
+  cellSize = Math.min(cellSize, 32)
 
   const verticalOffset = 60
   const horizontalOffset = 10
@@ -93,12 +93,12 @@ async function drawImage(timestamp){
 
   chartOptions.value = {
     chart: {
-      offsetX: (containerWidth -chartWidth)/2,
+      offsetX: (containerWidth - chartWidth)/2,
       type: 'heatmap',
       height: (chartHeight + "px"),
       width: (chartWidth + "px"),
       toolbar: {
-        offsetX: chartWidth < containerWidth * 0.7 ? chartWidth * 0.7 : 0,
+        offsetX: chartWidth < containerWidth * 0.75 ? containerWidth * 0.33 : 0,
         show: true
       },
       zoom: {
@@ -170,7 +170,7 @@ async function drawImage(timestamp){
       }
     },
     legend: {
-      show: verticalOffset/chartHeight < 0.3,
+      show: verticalOffset/chartHeight < 0.15,
       markers: {
         width: 5,
         height: 16,

@@ -207,21 +207,21 @@ function selectedTime(time){
 
 <template>
 
-  <div class="container align-top mt-5">
+  <div class="container align-top mt-5 pt-3">
     <div class="row m-2">
       <div class="col d-flex justify-content-center">
-        <div class="btn-group-toggle" data-toggle="buttons">
-          <span style="margin-right:10px;">Filtro:</span>
-          <label :class="{ active: isLabelSelected('customize_day') }" class="btn btn-sm btn-secondary timefilter">
+        <div class="btn-group-toggle text-center" data-toggle="buttons">
+          <span class="m-2">Filtro:</span>
+          <label :class="{ active: isLabelSelected('customize_day') }" class="btn btn-sm btn-secondary timefilter m-1">
             <input type="radio" name="timefilter-radio" value="customize_day" autocomplete="off" @click="selectTimePeriod('customize_day')">Altro periodo
           </label>
-          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('30_day')}">
+          <label class="btn btn-sm btn-secondary timefilter m-1" :class="{active: isLabelSelected('30_day')}">
             <input type="radio" name="timefilter-radio" value="30_day" autocomplete="off" @click="selectTimePeriod('30_day')">Ultimo mese
           </label>
-          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('7_day')}">
+          <label class="btn btn-sm btn-secondary timefilter m-1" :class="{active: isLabelSelected('7_day')}">
             <input type="radio" id="one_week_filter" name="timefilter-radio" value="7_day" autocomplete="off" @click="selectTimePeriod('7_day')" checked>Ultima settimana
           </label>
-          <label class="btn btn-sm btn-secondary timefilter" :class="{active: isLabelSelected('24_hours')}">
+          <label class="btn btn-sm btn-secondary timefilter m-1" :class="{active: isLabelSelected('24_hours')}">
             <input type="radio" name="timefilter-radio" value="24_hour" @click="selectTimePeriod('24_hours')" autocomplete="off">Ultime 24h
           </label>
         </div>
@@ -229,9 +229,9 @@ function selectedTime(time){
     </div>
     <div v-if="showCustomizeInput" class="row m-2" id="timeperiod" >
       <div class="col d-flex justify-content-center">
-        <span style="margin-right:10px; margin-left:10px;">Periodo da:</span>
+        <span class="m-1">Periodo da:</span>
         <input type="date" name="timeperiod_from" v-model="selectedDateFrom">
-        <span style="margin-right:10px; margin-left:10px;"> a:</span>
+        <span class="m-1"> a:</span>
         <input type="date" name="timeperiod_to" v-model="selectedDateTo">
         <div class="btn-group-toggle" data-toggle="buttons">
           <label class="btn btn-sm btn-secondary" style="margin-left:10px;">
@@ -260,7 +260,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
       <div class="humidity-card card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Matrice dell'umidità</span>
@@ -279,7 +279,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="showDynamicHeatmap" class="m-3 container col-md-12">
+    <div v-if="showDynamicHeatmap" class="my-3 container col-md-12">
       <div class="humidity-card card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Evoluzione matrice dell'umidità</span>
@@ -290,7 +290,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
       <div class="groundwaterpot-card card">
         <div class="card-header">Potenziale idrico</div>
         <div class="card-body">
@@ -299,18 +299,18 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('WA')" class="m-3 container col-md-12">
-      <div class="humidity-card card">
+    <div v-if="hasUserPermission('WA')" class="my-3 container col-md-12">
+      <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Calendario Irrigazione</span>
         </div>
-          <div class="dynamic-humidity-map">
+          <div class="card-body p-1">
             <Calendar :config="JSON.stringify(connectionParams)"></Calendar>
           </div>
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Consiglio Irriguo, Irrigazione e Precipitazioni</span> 
@@ -331,7 +331,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('WA')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('WA')" class="my-3 container col-md-12">
       <div class=" card">
         <div class="card-header">Potenziale Idrico Ottimale e Potenziale Idrico Medio Giornaliero</div>
         <div class="card-body">
@@ -340,13 +340,13 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="m-3 container">
+    <div v-if="hasUserPermission('MO')" class="my-3 container">
       <div class="countors-card card">
         <div class="card-header">Matrici di media e varianza</div>
         <div class="card-body row">
           <div class="col-lg-6">
-              <p>Matrice dell'umidità <strong>media</strong> lungo il periodo:</p>
-              <CountorMeanChart :config="JSON.stringify(connectionParams)"></CountorMeanChart>
+            <p>Matrice dell'umidità <strong>media</strong> lungo il periodo:</p>
+            <CountorMeanChart :config="JSON.stringify(connectionParams)"></CountorMeanChart>
           </div>
           <div class="col-lg-6">
             <p>Matrice di <strong>varianza</strong> dell'umidità lungo il periodo:</p>
@@ -356,7 +356,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
       <div class="card">
         <div class="card-header">Temperatura dell'aria</div>
         <div class="card-body">
@@ -365,7 +365,7 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="hasUserPermission('MO')" class="m-3 container col-md-12">
+    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
       <div class="card">
         <div class="card-header">Anomalie riscontrate</div>
         <div class="card-body">

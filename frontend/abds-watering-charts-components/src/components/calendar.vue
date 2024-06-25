@@ -114,7 +114,7 @@ async function mountChart(timeFilter) {
       <p><strong>Durata:</strong> ${e.duration !== null ? e.duration : "Non calcolata"}</p>
       ${ e.adviceTimestamp ? "<p><strong>Orario di calcolo:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
       ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
-      ${ e.wateringStart < Date.now() - SCHEDULE_SAFE_PERIOD ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
+      ${ e.wateringStart * 1000 > Date.now() + SCHEDULE_SAFE_PERIOD ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
 
       const event = { 
         title: titleFunction(e),
@@ -218,7 +218,7 @@ function isValidTime(time){
                 
               </div>
               <div class="form-group row align-items-center p-2">
-                <div class="col-auto"><label for="waterAmount">Quantità d'acqua attesa (L):</label></div>
+                <div class="col-auto"><label for="waterAmount">Acqua extra sistema (L):</label></div>
                 <div class="col-auto"><input type="number" class="form-control" id="waterAmount" name="waterAmount" min="0" v-model="updateForm.expectedWater"></div>
               </div>
               <div class="form-group row align-items-center p-2">
