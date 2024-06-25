@@ -6,7 +6,7 @@ const router = useRouter()
 const token = authService.authHeader()
 
 if(token)
-  router.push("/watering")
+  router.push("/")
 else router.push("/login")
 
 </script>

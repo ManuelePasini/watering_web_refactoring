@@ -5,7 +5,7 @@ import MonitoringPage from "@/components/MonitoringPage.vue";
 
 const routes = [
     {
-        path: "/watering",
+        path: "/",
         name: "Watering",
         component: MonitoringPage,
         props: true
@@ -23,7 +23,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory('/projects/watering/'),
     routes
 });
 

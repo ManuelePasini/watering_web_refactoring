@@ -22,7 +22,7 @@ const handleLogin = async () => {
     await authService.login({authUser, authPass});
     const token = await authService.authHeader();
     if(token) {
-        await router.push("/watering")
+        await router.push("/")
     } else {
       throw Error('Error on load user token')
     }
