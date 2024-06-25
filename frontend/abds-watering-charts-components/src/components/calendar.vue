@@ -114,7 +114,7 @@ async function mountChart(timeFilter) {
       <p><strong>Durata:</strong> ${e.duration !== null ? e.duration : "Non calcolata"}</p>
       ${ e.adviceTimestamp ? "<p><strong>Orario di calcolo:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
       ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
-      ${ e.wateringStart < Date.now() + SCHEDULE_SAFE_PERIOD ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
+      ${ e.wateringStart < Date.now() - SCHEDULE_SAFE_PERIOD ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
 
       const event = { 
         title: titleFunction(e),
@@ -187,51 +187,53 @@ function isValidTime(time){
 </script>
 
 <template>
-  <Qalendar class="is-light-mode"
-  :events="events"
-  :config="config" @updated-period="refreshPeriod" @edit-event="openModal" @click="openModal"/>
-  <div v-if="selectedEvent" class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-3"> Modifica Evento</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="is-light-mode">
+    <Qalendar
+      :events="events"
+      :config="config" @updated-period="refreshPeriod" @edit-event="openModal" @click="openModal"/>
+    <div v-if="selectedEvent" class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-3"> Modifica Evento</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+            <form @submit.prevent="submitForm">
+            <div class="modal-body">
+              <div class="row text-center fs-5 p-2"> 
+                <div class="col">{{titleFunction(selectedEvent)}} - {{ new Date(selectedEvent.date).toLocaleDateString("it-IT") }}</div>
+              </div>
+              <div class="form-group row align-items-center p-2 px-4">
+                <div class="col-auto form-check form-switch">
+                  <input type="checkbox" role="switch" class="form-check-input" id="enableEvent" name="enableEvent" v-model="updateForm.enabled">
+                </div>
+                <div class="col-auto"><label class="form-check-label" for="enableEvent">Abilita evento</label></div>
+              </div>
+              <div class="form-group row align-items-center p-2">
+                <div class="col-auto"><label for="startTime">Ora di Inizio:</label></div>
+                <div class="col-auto">
+                  <input type="time" class="form-control" id="startTime" name="startTime" v-model="updateForm.wateringStartTime" :class="{ 'is-invalid': !isValidTime(updateForm.wateringStartTime) }" required>
+                  <span v-if="!isValidTime(updateForm.wateringStartTime)" class="text-danger">Ora di inizio non valida</span>
+                </div>
+                
+              </div>
+              <div class="form-group row align-items-center p-2">
+                <div class="col-auto"><label for="waterAmount">Quantità d'acqua attesa (L):</label></div>
+                <div class="col-auto"><input type="number" class="form-control" id="waterAmount" name="waterAmount" min="0" v-model="updateForm.expectedWater"></div>
+              </div>
+              <div class="form-group row align-items-center p-2">
+                <div><label for="note">Note:</label></div>
+                <div class="my-2"><textarea class="form-control" id="note" name="note" rows="2" v-model="updateForm.note"></textarea></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" class="btn btn-primary" :disabled="!isValidTime(updateForm.wateringStartTime)">Salva</button>
+            </div>
+          </form>
         </div>
-          <form @submit.prevent="submitForm">
-          <div class="modal-body">
-            <div class="row text-center fs-5 p-2"> 
-              <div class="col">{{titleFunction(selectedEvent)}} - {{ new Date(selectedEvent.date).toLocaleDateString("it-IT") }}</div>
-            </div>
-            <div class="form-group row align-items-center p-2 px-4">
-              <div class="col-auto form-check form-switch">
-                <input type="checkbox" role="switch" class="form-check-input" id="enableEvent" name="enableEvent" v-model="updateForm.enabled">
-              </div>
-              <div class="col-auto"><label class="form-check-label" for="enableEvent">Abilita evento</label></div>
-            </div>
-            <div class="form-group row align-items-center p-2">
-              <div class="col-auto"><label for="startTime">Ora di Inizio:</label></div>
-              <div class="col-auto">
-                <input type="time" class="form-control" id="startTime" name="startTime" v-model="updateForm.wateringStartTime" :class="{ 'is-invalid': !isValidTime(updateForm.wateringStartTime) }" required>
-                <span v-if="!isValidTime(updateForm.wateringStartTime)" class="text-danger">Ora di inizio non valida</span>
-              </div>
-              
-            </div>
-            <div class="form-group row align-items-center p-2">
-              <div class="col-auto"><label for="waterAmount">Quantità d'acqua attesa (L):</label></div>
-              <div class="col-auto"><input type="number" class="form-control" id="waterAmount" name="waterAmount" min="0" v-model="updateForm.expectedWater"></div>
-            </div>
-            <div class="form-group row align-items-center p-2">
-              <div><label for="note">Note:</label></div>
-              <div class="my-2"><textarea class="form-control" id="note" name="note" rows="2" v-model="updateForm.note"></textarea></div>
-            </div>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-              <button type="submit" class="btn btn-primary" :disabled="!isValidTime(updateForm.wateringStartTime)">Salva</button>
-          </div>
-        </form>
-      </div>
-    </div>  
+      </div>  
+    </div>
   </div>
 
 </template>
