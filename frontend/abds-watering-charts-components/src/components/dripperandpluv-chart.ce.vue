@@ -1,7 +1,7 @@
 <script setup>
 
 import {Line} from "vue-chartjs";
-import {onMounted, ref, watchEffect} from "vue";
+import {ref, watchEffect} from "vue";
 import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";

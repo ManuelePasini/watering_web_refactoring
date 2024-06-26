@@ -54,16 +54,6 @@ const fieldService = new FieldService(sequelize);
  *           type: string
  *         description: The plantRow
  *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
- *         schema:
- *           type: string
- *         description: Colture type
- *       - in: query
  *         name: timeFilterFrom
  *         schema:
  *           type: string
@@ -112,11 +102,10 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
+
         const detectedValueTypeId = ['GRND_WATER_G', 'GRND_WATER_W', 'GRND_WATER'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -157,15 +146,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -214,11 +194,9 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
         const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -263,15 +241,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *         schema:
  *           type: string
  *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
- *         schema:
- *           type: string
- *       - in: query
  *         name: timeFilterFrom
  *         schema:
  *           type: string
@@ -310,18 +279,17 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
 
     try {
         const user = await authenticationService.validateJwt(req.headers.authorization);
-        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.useridid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
+        if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timeFilterFrom, timeFilterTo)))
             return res.status(401).json({message: 'Unauthorized request'});
     } catch (error) {
+        console.log(error)
         return res.status(403).json({message: 'Authentication failed'});
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
         const detectedValueTypeId = ['DRIPPER'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -363,15 +331,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -420,11 +379,9 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
         const detectedValueTypeId = ['PLUV_CURR'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -466,15 +423,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -523,10 +471,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
-
-        const result = await fieldService.getWaterAdvice(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getWaterAdvice(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -567,15 +512,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -624,11 +560,9 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
         const detectedValueTypeId = ['AIR_TEMP', 'AIR_TEMP_FOL'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -669,15 +603,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -726,11 +651,9 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
         const detectedValueTypeId = ['GRND_TEMP'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -771,15 +694,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -828,11 +742,9 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
         const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR', 'IGA'];
 
-        const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -873,15 +785,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -930,10 +833,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
     
     try {
-        const colture = req.query.colture;
-        const coltureType = req.query.coltureType;
-
-        const result = await fieldService.getEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType);
+        const result = await fieldService.getEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -974,15 +874,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -1073,15 +964,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -1177,15 +1059,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *         schema:
  *           type: string
  *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
- *         schema:
- *           type: string
- *       - in: query
  *         name: timeFilterFrom
  *         schema:
  *           type: string
@@ -1271,15 +1144,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query
@@ -1370,15 +1234,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - in: path
  *         name: plantRow
  *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: colture
- *         schema:
- *           type: string
- *         description: Colture
- *       - in: query
- *         name: coltureType
  *         schema:
  *           type: string
  *       - in: query

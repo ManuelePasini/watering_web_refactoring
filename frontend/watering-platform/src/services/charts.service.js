@@ -24,8 +24,6 @@ export class ChartsService {
             params: {
                 timeFilterFrom: params.timeFilterFrom,
                 timeFilterTo: params.timeFilterTo,
-                colture: params.colture,
-                coltureType: params.coltureType
             },
             headers: {
                 Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTcwMjQ5OTgxNywiZXhwIjoxNzAyNTg2MjE3fQ.eGvfVLTEVBQo31q_-v7nlv3I6pnjKm2aGlNosIUToIQ`

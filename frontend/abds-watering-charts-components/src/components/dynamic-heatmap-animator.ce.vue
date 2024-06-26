@@ -2,7 +2,7 @@
 
 import '../assets/animator.css'
 
-import {ref, onMounted, watch, reactive, watchEffect} from 'vue';
+import {ref, watchEffect} from 'vue';
 import GenericLinearChart from "./generic-linechart.ce.vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 import DynamicHeatmap from "../components/dynamic-heatmap.ce.vue";
@@ -15,7 +15,7 @@ const buttonTexts = {
 
 const props = defineProps(['config'])
 
-let animatorConfig = reactive({})
+let animatorConfig = ref(null)
 
 const communicationService = new CommunicationService();
 const endpoint = 'humidityBins'
@@ -30,16 +30,14 @@ let isPlaying = ref(false);
 let buttonText = ref(buttonTexts.start);
 let currentDate = ref('');
 
-function updateConfig(newTimestamp) {
+function updateConfig(currentTimestamp, lastTimestamp) {
   const parsedConfigProp = JSON.parse(props.config);
-  animatorConfig = JSON.stringify({
+  animatorConfig.value = JSON.stringify({
     environment: parsedConfigProp.environment,
     paths: parsedConfigProp.paths,
     params: {
-      colture: 'Kiwi',
-      coltureType: 'G3',
-      timeFilterFrom: newTimestamp.toString(),
-      timeFilterTo: newTimestamp.toString()
+      timeFilterFrom: (Number(lastTimestamp)+1).toString(),
+      timeFilterTo: currentTimestamp.toString()
     }
   })
 }
@@ -65,7 +63,7 @@ function startLoop() {
     currentTimestamp.value = timestampsArray[currentIndex.value];
     currentIndex.value = (currentIndex.value + 1) % timestampsArray.length;
     currentDate.value = new Date(currentTimestamp.value * 1000).toLocaleDateString('it-IT')
-    updateConfig(currentTimestamp.value)
+    updateConfig(timestampsArray[currentIndex.value],timestampsArray[Math.max(currentIndex.value - 1,0)])
     if(currentIndex.value + 1 === timestamps.value.size) {
       stopLoop()
       reset()
@@ -116,18 +114,10 @@ function getLeftOffset(dataLen, index) {
   return 100 / (dataLen - 1) * index;
 }
 
-onMounted(async () => {
-  var parsedConfig = JSON.parse(props.config)
-  await calculateTimestampLength();
-  updateConfig(parsedConfig.params.timeFilterFrom)
-  console.log(`Timestamp: ${timestamps}`)
-});
-
 watchEffect(async () => {
   var parsedConfig = JSON.parse(props.config)
   await calculateTimestampLength();
-  console.log(`TIMESTAMPS ${Array.from(timestamps.value)}`)
-  updateConfig(parsedConfig.params.timeFilterFrom)
+  updateConfig(parsedConfig.params.timeFilterTo, parsedConfig.params.timeFilterTo)
 });
 
 </script>
@@ -156,8 +146,8 @@ watchEffect(async () => {
         </div>
         <div class="col-1"><p></p></div>
         <div class="line_charts col-5">
-          <generic-linear-chart style="height: 200px" :config="animatorConfig" :endpoint="'dripper'" :yTitle="'liter'" :label="'Dripper'" :color="'rgb(31, 119, 180)'"></generic-linear-chart>
-          <generic-linear-chart style="height: 200px" :config="animatorConfig" :endpoint="'pluv'" :yTitle="'liter'"  :label="'Pluv'" :color="'rgb(31, 119, 180)'"></generic-linear-chart>
+          <generic-linear-chart style="height: 200px" :config="animatorConfig" :endpoint="'dripper'" :yTitle="'L'" :label="'Dripper'" :color="'rgb(31, 119, 180)'"></generic-linear-chart>
+          <generic-linear-chart style="height: 200px" :config="animatorConfig" :endpoint="'pluv'" :yTitle="'mm'"  :label="'Pluv'" :color="'rgb(31, 119, 180)'"></generic-linear-chart>
         </div>
       </div>
 

@@ -7,7 +7,7 @@ class WateringAdviceRepository {
         this.sequelize = sequelize;
     }
 
-    async findWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, colture, coltureType) {
+    async findWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
 
         const queryString = `
             SELECT DISTINCT "refStructureName",
@@ -29,8 +29,6 @@ class WateringAdviceRepository {
                 AND "fieldName" = '${fieldName}'
                 AND "sectorName" = '${sectorName}'
                 AND "plantRow" = '${plantRow}'
-                AND "colture" = '${colture}'
-                AND "coltureType" = '${coltureType}'
                 GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
                 ORDER BY rounded_timestamp ASC
                 )
@@ -51,8 +49,6 @@ class WateringAdviceRepository {
               AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
-              AND "colture" = '${colture}'
-              AND "coltureType" = '${coltureType}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
             UNION
@@ -73,8 +69,6 @@ class WateringAdviceRepository {
               AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
-              AND "colture" = '${colture}'
-              AND "coltureType" = '${coltureType}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
             UNION
@@ -131,9 +125,7 @@ class WateringAdviceRepository {
                 companyName,
                 fieldName,
                 sectorName,
-                plantRow,
-                colture,
-                coltureType
+                plantRow
             }
         });
 

@@ -14,8 +14,6 @@ export class CommunicationService {
             params: {
                 timeFilterFrom: queryParams ? queryParams.timeFilterFrom : null,
                 timeFilterTo: queryParams ? queryParams.timeFilterTo : null,
-                colture: queryParams ? queryParams.colture : null,
-                coltureType: queryParams ? queryParams.coltureType : null
             },
             headers: {
                 Authorization: 'Bearer ' + environment.token

@@ -1,7 +1,7 @@
 <script setup>
 
 import {Line} from "vue-chartjs";
-import {onMounted, ref, watchEffect} from "vue";
+import { ref, watchEffect} from "vue";
 import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
@@ -42,10 +42,6 @@ watchEffect(async () => {
   }
 });
 
-onMounted(async () => {
-  mountChart()
-});
-
 function addValueAndMaintainSize(value) {
   let newArray = [...data.value];
   newArray.shift();
@@ -57,13 +53,12 @@ async function mountChart() {
   const parsed = JSON.parse(props.config);
 
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, props.endpoint)
-  if(chartDataResponse) {
-    console.log(`È arrivato un dato: ${chartDataResponse[0].value}`)
-    addValueAndMaintainSize(chartDataResponse[0].value)
-  } else {
-    addValueAndMaintainSize(Math.random())
+  if(!chartDataResponse) {
+    return  
   }
-
+  console.log(`È arrivato un dato: ${chartDataResponse[0].value}`)
+  addValueAndMaintainSize(chartDataResponse[0].value)
+  
   chartData.value = {
     labels: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
     datasets: [{
@@ -86,7 +81,7 @@ async function mountChart() {
       y: {
         title: {
           display: true,
-          text: '°C'
+          text: props.yTitle
         },
         min: 0
       }

@@ -68,8 +68,6 @@ function updateConnectionParams() {
     },
     paths: selectedField.value,
     params: {
-      colture: selectedField.value.colture,
-      coltureType: selectedField.value.coltureType,
       timeFilterFrom: selectedTimestampFrom.value,
       timeFilterTo: selectedTimestampTo.value
     }
