@@ -219,7 +219,7 @@ function isValidTime(time){
               </div>
               <div class="form-group row align-items-center p-2">
                 <div class="col-auto"><label for="waterAmount">Acqua extra sistema (L):</label></div>
-                <div class="col-auto"><input type="number" class="form-control" id="waterAmount" name="waterAmount" min="0" v-model="updateForm.expectedWater"></div>
+                <div class="col-auto"><input type="number" class="form-control" id="waterAmount" name="waterAmount" min="0" step="0.01" v-model="updateForm.expectedWater"></div>
               </div>
               <div class="form-group row align-items-center p-2">
                 <div><label for="note">Note:</label></div>
