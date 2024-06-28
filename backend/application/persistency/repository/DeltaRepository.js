@@ -71,6 +71,16 @@ class DeltaRepository {
                 AND "sectorName" = '${sectorName}'
                 AND "plantRow" = '${plantRow}'
                 AND "current" = 'true'
+                AND (mp.xx, mp.yy) IN (
+                    SELECT DISTINCT xx, yy
+                    FROM data_interpolated
+                    WHERE "refStructureName" = '${refStructureName}'
+                    AND "companyName" = '${companyName}'
+                    AND "fieldName" = '${fieldName}'
+                    AND "sectorName" = '${sectorName}'
+                    AND "plantRow" = '${plantRow}'
+                    AND timestamp BETWEEN '${timestampFrom}' AND '${timestampTo}'
+                )
                 GROUP BY "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", fm."matrixId"
                 ) as sq1
                 CROSS JOIN (
