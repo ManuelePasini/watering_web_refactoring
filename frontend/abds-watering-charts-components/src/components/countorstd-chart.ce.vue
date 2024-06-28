@@ -10,6 +10,8 @@ const chartRef = ref(null);
 const props = defineProps(['config'])
 const endpoint = 'statisticsChart'
 const showChart = ref(false)
+const container = ref(null)
+const imageStyle = ref({width:"", height:""})
 
 watchEffect(async () => {
   let value = props.config;
@@ -32,10 +34,6 @@ async function mountChart() {
     showChart.value = false
     return
   }
-
-  let width = 470
-  let height = 250
-  let margin = {top: 10, bottom: 35, left: 47, right: 85}
 
   let axisX = [];
   let axisY = [];
@@ -69,8 +67,28 @@ async function mountChart() {
     }
   }
 
+  let margin = {top: 10, bottom: 35, left: 47, right: 85}
+
   const numCellInWidth = ((Math.max(...axisX) - Math.min(...axisX)) / 5) + 1
   const numCellInHeight = (((Math.min(...axisY) * -1) - (Math.max(...axisY) * -1)) / 5) + 1
+
+  if(!container.value){
+    await nextTick()
+  }
+
+  const containerWidth = container.value.offsetWidth
+  let cellSize
+  if(numCellInWidth > numCellInHeight){
+    cellSize = (containerWidth - margin.left - margin.right) / numCellInWidth
+  } else {
+    cellSize = (containerWidth - margin.left - margin.right) / numCellInHeight
+  }
+
+  let width = cellSize * numCellInWidth + margin.left + margin.right
+  let height = cellSize * numCellInHeight + margin.top + margin.bottom
+
+  imageStyle.value.width = width + "px"
+  imageStyle.value.height = height + "px"
 
   let svg = d3.create("svg")
       .attr("width", width)
@@ -179,8 +197,8 @@ async function mountChart() {
 </script>
 
 <template>
-  <div>
-    <svg v-if="showChart" style="width: 470px; height: 250px" ref="chartRef"></svg>
+  <div ref="container">
+    <svg v-if="showChart" :style="imageStyle" ref="chartRef"></svg>
     <div v-else>Nessun dato disponibile.</div>
   </div>
 </template>
