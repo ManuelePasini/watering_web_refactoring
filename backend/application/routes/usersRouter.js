@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, request } from 'express';
 
 import sequelize from '../configs/dbConfig.js';
 
@@ -245,7 +245,7 @@ usersRouter.put('/registerUsers', async (req, res) => {
  *         description: Error on creating grants.
  */
 usersRouter.put('/createGrants', async (req, res) => {
-    let requestUserData = {userId: -1, partner: ''}
+    let requestUserData
     try {
         requestUserData = await authenticationService.validateJwt(req.headers.authorization);
     } catch (error) {
@@ -253,15 +253,16 @@ usersRouter.put('/createGrants', async (req, res) => {
     }
 
     try {
-        if (!(await authorizationService.isUserAuthorized(requestUserData.userid, 'partner')))
+        const user = await userService.findUser(requestUserData.userid)
+        if (!(await authorizationService.isUserAuthorized(user.userid, 'partner')))
             return res.status(401).json({message: 'Unauthorized request'});
 
         if(!req.body && req.body === '')
             throw new Error('Body is empty');
 
         const requestDto = new UserGrantsDto(req.body.grants)
-
-        await userService.createUserGrants(requestUserData.affiliation, requestDto)
+    
+        await userService.createUserGrants(user.role === 'admin' ? 'admin' : user.affiliation, requestDto)
 
         return res.status(200).json({message: `Grants created with success`})
     } catch (error) {

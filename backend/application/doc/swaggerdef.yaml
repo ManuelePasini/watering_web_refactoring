@@ -170,11 +170,11 @@ components:
           type: string
         plantRow:
           type: string
-        applications:
+        permits:
           type: array
           items:
             type: string
-        userId:
+        username:
           type: string
 
     OptStateDto:
