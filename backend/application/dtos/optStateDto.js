@@ -15,11 +15,12 @@ export class OptStateDto {
 
 export class MatrixData {
 
-  constructor(x, y, z, value) {
+  constructor(x, y, z, value, weight) {
     this.x = x
     this.y = y
     this.z = z
     this.optValue = value
+    this.weight = weight
   }
 
 }

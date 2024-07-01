@@ -4,12 +4,14 @@ import { UserFieldPermission, UserFieldPermissions } from '../persistency/queryw
 import initUser from '../persistency/model/User.js';
 import initFieldsPermit from '../persistency/model/FieldsPermit.js';
 import initTranscodingField from '../persistency/model/TranscodingField.js';
+import initMatrixProfile from '../persistency/model/MatrixProfile.js';
+import initMatrixField from '../persistency/model/MatrixField.js';
 
 class UserService {
 
     constructor(sequelize) {
         this.userRepository = new UserRepository(initUser(sequelize), initFieldsPermit(sequelize), initTranscodingField(sequelize), sequelize);
-        this.fieldRepository = new FieldRepository(undefined, undefined, initTranscodingField(sequelize), sequelize)
+        this.fieldRepository = new FieldRepository(initMatrixProfile(sequelize), initMatrixField(sequelize), initTranscodingField(sequelize), sequelize)
     }
 
     async findUser(user) {

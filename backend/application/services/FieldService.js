@@ -5,6 +5,7 @@ import ViewDataOriginalRepository from '../persistency/repository/ViewDataOrigin
 import WateringAdviceRepository from '../persistency/repository/WateringAdviceRepository.js';
 import DtoConverter from './DtoConverter.js';
 import FieldRepository from '../persistency/repository/FieldRepository.js';
+import { OptStateDto } from "../dtos/optStateDto.js";
 
 import initMatrixProfile from '../persistency/model/MatrixProfile.js';
 import initMatrixField from '../persistency/model/MatrixField.js';
@@ -72,6 +73,15 @@ class FieldService {
     async getWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
         const result = await this.wateringAdviceRepository.findWaterAdvice(timefilterFrom, timefilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
         return dtoConverter.convertWateringAdviceWrapper(result);
+    }
+
+    async getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp){
+        const result = await this.fieldRepository.getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp)
+        console.log(result)
+        if (result.length > 0){
+            return dtoConverter.convertOptimalStateWrapper(result)
+        }
+        return new OptStateDto(refStructureName, companyName, fieldName, sectorName, plantRow, null, null, null)
     }
 
     async createMatrixOptState(optStateDto) {

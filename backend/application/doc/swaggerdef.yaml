@@ -212,6 +212,8 @@ components:
           type: number
         optValue:
           type: number
+        weight:
+          type: number
 
     WateringAdviceDtoRequest:
       type: object

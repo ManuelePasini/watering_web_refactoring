@@ -9,6 +9,9 @@ class FieldRepository {
     this.TranscodingField = TranscodingField
     this.WateringFields = WateringFields
     this.sequelize = sequelize
+
+    MatrixField.hasMany(MatrixProfile, { foreignKey: 'matrixId' });
+    MatrixProfile.belongsTo(MatrixField, { foreignKey: 'matrixId' });
   }
 
   async createMatrixProfile(matrixId, x, y, z, value) {
@@ -47,6 +50,47 @@ class FieldRepository {
     } catch (error) {
       throw Error(error.message)
     }
+  }
+
+  async getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp){
+    try {
+      this.MatrixProfile.removeAttribute('id')
+
+      return (await this.MatrixProfile.findAll({
+          attributes: ['xx', 'yy', 'zz', 'optValue', 'weight'],
+          include: {
+              model: this.MatrixField,
+              attributes: ['refStructureName', 'companyName', 'fieldName', 'sectorName', 'plantRow',
+              ['timestamp_from', 'validFrom'], ['timestamp_to', 'validTo']],
+              where: {
+                refStructureName: refStructureName,
+                companyName: companyName,
+                fieldName: fieldName,
+                sectorName: sectorName,
+                plantRow: plantRow,
+                timestamp_from: { [Op.lt]: timestamp },
+                timestamp_to: {
+                  [Op.or]: {
+                    [Op.is]: null,
+                    [Op.gt]: timestamp
+                  },
+                }
+            },
+          },
+          raw: true,
+          nest: true
+      })).map(el => {
+        return {
+          xx: el.xx, 
+          yy: el.yy,
+          zz: el.zz,
+          optValue: el.optValue,
+          weight: el.weight,
+          ...el.field_matrix
+        }});
+  } catch (error) {
+      console.error('Error on get optimal state:', error);
+  }
   }
 
   async getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorName, plantRow) {
