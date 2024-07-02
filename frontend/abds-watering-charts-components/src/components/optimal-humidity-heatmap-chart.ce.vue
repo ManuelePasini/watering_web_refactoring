@@ -2,13 +2,14 @@
 import {nextTick, ref, watch, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 import VueApexCharts  from "vue3-apexcharts"
-import { luxonDateTimeToString } from "../common/dateUtils.js"
 
 const communicationService = new CommunicationService();
 const heatmapSeries = ref([]);
-const chartOptions = ref({emitsOptions: false})
+const weightsSeries = ref([])
+const optValueChartOptions = ref({emitsOptions: false})
+const weightsChartOptions = ref({emitsOptions: false})
 const image = ref({})
-const container = ref(null)
+const containerOptimal = ref(null)
 
 const props = defineProps(['config', 'selectedTimestamp'])
 const showChart = ref(false)
@@ -21,7 +22,29 @@ watchEffect( async () => {
   }
 });
 
-async function drawImage(){
+const buildHeatmapSeries = (valueKey) => {
+  let x = []
+  const series = Array.from(image.value.reduce((accumulator, currentValue) => {
+    if (!accumulator.has(currentValue.y))
+      accumulator.set(currentValue.y, []);
+    accumulator.get(currentValue.y).push({ x: currentValue.x,
+      value: currentValue[valueKey].toFixed(2)
+    })
+    return accumulator
+  }, new Map()), ([key, value])=> {
+    if(x.length === 0){
+      x = value.map(e => e.x).sort((a,b)=>parseInt(a)-parseInt(b))
+    }
+    return {
+      name: key, 
+      data: value.sort((a,b) => a.x - b.x).map(e => e.value)
+    }
+  }).sort((a,b)=> b.name - a.name)
+
+  return [x, series]
+}
+
+async function drawValuesImage(){
   if (!image.value){
     return
   } 
@@ -29,23 +52,7 @@ async function drawImage(){
   const parsed = JSON.parse(props.config);
   const dripperPos = await communicationService.getFieldInfo(parsed.environment, parsed.paths, parsed.params, "dripperInfo")
 
-  let xValues = [] 
-  const series = Array.from(image.value.reduce((accumulator, currentValue) => {
-    if (!accumulator.has(currentValue.y))
-      accumulator.set(currentValue.y, []);
-    accumulator.get(currentValue.y).push({ x: currentValue.x,
-      value: currentValue.optValue.toFixed(2)
-    })
-    return accumulator
-  }, new Map()), ([key, value])=> {
-    if(xValues.length === 0){
-      xValues = value.map(e => e.x).sort((a,b)=>parseInt(a)-parseInt(b))
-    }
-    return {
-      name: key, 
-      data: value.sort((a,b) => a.x - b.x).map(e => e.value)
-    }
-  }).sort((a,b)=> b.name - a.name)
+  const [xValues, series] = buildHeatmapSeries("optValue")
 
   const dripperSeries = {
     name: "0",
@@ -57,11 +64,11 @@ async function drawImage(){
   series.push(dripperSeries)
 
   heatmapSeries.value = series
-  if(!container.value){
+  if(!containerOptimal.value){
     await nextTick()
   }
 
-  const containerWidth = container.value.offsetWidth
+  const containerWidth = containerOptimal.value.offsetWidth
 
   let cellSize
   if(heatmapSeries.value[0].data.length > heatmapSeries.value.length){
@@ -72,12 +79,12 @@ async function drawImage(){
 
   cellSize = Math.min(cellSize, 32)
 
-  const verticalOffset = 60
+  const verticalOffset = 25
   const horizontalOffset = 10
   const chartHeight = (cellSize * heatmapSeries.value.length + verticalOffset) 
   const chartWidth = (cellSize * heatmapSeries.value[0].data.length + horizontalOffset)
 
-  chartOptions.value = {
+  optValueChartOptions.value = {
     chart: {
       offsetX: (containerWidth - chartWidth)/2,
       type: 'heatmap',
@@ -156,12 +163,7 @@ async function drawImage(){
       }
     },
     legend: {
-      show: verticalOffset/chartHeight < 0.2,
-      markers: {
-        width: 5,
-        height: 16,
-        radius: 0
-      }
+      show: false,
     },
     stroke: {
       width: 0
@@ -212,26 +214,161 @@ async function drawImage(){
   }
 }
 
+async function drawWeightsImage(){
+  if (!image.value){
+    return
+  } 
+
+  console.log(image.value)
+  const [xValues, series] = buildHeatmapSeries("weight")
+
+  const dripperSeries = {
+    name: "0",
+    data: new Array(series[0].data.length).fill(0)
+  }
+
+  series.push(dripperSeries)
+
+  weightsSeries.value = series
+  if(!containerOptimal.value){
+    await nextTick()
+  }
+
+  const containerWidth = containerOptimal.value.offsetWidth
+
+  let cellSize
+  if(weightsSeries.value[0].data.length > weightsSeries.value.length){
+    cellSize = containerWidth / weightsSeries.value[0].data.length
+  } else {
+    cellSize = containerWidth / weightsSeries.value.length * 0.9
+  }
+
+  cellSize = Math.min(cellSize, 32)
+
+  const verticalOffset = 25
+  const horizontalOffset = 10
+  const chartHeight = (cellSize * weightsSeries.value.length + verticalOffset) 
+  const chartWidth = (cellSize * weightsSeries.value[0].data.length + horizontalOffset)
+
+  weightsChartOptions.value = {
+    chart: {
+      offsetX: (containerWidth - chartWidth)/2,
+      type: 'heatmap',
+      height: (chartHeight + "px"),
+      width: (chartWidth + "px"),
+      toolbar: {
+        offsetX: chartWidth < containerWidth * 0.75 ? containerWidth * 0.3 : 0,
+        show: true
+      },
+      zoom: {
+        enabled: false,
+      }
+    },
+    plotOptions: {
+      heatmap: {
+        enableShades: true,
+        radius: 0,
+      },
+    },
+    colors: ['#06bd4f'],
+    dataLabels: {
+      formatter: function(value, { seriesIndex, dataPointIndex, w }) { 
+        if (value == 0){
+          return ""
+        } else {
+          return value
+        }
+      },
+      enabled: cellSize > 20,
+      style: {
+        fontSize: '10px',
+        colors: ["#333333"]
+      },
+
+    },
+    stroke: {
+      width: 0
+    },
+    title: {
+      text: 'Maschera dei pesi',
+      align: 'center',
+      offsetY: 10,
+    },
+    xaxis: {
+      type: 'category',
+      categories: xValues,
+      tooltip: {
+          enabled: false,
+      },
+      tickPlacement: 'on',
+      labels: {
+        show: true
+      }
+    },
+    yaxis: {
+      axisTicks: {
+        show: true,
+      },
+      labels: {
+        style: {
+          fontSize: '12px'
+        }
+      }
+    },
+    tooltip:{
+      custom: function({series, seriesIndex, dataPointIndex, w}) {
+        let value = series[seriesIndex][dataPointIndex]
+        if (value > 0) {
+          return ('<div class="arrow_box m-1">' +
+            '<div> <strong>val</strong>: ' + value + '</div>' +
+            '<div> <strong>x</strong>: ' + xValues[dataPointIndex] + '</div>' +
+            '<div> <strong>y</strong>: ' + heatmapSeries.value[seriesIndex].name + '</div>' +
+            '</div>')
+        } else 
+          return ""
+
+      }
+    }
+  }
+}
+
 async function mountChart() {
   const parsed = JSON.parse(props.config);
-
+  parsed.params["timestamp"] = props.selectedTimestamp
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'optimalState')
 
   if(chartDataResponse) {
     showChart.value = chartDataResponse.length > 0
     if(showChart.value){
         image.value = chartDataResponse
-        await drawImage() 
+        await drawValuesImage()
+        await drawWeightsImage()
     }
   } else {
     showChart.value = false
   } 
 } 
+
+watch( () => props.selectedTimestamp, async () => {
+  await mountChart()
+})
 </script>
 
 <template>
-  <div v-if="showChart" ref="container">
-    <VueApexCharts type="heatmap" :options="chartOptions" :series="heatmapSeries"></VueApexCharts>
+  <div class="row" v-if="showChart">
+    <div class="col-lg-6 order-lg-1 order-2 ">
+      <div ref="containerOptimal">
+        <VueApexCharts type="heatmap" :options="weightsChartOptions" :series="weightsSeries"></VueApexCharts>
+      </div>
+    </div>
+    <div class="col-lg-6 order-lg-2 order-1">
+      <div>
+        <VueApexCharts type="heatmap" :options="optValueChartOptions" :series="heatmapSeries"></VueApexCharts>
+      </div>
+    </div>
+  </div>
+  <div class="text-center p-3" v-else>
+    Nessun ottimo disponibile.
   </div>
 </template>
 

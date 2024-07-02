@@ -36,6 +36,7 @@ let selectedFieldName = ref("Seleziona una tesi")
 let selectedField = ref(null)
 let selectedTimeLabel = ref("")
 let showDynamicHeatmap = ref(false)
+let showOptimalMatrix = ref(false)
 let showDetailedWatering = ref(false)
 let detailedWateringButton = ref("Mostra puntuale")
 
@@ -192,6 +193,10 @@ function enableDynamicHeatmap() {
   showDynamicHeatmap.value = !showDynamicHeatmap.value
 }
 
+function enableOptimalMatrix() {
+  showOptimalMatrix.value = !showOptimalMatrix.value
+}
+
 function enableDetailedAggregate() {
   showDetailedWatering.value = !showDetailedWatering.value
   detailedWateringButton.value = showDetailedWatering.value ? "Mostra giornaliero" : "Mostra puntuale"
@@ -263,17 +268,23 @@ function selectedTime(time){
       <div class="humidity-card card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Matrice dell'umidità</span>
-          <button class="btn btn-sm btn-secondary" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
+          <div>
+            <button class="btn btn-sm btn-secondary mx-1" type="button" @click="enableOptimalMatrix" id="optimal-heatmap-button">Mostra ottimo</button>
+            <button class="btn btn-sm btn-secondary mx-1" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
+          </div>  
         </div>
-        <div class="card-body row">
-          <span>Seleziona un istante temporale nel grafico di sinistra per mostrare la relativa matrice di umidità (Con "<strong>G</strong>" 
-            si denota la posizione del gocciolatore):</span>
-          <div class="col-lg-6 align-content-center">
-            <HumidityMultiLineChart style="height: 300px" :config="JSON.stringify(connectionParams)" @selectTimestamp="selectedTime"></HumidityMultiLineChart>
+        <div class="card-body">
+          <div class="row">
+            <span>Seleziona un istante temporale nel grafico di sinistra per mostrare la relativa matrice di umidità (Con "<strong>G</strong>" 
+              si denota la posizione del gocciolatore):</span>
+            <div class="col-lg-6 align-content-center">
+              <HumidityMultiLineChart style="height: 300px" :config="JSON.stringify(connectionParams)" @selectTimestamp="selectedTime"></HumidityMultiLineChart>
+            </div>
+            <div class="col-lg-6">
+              <HumidityHeatmap :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"></HumidityHeatmap>
+            </div>
           </div>
-          <div class="col-lg-6">
-            <HumidityHeatmap :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"></HumidityHeatmap>
-          </div>          
+          <OptimalHumidityHeatmap v-if="showOptimalMatrix" :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"></OptimalHumidityHeatmap>
         </div>
       </div>
     </div>
@@ -286,17 +297,6 @@ function selectedTime(time){
           <div class="dynamic-humidity-map">
             <HumidityDynamicHeatmap v-if="hasUserPermission('MO')" :config="JSON.stringify(connectionParams)"></HumidityDynamicHeatmap>
           </div>
-      </div>
-    </div>
-
-    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
-      <div class="humidity-card card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Matrice Ottimale</span>
-        </div>
-        <div class="card-body">
-            <OptimalHumidityHeatmap :config="JSON.stringify(connectionParams)"></OptimalHumidityHeatmap>        
-        </div>
       </div>
     </div>
 
