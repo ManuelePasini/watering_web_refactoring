@@ -52,7 +52,7 @@ function addValueAndMaintainSize(value) {
 async function mountChart() {
   const parsed = JSON.parse(props.config);
 
-  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, props.endpoint)
+  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, props.endpoint, 'values.0.measures')
   if(!chartDataResponse) {
     return  
   }
@@ -72,6 +72,9 @@ async function mountChart() {
 
   options.value = {
     maintainAspectRatio: true,
+    animation: {
+        duration: 0
+    },
     scales: {
       x: {
         ticks: {

@@ -1,11 +1,13 @@
 import axios from "axios";
+import { getNestedProperty } from "../utils/utils";
 
 export class CommunicationService {
 
-    async getChartData(environment, pathsParams, queryParams, endpoint) {
-        const response = await this.getAPI(environment, "/fieldCharts", pathsParams, queryParams, endpoint)
-        if (response && response.values.length > 0)
-            return response.values[0].measures;
+    async getChartData(environment, pathsParams, queryParams, endpoint, dataKey) {
+        const response = await this.getAPI(environment, "/fieldCharts", pathsParams, queryParams, endpoint);
+        if (response) {
+            return getNestedProperty(response, dataKey);
+        }
         return null;
     }
 

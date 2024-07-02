@@ -182,7 +182,7 @@ async function drawImage(timestamp){
 async function mountChart() {
   const parsed = JSON.parse(props.config);
 
-  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint)
+  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'values.0.measures')
 
   if(chartDataResponse) {
     images.value = new Map(chartDataResponse.map(obj => [obj.timestamp, obj.image]))
