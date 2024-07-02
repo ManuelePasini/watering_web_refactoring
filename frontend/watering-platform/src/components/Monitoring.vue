@@ -14,6 +14,7 @@ import HumidityHeatmap from "../../../abds-watering-charts-components/src/compon
 import HumidityMultiLineChart from "../../../abds-watering-charts-components/src/components/humiditymultilinear-chart.ce.vue"
 import HumidityDynamicHeatmap from "../../../abds-watering-charts-components/src/components/dynamic-heatmap-animator.ce.vue"
 import Calendar from "../../../abds-watering-charts-components/src/components/calendar.vue"
+import OptimalHumidityHeatmap from "../../../abds-watering-charts-components/src/components/optimal-humidity-heatmap-chart.ce.vue"
 import LogComponent from './LogComponent.vue';
 import {useRouter} from "vue-router";
 import authService from '@/services/auth.service';
@@ -64,7 +65,7 @@ function updateConnectionParams() {
     connectionParams = {
     environment: {
       host: import.meta.env.VITE_BACKEND_ADDRESS,
-      token: token.value
+      token: token.value 
     },
     paths: selectedField.value,
     params: {
@@ -205,7 +206,7 @@ function selectedTime(time){
 
 <template>
 
-  <div class="container align-top mt-5 pt-3">
+  <div class="container align-top mt-5 pt-5 pt-sm-3">
     <div class="row m-2">
       <div class="col d-flex justify-content-center">
         <div class="btn-group-toggle text-center" data-toggle="buttons">
@@ -285,6 +286,17 @@ function selectedTime(time){
           <div class="dynamic-humidity-map">
             <HumidityDynamicHeatmap v-if="hasUserPermission('MO')" :config="JSON.stringify(connectionParams)"></HumidityDynamicHeatmap>
           </div>
+      </div>
+    </div>
+
+    <div v-if="hasUserPermission('MO')" class="my-3 container col-md-12">
+      <div class="humidity-card card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Matrice Ottimale</span>
+        </div>
+        <div class="card-body">
+            <OptimalHumidityHeatmap :config="JSON.stringify(connectionParams)"></OptimalHumidityHeatmap>        
+        </div>
       </div>
     </div>
 

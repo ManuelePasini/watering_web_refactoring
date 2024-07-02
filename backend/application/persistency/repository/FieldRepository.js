@@ -54,43 +54,65 @@ class FieldRepository {
 
   async getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp){
     try {
-      this.MatrixProfile.removeAttribute('id')
+      const query = `SELECT 
+            "matrix_profile"."xx", 
+            "matrix_profile"."yy", 
+            "matrix_profile"."zz", 
+            "matrix_profile"."optValue", 
+            "matrix_profile"."weight", 
+            "field_matrix"."refStructureName", 
+            "field_matrix"."companyName", 
+            "field_matrix"."fieldName", 
+            "field_matrix"."sectorName", 
+            "field_matrix"."plantRow", 
+            "field_matrix"."timestamp_from" AS "validFrom", 
+            "field_matrix"."timestamp_to" AS "validTo" 
+        FROM "matrix_profile" 
+        INNER JOIN "field_matrix" 
+            ON "matrix_profile"."matrixId" = "field_matrix"."matrixId"
+        INNER JOIN (
+            SELECT 
+                xx, 
+                yy, 
+                zz,
+                MAX("timestamp") as max_timestamp
+            FROM data_interpolated
+            WHERE "timestamp" < ${timestamp}
+              AND "refStructureName" = '${refStructureName}'
+              AND "companyName" = '${companyName}'
+              AND "fieldName" = '${fieldName}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
+            GROUP BY xx, yy, zz
+        ) AS actual_profile
+            ON "matrix_profile".xx = actual_profile.xx
+            AND "matrix_profile".yy = actual_profile.yy
+            AND "matrix_profile".zz = actual_profile.zz
+        WHERE "field_matrix"."refStructureName" = '${refStructureName}' 
+            AND "field_matrix"."companyName" = '${companyName}' 
+            AND "field_matrix"."fieldName" = '${fieldName}' 
+            AND "field_matrix"."sectorName" = '${sectorName}' 
+            AND "field_matrix"."plantRow" = '${plantRow}' 
+            AND "field_matrix"."timestamp_from" < ${timestamp} 
+            AND ("field_matrix"."timestamp_to" IS NULL OR "field_matrix"."timestamp_to" > ${timestamp});`
 
-      return (await this.MatrixProfile.findAll({
-          attributes: ['xx', 'yy', 'zz', 'optValue', 'weight'],
-          include: {
-              model: this.MatrixField,
-              attributes: ['refStructureName', 'companyName', 'fieldName', 'sectorName', 'plantRow',
-              ['timestamp_from', 'validFrom'], ['timestamp_to', 'validTo']],
-              where: {
-                refStructureName: refStructureName,
-                companyName: companyName,
-                fieldName: fieldName,
-                sectorName: sectorName,
-                plantRow: plantRow,
-                timestamp_from: { [Op.lt]: timestamp },
-                timestamp_to: {
-                  [Op.or]: {
-                    [Op.is]: null,
-                    [Op.gt]: timestamp
-                  },
-                }
-            },
-          },
-          raw: true,
-          nest: true
-      })).map(el => {
-        return {
-          xx: el.xx, 
-          yy: el.yy,
-          zz: el.zz,
-          optValue: el.optValue,
-          weight: el.weight,
-          ...el.field_matrix
-        }});
-  } catch (error) {
-      console.error('Error on get optimal state:', error);
-  }
+      const result = await this.sequelize.query(query, {
+        type: QueryTypes.SELECT,
+        bind: {
+          refStructureName,
+          companyName,
+          fieldName,
+          sectorName,
+          plantRow,
+          timestamp
+        }
+      });
+
+      return result
+        
+    } catch (error) {
+        console.error('Error on get optimal state:', error);
+    }
   }
 
   async getCurrentWaterAdvice(refStructureName, companyName, fieldName, sectorName, plantRow) {

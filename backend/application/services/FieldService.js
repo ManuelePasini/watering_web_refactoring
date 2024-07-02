@@ -77,7 +77,6 @@ class FieldService {
 
     async getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp){
         const result = await this.fieldRepository.getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp)
-        console.log(result)
         if (result.length > 0){
             return dtoConverter.convertOptimalStateWrapper(result)
         }
