@@ -7,7 +7,6 @@ import logsRouter from './routes/logsRouter.js'
 import swaggerJsdoc from 'swagger-jsdoc';
 import { serve, setup } from 'swagger-ui-express';
 
-import sequelize from './configs/dbConfig.js';
 import cors from 'cors';
 
 import dotenv from 'dotenv'
@@ -39,12 +38,6 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
-sequelize.authenticate().then(() => {
-   console.log('Database connection has been initialized successfully');
-}).catch((err) => {
-    console.log('Unable to connect to the database:',err);
-});
 
 app.listen(port, () => {
   console.log(`Server is running at ${process.env.BACKEND_ADDRESS}`);

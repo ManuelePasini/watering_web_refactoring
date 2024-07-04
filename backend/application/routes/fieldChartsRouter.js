@@ -1301,7 +1301,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *       - bearerAuth: []
  *     summary: Get optimal state for a field
  *     description: Get the optimal state for a field.
- *     tags: [Field Operations]
+ *     tags: [Field Chart Data]
  *     parameters:
  *       - in: path
  *         name: refStructureName
@@ -1379,6 +1379,100 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
   
     try {
       const result = await fieldService.getOptimalState(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp);
+      res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  
+  });
+
+  /**
+ * @swagger
+ * /fields/{refStructureName}/{companyName}/{fieldName}/{sectorName}/{plantRow}/getDistanceFromOptimalState:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get distance from optimal state for a field
+ *     description: Get distance from optimal state for a field.
+ *     tags: [Field Chart Data]
+ *     parameters:
+ *       - in: path
+ *         name: refStructureName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The reference structure name
+ *       - in: path
+ *         name: companyName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The company name
+ *       - in: path
+ *         name: fieldName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The field name
+ *       - in: path
+ *         name: sectorName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The sector name
+ *       - in: path
+ *         name: plantRow
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The plantRow
+ *       - in: query
+ *         name: timestamp
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: The timestamp in which find the information
+ *     responses:
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/OptStateDto'
+ *       '400':
+ *         description: Invalid request or thesis not found.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on retrieve optimal field matrix.
+ */
+fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:plantRow/getDistanceFromOptimalState', async (req, res) => {
+  
+    const refStructureName = req.params.refStructureName;
+    const companyName = req.params.companyName;
+    const fieldName = req.params.fieldName;
+    const sectorName = req.params.sectorName;
+    const plantRow = req.params.plantRow;
+    const timestamp = req.query.timestamp ? req.query.timestamp : Date.now()/1000;
+    console.log(req.query)
+
+    try {
+      const user = await authenticationService.validateJwt(req.headers.authorization);
+      if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'MO', timestamp, timestamp)))
+        return res.status(401).json({ message: 'Unauthorized request' });
+    } catch (error) {
+      return res.status(403).json({ message: 'Authentication failed' });
+    }
+  
+    try {
+      const result = await fieldService.getPunctualDistance(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp);
       res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ message: error.message });

@@ -13,10 +13,7 @@ export class CommunicationService {
 
     async getAPI(environment, primaryPath, pathsParams, queryParams, endpoint) {
         return axios.get(this.buildURL(environment.host, primaryPath, pathsParams, endpoint), {
-            params: {
-                timeFilterFrom: queryParams ? queryParams.timeFilterFrom : null,
-                timeFilterTo: queryParams ? queryParams.timeFilterTo : null,
-            },
+            params: queryParams,
             headers: {
                 Authorization: 'Bearer ' + environment.token
             }

@@ -132,6 +132,13 @@ class DtoConverter {
             exampleData.validFrom, exampleData.validTo, optimalState)
     }
 
+    convertPunctualDistanceWrapper(wrappers){
+        const [[jsonKey, values]] = this.#buildGenericReferenceMap(wrappers).entries();
+        const key = JSON.parse(jsonKey)
+        const distances = values.map(v => new InterpolatedMeasureData(0, v.yy, v.xx, v.distance))
+        return new InterpolatedDataValue(key.refStructureName, key.companyName, key.fieldName, new PlantDto(key.sectorName, key.plantRow), distances)
+    }
+
     #buildGenericReferenceMap(wrappers) {
         return wrappers.reduce((accumulator, currentValue) => {
             const key = {

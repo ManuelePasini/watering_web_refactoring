@@ -45,6 +45,11 @@ class FieldService {
         return dtoConverter.convertDeltaWrapper(result);
     }
 
+    async getPunctualDistance(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp) {
+        const result = await this.deltaRepository.findPunctualDelta(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp);
+        return dtoConverter.convertPunctualDistanceWrapper(result);
+    }
+
     async getHumidityBins(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
         const result = await this.humidityBinsRepository.findHumidityBins(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
         return dtoConverter.convertHumidityBinWrapper(result);

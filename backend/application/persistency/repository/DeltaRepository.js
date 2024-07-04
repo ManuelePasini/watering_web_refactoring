@@ -19,42 +19,48 @@ class DeltaRepository {
                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(q1."timestamp"))) ::INT AS timestamp, 
              'Media Pot. Idr. Giornaliera' as "detectedValueTypeDescription"
             FROM (
-                SELECT wa."refStructureName", wa."companyName", wa."fieldName", wa."sectorName", wa."plantRow", di."timestamp", AVG (CASE WHEN di."value" > -300 THEN LN(ABS(di."value")) * weighted."weight"
+                SELECT di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp", AVG (CASE WHEN di."value" > -300 THEN LN(ABS(di."value")) * weighted."weight"
                 ELSE LN(ABS(-300)) * weighted."weight" END) as "value", di."xx", di."yy"
                 FROM data_interpolated as di
                 JOIN (
-                SELECT DISTINCT "watering_start", "refStructureName", "companyName", "fieldName", "sectorName", "plantRow"
-                FROM watering_schedule
-                WHERE "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}') as wa ON ((wa.\"watering_start\" / 3600)::INT * 3600) - 3600  = di.\"timestamp\"
-                AND di."refStructureName" = wa."refStructureName"
-                AND di."companyName" = wa."companyName"
-                AND di."fieldName" = wa."fieldName"
-                AND di."sectorName" = wa."sectorName"
-                AND di."plantRow" = wa."plantRow"
+                        SELECT "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", "xx", "yy", "weight", fi."matrixId", "timestamp_from", "timestamp_to"
+                        FROM field_matrix as fi
+                        JOIN matrix_profile as mp ON fi."matrixId" = mp."matrixId"
+                        WHERE "refStructureName" = '${refStructureName}'
+                        AND "companyName" = '${companyName}'
+                        AND "fieldName" = '${fieldName}'
+                        AND "sectorName" = '${sectorName}'
+                        AND "plantRow" = '${plantRow}'
+                        AND "timestamp_from" < '${parseInt(timestampTo)}' 
+                        AND ("timestamp_to" > '${parseInt(timestampFrom)}' OR "timestamp_to" IS NULL)
+                    ) as weighted 
+                    ON weighted."refStructureName" = di."refStructureName"
+                        AND weighted."companyName" = di."companyName"
+                        AND weighted."fieldName" = di."fieldName"
+                        AND weighted."sectorName" = di."sectorName"
+                        AND weighted."plantRow" = di."plantRow"
+                        AND weighted."xx" = di."xx"
+                        AND weighted."yy" = di."yy"
+                        AND di."timestamp" > weighted."timestamp_from" AND (di."timestamp" < weighted."timestamp_to" OR weighted."timestamp_to" IS NULL)
                 JOIN (
-                SELECT "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", "xx", "yy", "weight", fi."matrixId"
-                FROM field_matrix as fi
-                JOIN matrix_profile as mp ON fi."matrixId" = mp."matrixId"
-                WHERE "refStructureName" = '${refStructureName}'
-                AND "companyName" = '${companyName}'
-                AND "fieldName" = '${fieldName}'
-                AND "sectorName" = '${sectorName}'
-                AND "plantRow" = '${plantRow}'
-                AND fi."current" = 'true'
-                ) as weighted ON weighted."refStructureName" = di."refStructureName"
-                AND weighted."companyName" = di."companyName"
-                AND weighted."fieldName" = di."fieldName"
-                AND weighted."sectorName" = di."sectorName"
-                AND weighted."plantRow" = di."plantRow"
-                AND weighted."xx" = di."xx"
-                AND weighted."yy" = di."yy"
+                    SELECT (("watering_start" / 3600)::INT * 3600) - 3600 AS timestamp
+                    FROM watering_schedule
+                    WHERE latest = true
+                        AND "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}'
+                        AND "refStructureName" = '${refStructureName}'
+                        AND "companyName" = '${companyName}'
+                        AND "fieldName" = '${fieldName}'
+                        AND "sectorName" = '${sectorName}'
+                        AND "plantRow" = '${plantRow}'
+                    ) as wa 
+                    ON wa."timestamp"  = di."timestamp"
                 WHERE di."refStructureName" = '${refStructureName}'
-                AND di."companyName" = '${companyName}'
-                AND di."fieldName" = '${fieldName}'
-                AND di."sectorName" = '${sectorName}'
-                AND di."plantRow" = '${plantRow}'
-                AND wa."watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}'
-                GROUP BY wa."refStructureName", wa."companyName", wa."fieldName", wa."sectorName", wa."plantRow", di."timestamp", di."xx", di."yy"
+                    AND di."companyName" = '${companyName}'
+                    AND di."fieldName" = '${fieldName}'
+                    AND di."sectorName" = '${sectorName}'
+                    AND di."plantRow" = '${plantRow}'
+                    AND wa."timestamp" BETWEEN '${timestampFrom}' AND '${timestampTo}'
+                GROUP BY di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp", di."xx", di."yy"
                 ) as q1
             GROUP BY q1."refStructureName", q1."companyName", q1."fieldName", q1."sectorName", q1."plantRow", q1."timestamp"
             UNION
@@ -62,7 +68,7 @@ class DeltaRepository {
             SELECT sq1."refStructureName", sq1."companyName", sq1."fieldName", sq1."sectorName", sq1."plantRow", "value", EXTRACT (EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(sq2."timestamp"))):: INT AS timestamp, 'Media Pot. Idr. Ottimale' as "detectedValueTypeDescription"
             FROM (
                 SELECT "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", ROUND(AVG (CASE WHEN "optValue" > -300 THEN LN(ABS("optValue")) * "weight"
-                ELSE LN(ABS(-300)) * "weight" END):: numeric, 6) as "value", fm."matrixId"
+                ELSE LN(ABS(-300)) * "weight" END):: numeric, 6) as "value", fm."matrixId", "timestamp_from", "timestamp_to"
                 FROM field_matrix as fm
                 JOIN matrix_profile as mp ON fm."matrixId" = mp."matrixId"
                 WHERE "refStructureName" = '${refStructureName}'
@@ -70,7 +76,8 @@ class DeltaRepository {
                 AND "fieldName" = '${fieldName}'
                 AND "sectorName" = '${sectorName}'
                 AND "plantRow" = '${plantRow}'
-                AND "current" = 'true'
+                AND "timestamp_from" < '${parseInt(timestampTo)}' 
+                AND ("timestamp_to" > '${parseInt(timestampFrom)}' OR "timestamp_to" IS NULL)
                 AND (mp.xx, mp.yy) IN (
                     SELECT DISTINCT xx, yy
                     FROM data_interpolated
@@ -81,16 +88,21 @@ class DeltaRepository {
                     AND "plantRow" = '${plantRow}'
                     AND timestamp BETWEEN '${timestampFrom}' AND '${timestampTo}'
                 )
-                GROUP BY "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", fm."matrixId"
+                GROUP BY "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", fm."matrixId", "timestamp_from", "timestamp_to"
                 ) as sq1
-                CROSS JOIN (
-                SELECT DISTINCT EXTRACT (EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP("watering_start"))):: INT AS timestamp
-                FROM watering_schedule
-                WHERE TO_CHAR(TO_TIMESTAMP("watering_start"), 'YYYY-MM-DD') IN (
-                SELECT DISTINCT TO_CHAR(TO_TIMESTAMP("watering_start"), 'YYYY-MM-DD') as "timestamp"
-                FROM watering_schedule
-                WHERE "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}')
-                ) as sq2)
+                JOIN (
+                    SELECT "watering_start" AS timestamp
+                    FROM watering_schedule
+                    WHERE latest = true
+                        AND "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}'
+                        AND "refStructureName" = '${refStructureName}'
+                        AND "companyName" = '${companyName}'
+                        AND "fieldName" = '${fieldName}'
+                        AND "sectorName" = '${sectorName}'
+                        AND "plantRow" = '${plantRow}'
+                    ) as sq2
+                ON "timestamp" > "timestamp_from" AND ("timestamp" < "timestamp_to" OR "timestamp_to" IS NULL)
+            )
             ORDER BY "timestamp" DESC
         `;
 
@@ -117,6 +129,84 @@ class DeltaRepository {
             result.timestamp,
             result.detectedValueTypeDescription
         ));
+    }
+
+    async findPunctualDelta(refStructureName, companyName, fieldName, sectorName, plantRow, timestamp) {
+
+        const queryString = `
+            SELECT q1."refStructureName",
+                   q1."companyName",
+                   q1."fieldName",
+                   q1."sectorName",
+                   q1."plantRow",
+                   q1.xx,
+                   q1.yy,
+                   q1."value" - q2."value" as distance,
+                   q1."timestamp"
+            FROM (
+                SELECT di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp", (CASE WHEN di."value" > -300 THEN LN(ABS(di."value")) * weighted."weight"
+                ELSE LN(ABS(-300)) * weighted."weight" END) as "value", di."xx", di."yy"
+                FROM data_interpolated as di
+                JOIN (
+                    SELECT "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", "xx", "yy", "weight"
+                    FROM field_matrix as fi
+                    JOIN matrix_profile as mp ON fi."matrixId" = mp."matrixId"
+                    WHERE "refStructureName" = '${refStructureName}'
+                    AND "companyName" = '${companyName}'
+                    AND "fieldName" = '${fieldName}'
+                    AND "sectorName" = '${sectorName}'
+                    AND "plantRow" = '${plantRow}'
+                    AND "timestamp_from" < '${parseInt(timestamp)}' 
+                    AND ("timestamp_to" > '${parseInt(timestamp)}' OR "timestamp_to" IS NULL)
+                ) as weighted 
+                    ON weighted."refStructureName" = di."refStructureName"
+                        AND weighted."companyName" = di."companyName"
+                        AND weighted."fieldName" = di."fieldName"
+                        AND weighted."sectorName" = di."sectorName"
+                        AND weighted."plantRow" = di."plantRow"
+                        AND weighted."xx" = di."xx"
+                        AND weighted."yy" = di."yy"
+                WHERE di."timestamp" = ${timestamp}/3600::INT*3600
+                    AND di."refStructureName" = '${refStructureName}'
+                    AND di."companyName" = '${companyName}'
+                    AND di."fieldName" = '${fieldName}'
+                    AND di."sectorName" = '${sectorName}'
+                    AND di."plantRow" = '${plantRow}'
+                ) as q1
+            JOIN (
+                SELECT "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", "xx", "yy", (CASE WHEN "optValue" > -300 THEN LN(ABS("optValue")) * "weight"
+                    ELSE LN(ABS(-300)) * "weight" END):: numeric as "value"
+                FROM field_matrix as fm
+                JOIN matrix_profile as mp ON fm."matrixId" = mp."matrixId"
+                WHERE "refStructureName" = '${refStructureName}'
+                    AND "companyName" = '${companyName}'
+                    AND "fieldName" = '${fieldName}'
+                    AND "sectorName" = '${sectorName}'
+                    AND "plantRow" = '${plantRow}'
+                    AND "timestamp_from" < '${parseInt(timestamp)}' 
+                    AND ("timestamp_to" > '${parseInt(timestamp)}' OR "timestamp_to" IS NULL)
+                ) as q2
+            ON q1."refStructureName" = q2."refStructureName"
+                        AND q1."companyName" = q2."companyName"
+                        AND q1."fieldName" = q2."fieldName"
+                        AND q1."sectorName" = q2."sectorName"
+                        AND q1."plantRow" = q2."plantRow"
+                        AND q1."xx" = q2."xx"
+                        AND q1."yy" = q2."yy"`;
+
+        const results = await this.sequelize.query(queryString, {
+           type: QueryTypes.SELECT,
+           bind: {
+               timestamp,
+               refStructureName,
+               companyName,
+               fieldName,
+               sectorName,
+               plantRow
+           }
+        });
+
+        return results
     }
 
 
