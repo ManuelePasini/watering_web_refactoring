@@ -327,16 +327,10 @@ function selectedTime(time){
           <button class="btn btn-sm btn-secondary" type="button" @click="enableDetailedAggregate" id="dynamic-heatmap-button">{{ detailedWateringButton }}</button>
         </div>
         <div v-if="!showDetailedWatering">
-          <pre style="padding-left: 20px; padding-top: 10px;"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
-          <div class="card-body">
-            <WaterAdviceChart style="height: 300px" :config="JSON.stringify(connectionParams)"></WaterAdviceChart>
-          </div>
+            <WaterAdviceChart :config="JSON.stringify(connectionParams)"></WaterAdviceChart>
         </div>
         <div v-else>
-          <pre style="padding-left: 20px; padding-top: 10px;"><b>Pluv Curr</b> espresso in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
-          <div class="card-body">
-            <DripperAndPluvChart style="height: 300px" :config="JSON.stringify(connectionParams)"></DripperAndPluvChart>
-          </div>
+            <DripperAndPluvChart :config="JSON.stringify(connectionParams)"></DripperAndPluvChart>
         </div>
       </div>
     </div>

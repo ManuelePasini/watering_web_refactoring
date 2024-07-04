@@ -148,10 +148,13 @@ async function mountChart() {
 </script>
 
 <template>
-  <div v-if="showChart">
-    <Line :data="chartData" :options="options"/>
+  <pre style="padding-left: 20px; padding-top: 10px;"><b>Pluv Curr</b> espresso in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
+  <div class="card-body">
+    <div v-if="showChart">
+      <Line style="height: 320px;" :data="chartData" :options="options"/>
+    </div>
+    <div v-else>Nessun dato disponibile.</div>ù
   </div>
-  <div v-else>Nessun dato disponibile.</div>
 </template>
 
 <style scoped>

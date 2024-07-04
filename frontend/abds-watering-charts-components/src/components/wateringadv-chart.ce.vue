@@ -16,6 +16,7 @@ import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
 import {BarDatasetData} from "../common/BarDatasetData.js";
+import { group } from 'd3';
 
 const communicationService = new CommunicationService();
 
@@ -29,17 +30,19 @@ const props = defineProps(['config'])
 
 const endpoint = 'wateringAdvice'
 
+const totalGroups = ref(null)
+
 const colorFunction = (str) => {
   if (str === 'Dripper (L)')
-    return '#339CFF'
+    return '#339CFFC5'
   if (str === 'Pluv Curr (mm)')
-    return '#FFCD3D'
+    return '#FFCD3DC5'
   if (str === 'Advice (L)')
-    return '#6064C8'
+    return '#6064C8C5'
   if (str === 'Pot Evap (mm)')
-    return '#FA4443'
+    return '#FA4443C5'
   if (str === 'Expected Water (L)')
-    return '#4CAF50'
+    return '#4CAF50C5'
 }
 
 const groupByType = (measures) => {
@@ -49,7 +52,6 @@ const groupByType = (measures) => {
       accumulator.set(key, []);
 
     accumulator.get(key).push(JSON.stringify({ x: luxonDateTime(currentValue.timestamp), y: Number(currentValue.value).toFixed(2) }));
-
     return accumulator;
   }, new Map());
 }
@@ -82,8 +84,12 @@ async function mountChart() {
   const maxValue = Math.max(...values);
 
   const groupByData = groupByType(data);
+  totalGroups.value = new Map(groupByData.entries().map(([k,v])=> {
+    return [k,v.reduce((a,b)=> a+parseFloat(JSON.parse(b).y),0)]
+  }))
 
-  const datasets = createDatasets(groupByData).map(bin => bin.getDataSet())
+  console.log(totalGroups.value)
+  const datasets = createDatasets(groupByData).map(bin => bin.getDataSet()) 
 
   chartData.value = {
     datasets: datasets
@@ -143,10 +149,18 @@ async function mountChart() {
 </script>
 
 <template>
-  <div v-if="showChart">
-    <Bar :data="chartData" :options="options" />
+  <pre class="p-2"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
+  <div class="d-flex flex-wrap justify-content-end">
+    <div v-for="([group, total]) in totalGroups" :key="group" class="px-2 p-1 m-1 mx-auto" :style="{backgroundColor: colorFunction(group) , borderColor: colorFunction(group), borderRadius: '8px', borderWidth: '1px', borderStyle: 'solid' }">
+        <div>Totale {{ group }}: {{ total.toFixed(2) }}</div>
+    </div>
   </div>
-  <div v-else>Nessun dato disponibile.</div>
+  <div class="card-body">
+    <div v-if="showChart">
+      <Bar style="height: 320px;" :data="chartData" :options="options" />
+    </div>
+    <div v-else>Nessun dato disponibile.</div>
+  </div>  
 </template>
 
 <style scoped>
