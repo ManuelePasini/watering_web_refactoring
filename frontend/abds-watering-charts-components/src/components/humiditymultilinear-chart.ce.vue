@@ -53,11 +53,19 @@ const cleanHumidityBin = (bin) => {
 }
 
 const groupByHumidityBin = (bins) => {
+  const totalBinTimestamp = bins.reduce((accumulator,currentValue)=>{
+    const key = currentValue.timestamp
+    if(!accumulator.has(key))
+      accumulator.set(key, 0);
+    accumulator.set(key, accumulator.get(key) + parseInt(currentValue.count))
+    return accumulator;
+  }, new Map());
+
   return bins.reduce((accumulator, currentValue) => {
     const key = cleanHumidityBin(currentValue.humidityBin);
     if(!accumulator.has(key))
       accumulator.set(key, []);
-    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: currentValue.count}));
+    accumulator.get(key).push(JSON.stringify({x: luxonDateTime(currentValue.timestamp), y: currentValue.count/totalBinTimestamp.get(currentValue.timestamp)*100}));
     return accumulator;
   }, new Map());
 }
@@ -98,6 +106,7 @@ async function mountChart() {
   }
 
   const groupByData = groupByHumidityBin(data);
+  emit('selectTimestamp',Math.max(...data.map(e=>e.timestamp)))
 
   chartData.value = {
     datasets: createDatasets(groupByData).map(bin => bin.getDataSet())
@@ -118,11 +127,25 @@ async function mountChart() {
         labels: {
           boxWidth: 2
         }
+      },
+      tooltip: {
+        callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += context.parsed.y.toFixed(2) + '%'; // Format y-value as percentage
+                }
+                return label;
+              }
+            }
       }
     },
     tooltips: {
       mode: 'index',
-      intersect: true,
+      intersect: true
     },
     interaction: {
       mode: 'nearest',
@@ -155,15 +178,20 @@ async function mountChart() {
         }
       },
       y: {
+        type: 'linear',
+        ticks: {
+            callback: function(value, index, values) {
+                return value + '%'; // Add percentage sign to y-axis labels
+            },
+            stepSize: 20,
+        },
         stacked: true,
         title: {
           display: true,
-          text: '#Celle'
-        },
-        ticks: {
-          stepSize: 20
+          text: '% Celle'
         },
         min: 0,
+        max: 100
       }
     },
     onClick: function handleClick(event, array) {
@@ -179,7 +207,7 @@ async function mountChart() {
 
 <template>
   <div v-if="showChart">
-    <Line :data="chartData" :options="options"/>
+    <Line style="height: 300px" :data="chartData" :options="options"/>
   </div>
   <div v-else>Nessun dato disponibile.</div>
 </template>

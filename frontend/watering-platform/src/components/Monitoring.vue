@@ -278,7 +278,7 @@ function selectedTime(time){
             <span>Seleziona un istante temporale nel grafico di sinistra per mostrare la relativa matrice di umidità (Con "<strong>G</strong>" 
               si denota la posizione del gocciolatore):</span>
             <div class="col-lg-6 align-content-center">
-              <HumidityMultiLineChart style="height: 300px" :config="JSON.stringify(connectionParams)" @selectTimestamp="selectedTime"></HumidityMultiLineChart>
+              <HumidityMultiLineChart :config="JSON.stringify(connectionParams)" @selectTimestamp="selectedTime"></HumidityMultiLineChart>
             </div>
             <div class="col-lg-6">
               <HumidityHeatmap :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"></HumidityHeatmap>
