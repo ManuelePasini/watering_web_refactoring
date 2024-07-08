@@ -1,4 +1,4 @@
-import { DataInterpolatedDistinctPoints, DataInterpolatedDistinctPoint } from '../querywrappers/DataInterpolatedDistinctPoints.js';
+import { ThesisPoints, ThesisPoint } from '../querywrappers/ThesisPointsWrapper.js';
 
 import { DataInterpolatedWrapper } from '../querywrappers/DataInterpolatedWrapper.js';
 import { DataInterpolatedMeanWrapper } from '../querywrappers/DataInterpolatedMeanWrapper.js';
@@ -113,19 +113,25 @@ class DataInterpolatedRepository {
         ));
     }
 
-    async findDistinctPlantRowPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
+    async findThesisPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
 
         const query = `
-            SELECT "zz", "yy", "xx"
+            SELECT "xx", "yy", "zz" 
             FROM data_interpolated
             WHERE "refStructureName" = '${refStructureName}'
-              AND "companyName" = '${companyName}'
-              AND "fieldName" = '${fieldName}'
-              AND "sectorName" = '${sectorName}'
-              AND "plantRow" = '${plantRow}'
-            GROUP BY "zz", "yy", "xx"
-            ORDER BY "zz", "yy", "xx"
-        `;
+                AND "companyName" = '${companyName}'
+                AND "fieldName" = '${fieldName}'
+                AND "sectorName" = '${sectorName}'
+                AND "plantRow" = '${plantRow}'
+                AND  "timestamp" = (
+                    SELECT MAX(timestamp) 
+                    FROM data_interpolated 
+                    WHERE "refStructureName" = '${refStructureName}'
+                        AND "companyName" = '${companyName}'
+                        AND "fieldName" = '${fieldName}'
+                        AND "sectorName" = '${sectorName}'
+                        AND "plantRow" = '${plantRow}')
+            ORDER BY "xx", "yy", "zz"`;
 
         const results = await this.sequelize.query(query,
           {
@@ -140,13 +146,13 @@ class DataInterpolatedRepository {
           }
         );
 
-        const points = results.map(result => new DataInterpolatedDistinctPoint(
+        const points = results.map(result => new ThesisPoint(
           result.xx,
           result.yy,
           result.zz
         ));
 
-        return new DataInterpolatedDistinctPoints(points)
+        return new ThesisPoints(points)
     }
 
 }

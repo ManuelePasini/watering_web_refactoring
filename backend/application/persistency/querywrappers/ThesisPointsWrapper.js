@@ -1,4 +1,4 @@
-export class DataInterpolatedDistinctPoints {
+export class ThesisPoints {
 
   constructor(points) {
     this.points = points
@@ -6,7 +6,7 @@ export class DataInterpolatedDistinctPoints {
 
 }
 
-export class DataInterpolatedDistinctPoint {
+export class ThesisPoint {
 
   constructor(x, y, z) {
     this.x = x

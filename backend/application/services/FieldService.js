@@ -119,8 +119,8 @@ class FieldService {
         }
     }
 
-    async findDistinctplantRowPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
-        return this.dataInterpolatedRepository.findDistinctplantRowPoints(refStructureName, companyName, fieldName, sectorName, plantRow)
+    async findThesisPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
+        return this.dataInterpolatedRepository.findThesisPoints(refStructureName, companyName, fieldName, sectorName, plantRow)
     }
 
 }

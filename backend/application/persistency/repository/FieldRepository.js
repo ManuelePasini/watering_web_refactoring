@@ -23,17 +23,22 @@ class FieldRepository {
   async createMatrixField(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo) {
     try {
       this.MatrixField.update(
-        { current: false },
+        { 
+          timestamp_to: validFrom,
+          current: false 
+        },
         {
           where: {
             refStructureName: structureName,
             companyName: companyName,
             fieldName: fieldName,
             sectorName: sectorName,
-            plantRow: plantRow
+            plantRow: plantRow,
+            current: true
           }
         }
       )
+
       const model = this.MatrixField.build({
         refStructureName: structureName,
         companyName: companyName,
@@ -41,12 +46,12 @@ class FieldRepository {
         sectorName: sectorName,
         plantRow: plantRow,
         timestamp_from: Math.floor(new Date(validFrom).getTime() / 1000),
-        timestamp_to: Math.floor(new Date(validTo).getTime() / 1000),
-        current: true
+        timestamp_to: validTo ? Math.floor(new Date(validTo).getTime() / 1000) : null,
+        current: true,
+        matrixId: this.MatrixProfile.max('matrixId') + 1
       })
 
-      const newModel = await model.save()
-      return newModel;
+      return await model.save()
     } catch (error) {
       throw Error(error.message)
     }

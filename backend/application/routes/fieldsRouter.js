@@ -45,7 +45,7 @@ import { CreateFieldDto } from '../dtos/createFieldDto.js';
  *         description: Error on creating field opt matrix.
  */
 fieldsRouter.put('/setOptState', async (req, res) => {
-  let requestUserData = {userId: -1, partner: ''}
+  let requestUserData
   try {
     requestUserData = await authenticationService.validateJwt(req.headers.authorization);
   } catch (error) {
@@ -59,14 +59,14 @@ fieldsRouter.put('/setOptState', async (req, res) => {
     if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'SetOpt')))
       return res.status(401).json({message: 'Unauthorized request'});
 
-    if(!req.body.validFrom || !req.body.validTo || !req.body.optimalState)
+    if(!req.body.validFrom || !req.body.optimalState)
       return res.status(400).json({message: 'Invalid request'});
 
     const bodyRequest = new OptStateDto(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, req.body.validFrom, req.body.validTo, req.body.optimalState)
 
-    const interpolatedPoints = await fieldService.findDistinctplantRowPoints(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
+    const thesisPoints = await fieldService.findThesisPoints(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
 
-    if(!checkOptState(interpolatedPoints, req.body.optimalState))
+    if(!checkOptState(thesisPoints, req.body.optimalState))
       return res.status(400).json({error: "Opt state matrix does not match"})
 
     await fieldService.createMatrixOptState(bodyRequest)
@@ -278,12 +278,12 @@ fieldsRouter.get("/:refStructureName/:companyName/:fieldName/:sectorName/:plantR
   }
 })
 
-function checkOptState(dataInterpolatedPoints, list2) {
-  if (dataInterpolatedPoints.points.length !== list2.length) return false;
+function checkOptState(thesisPoints, newOptimalPoints) {
+  if (thesisPoints.points.length !== newOptimalPoints.length) return false;
 
-  for (const elem1 of dataInterpolatedPoints.points) {
-    const matchingElem2 = list2.find(elem2 => elem2.x === elem1.x && elem2.y === elem1.y && elem2.z === elem1.z);
-    if (!matchingElem2) return false;
+  for (const point of thesisPoints.points) {
+    const match = newOptimalPoints.find(optPoint => optPoint.x === point.x && optPoint.y === point.y && optPoint.z === point.z);
+    if (!match) return false;
   }
 
   return true;
