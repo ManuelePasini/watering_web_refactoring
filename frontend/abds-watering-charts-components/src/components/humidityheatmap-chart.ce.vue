@@ -161,12 +161,12 @@ async function drawImage(timestamp){
         if (value == 0){
           return "G"
         } else {
-          return value
+          return value.toFixed(0)
         }
       },
-      enabled: cellSize > 20,
+      enabled: cellSize > 15,
       style: {
-        fontSize: '9px',
+        fontSize: (cellSize > 22 ? '10' : '9') + 'px',
       }
     },
     legend: {
