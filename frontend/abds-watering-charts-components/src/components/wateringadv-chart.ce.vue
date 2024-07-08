@@ -88,7 +88,6 @@ async function mountChart() {
     return [k,v.reduce((a,b)=> a+parseFloat(JSON.parse(b).y),0)]
   }))
 
-  console.log(totalGroups.value)
   const datasets = createDatasets(groupByData).map(bin => bin.getDataSet()) 
 
   chartData.value = {

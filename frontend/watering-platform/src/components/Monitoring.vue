@@ -32,8 +32,9 @@ let customSelectedTimestampTo = ref(getCurrentTimestampMinusDays(0))
 let customSelectedTimestampFrom = ref(getCurrentTimestampMinusDays(2))
 
 
-let selectedFieldName = ref("Seleziona una tesi")
-let selectedField = ref(null)
+let selectedFieldName = ref("Seleziona un campo")
+let selectedThesisName = ref("Seleziona una tesi")
+let selectedThesis = ref(null)
 let selectedTimeLabel = ref("")
 let showDynamicHeatmap = ref(false)
 let showOptimalMatrix = ref(false)
@@ -44,6 +45,9 @@ const token = reactive(props.token)
 const user = reactive(props.user)
 const userPermissions = reactive({})
 
+const fields = reactive([])
+const thesis = reactive([])
+let activeThesis
 let connectionParams = {}
 
 onMounted(async () => {
@@ -55,20 +59,20 @@ onMounted(async () => {
 watchEffect(async ()=>{
   if(token.value){
     await updateUserPermission()
-    if (!selectedField.value && userPermissions.value.permissions[0]){
-      selectItem(userPermissions.value.permissions[0])
+    if (!selectedThesis.value && fields.value[0]){
+      selectField(fields.value[0])
     }
   }
 })
 
 function updateConnectionParams() {
-  if(selectedField.value){
+  if(selectedThesis.value){
     connectionParams = {
     environment: {
       host: import.meta.env.VITE_BACKEND_ADDRESS,
       token: token.value 
     },
-    paths: selectedField.value,
+    paths: selectedThesis.value,
     params: {
       timeFilterFrom: selectedTimestampFrom.value,
       timeFilterTo: selectedTimestampTo.value
@@ -154,14 +158,26 @@ function updateCustomTimestamps(){
 }
 
 function selectItem(item) {
-  selectedFieldName.value = createFieldName(item)
-  selectedField.value = item
+  selectedThesisName = createThesisName(item)
+  selectedThesis.value = item
   updateConnectionParams()
+}
+
+function selectField(field){
+  selectedFieldName.value = createFieldName(field)
+  thesis.value = activeThesis.get(JSON.stringify(field))
+  selectedThesis.value = thesis.value[0]
+  selectItem(selectedThesis.value)
 }
 
 function createFieldName(item) {
   if(!item) return ''
-  return `${item.refStructureName}; ${item.companyName}; ${item.fieldName}; Settore ${item.sectorName}; Tesi ${item.plantRow}; ${item.colture}; ${item.coltureType}`
+  return `${item.refStructureName}; ${item.companyName}; ${item.fieldName}`
+}
+
+function createThesisName(item){
+  if(!item) return ''
+  return `Settore ${item.sectorName}; Tesi ${item.plantRow}; ${item.colture}; ${item.coltureType}`
 }
 
 function isLabelSelected(value) {
@@ -171,16 +187,29 @@ function isLabelSelected(value) {
 async function updateUserPermission(){
   if (token.value){
     userPermissions.value = await authService.retrieveUserFieldPermissions(token.value, selectedTimestampFrom.value, selectedTimestampTo.value)
+    activeThesis = userPermissions.value.permissions.reduce((accumulator, currentValue)=>{
+      const field = JSON.stringify({
+        refStructureName: currentValue.refStructureName,
+        companyName: currentValue.companyName,
+        fieldName: currentValue.fieldName
+      })
+      if (!accumulator.has(field)){
+        accumulator.set(field,[])
+      }
+      accumulator.get(field).push(currentValue)
+      return accumulator
+    }, new Map())
+    fields.value = Array.from(activeThesis.keys().map(f => JSON.parse(f)))
   }
 }
 
 function hasUserPermission(permission) {
   if(userPermissions && userPermissions.value && userPermissions.value.permissions) {
-    if(!selectedField.value || Object.keys(selectedField.value).length === 0) return false;
+    if(!selectedThesis.value || Object.keys(selectedThesis.value).length === 0) return false;
     if(userPermissions.value.role === 'admin') return true
-    const keySelected = createFieldName(selectedField.value)
+    const keySelected = createFieldName(selectedThesis.value)+ createThesisName(selectedThesis.value)
     for(const field of userPermissions.value.permissions) {
-      const tmpKey = createFieldName(field)
+      const tmpKey = createFieldName(field)+ createThesisName(field)
       if(keySelected === tmpKey) {
         return field.permissions.includes(permission)
       }
@@ -245,22 +274,39 @@ function selectedTime(time){
       </div>
     </div>
 
-    <div v-if="userPermissions.value && userPermissions.value.permissions" class="m-2 align-top col-md-12">
-      <div class="col d-flex justify-content-center">
-        <p style="vertical-align: middle; margin-right: 10px">Campo: </p>
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="m-2 col-md-12 d-flex flex-row justify-content-center flex-wrap">
+      <div v-if="fields.value" class="d-flex align-items-center flex-wrap">
+        <p class="px-2 m-0">Campo:</p>
+        <button class="btn btn-secondary dropdown-toggle my-1 px-2" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
           {{ selectedFieldName }}
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <li v-for="(item, index) in userPermissions.value.permissions" :key="index">
+          <li v-for="(item, index) in fields.value" :key="index">
             <a
                 class="dropdown-item"
                 href="#"
-                @click.prevent="selectItem(item)">
+                @click.prevent="selectField(item)">
                {{createFieldName(item)}}
             </a>
           </li>
         </ul>
+      </div>
+      <div v-if="thesis.value" class="d-flex align-items-center flex-wrap">
+        <p class="px-2 mb-0">Tesi: </p>
+        <button class="btn btn-secondary dropdown-toggle my-1 px-2" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ selectedThesisName }}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <li v-for="(item, index) in thesis.value" :key="index">
+            <a
+                class="dropdown-item"
+                href="#"
+                @click.prevent="selectItem(item)">
+               {{createThesisName(item)}}
+            </a>
+          </li>
+        </ul>
+
       </div>
     </div>
 
@@ -269,8 +315,8 @@ function selectedTime(time){
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Matrice dell'umidità</span>
           <div>
-            <button class="btn btn-sm btn-secondary mx-1" type="button" @click="enableOptimalMatrix" id="optimal-heatmap-button">Mostra ottimo</button>
-            <button class="btn btn-sm btn-secondary mx-1" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
+            <button class="btn btn-sm btn-secondary m-1" type="button" @click="enableOptimalMatrix" id="optimal-heatmap-button">Mostra ottimo</button>
+            <button class="btn btn-sm btn-secondary m-1" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
           </div>  
         </div>
         <div class="card-body">
