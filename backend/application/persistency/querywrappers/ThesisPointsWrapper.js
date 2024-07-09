@@ -8,10 +8,10 @@ export class ThesisPoints {
 
 export class ThesisPoint {
 
-  constructor(x, y, z) {
-    this.x = x
-    this.y = y
-    this.z = z
+  constructor(xx, yy, zz) {
+    this.xx = xx
+    this.yy = yy
+    this.zz = zz
   }
 
 }

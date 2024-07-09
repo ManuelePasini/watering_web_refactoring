@@ -25,9 +25,9 @@ watchEffect( async () => {
 const buildHeatmapSeries = (valueKey) => {
   let x = []
   const series = Array.from(image.value.reduce((accumulator, currentValue) => {
-    if (!accumulator.has(currentValue.y))
-      accumulator.set(currentValue.y, []);
-    accumulator.get(currentValue.y).push({ x: currentValue.x,
+    if (!accumulator.has(currentValue.yy))
+      accumulator.set(currentValue.yy, []);
+    accumulator.get(currentValue.yy).push({ x: currentValue.xx,
       value: currentValue[valueKey].toFixed(2)
     })
     return accumulator
@@ -59,7 +59,7 @@ async function drawValuesImage(){
     data: new Array(series[0].data.length).fill(1)
   }
 
-  dripperSeries.data[xValues.indexOf(dripperPos.x)] = 0
+  dripperSeries.data[xValues.indexOf(dripperPos.xx)] = 0
 
   series.push(dripperSeries)
 
@@ -154,12 +154,12 @@ async function drawValuesImage(){
         if (value == 0){
           return "G"
         } else {
-          return value
+          return value.toFixed(0)
         }
       },
-      enabled: cellSize > 20,
+      enabled: cellSize > 15,
       style: {
-        fontSize: '9px',
+        fontSize: (cellSize > 22 ? '10' : '9') + 'px',
       }
     },
     legend: {
@@ -219,7 +219,6 @@ async function drawWeightsImage(){
     return
   } 
 
-  console.log(image.value)
   const [xValues, series] = buildHeatmapSeries("weight")
 
   const dripperSeries = {

@@ -66,13 +66,13 @@ async function drawImage(timestamp){
     data: new Array(series[0].data.length).fill(1)
   }
 
-  dripperSeries.data[xValues.indexOf(dripperPos.x)] = 0
+  dripperSeries.data[xValues.indexOf(dripperPos.xx)] = 0
 
   series.push(dripperSeries)
 
   heatmapSeries.value = series
   if(!container.value){
-    await nextTick()
+    return
   }
 
   const containerWidth = container.value.offsetWidth
@@ -236,7 +236,11 @@ async function mountChart() {
     showChart.value = images.value.size > 0
     if (showChart.value){
       const timestamps = Array.from(images.value.keys()).sort()
-      await drawImage(timestamps[timestamps.length - 1])
+      if(props.selectedTimestamp){
+        await drawImage(props.selectedTimestamp)
+      } else {
+        await drawImage(timestamps[timestamps.length - 1])
+      }
     }
   } else {
     showChart.value = false

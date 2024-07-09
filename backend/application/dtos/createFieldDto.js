@@ -69,13 +69,13 @@ export class ThesisDto {
 
 export class SensorDto {
 
-  constructor(id, name, type, x, y, z) {
+  constructor(id, name, type, xx, yy, zz) {
     this.id = id
     this.name = name
     this.type = type
-    this.x = x
-    this.y = y
-    this.z = z
+    this.xx = xx
+    this.yy = yy
+    this.zz = zz
   }
 
 }

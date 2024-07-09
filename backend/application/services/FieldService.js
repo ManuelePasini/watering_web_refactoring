@@ -101,7 +101,7 @@ class FieldService {
     async createMatrixOptState(optStateDto) {
         const matrixFieldInserted = await this.fieldRepository.createMatrixField(optStateDto.structureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.sectorName, optStateDto.plantRow, optStateDto.validFrom, optStateDto.validTo)
         for (const matrixData of optStateDto.optimalState) {
-            await this.fieldRepository.createMatrixProfile(matrixFieldInserted.matrixId, matrixData.x, matrixData.y, matrixData.z, matrixData.value)
+            await this.fieldRepository.createMatrixProfile(matrixFieldInserted.matrixId, matrixData.xx, matrixData.yy, matrixData.zz, matrixData.value)
         }
     }
 
@@ -120,7 +120,7 @@ class FieldService {
                     for (const sector of field.sectors) {
                         for (const plantRow of sector.theses) {
                             for (const sensor of plantRow.sensors) {
-                                await this.fieldRepository.createTranscodingField(affiliation, structure.structureName, company.companyName, field.fieldName, field.coltureType, sector.sectorName, sector.wateringCapacity, sector.initialWatering, sector.maximumWatering, sector.adviceTime, sector.wateringType, plantRow.adviceWeight, plantRow.plantRowName, plantRow.sensorNumber, sensor.id, sensor.name, sensor.type, sensor.x, sensor.y, sensor.z)
+                                await this.fieldRepository.createTranscodingField(affiliation, structure.structureName, company.companyName, field.fieldName, field.coltureType, sector.sectorName, sector.wateringCapacity, sector.initialWatering, sector.maximumWatering, sector.adviceTime, sector.wateringType, plantRow.adviceWeight, plantRow.plantRowName, plantRow.sensorNumber, sensor.id, sensor.name, sensor.type, sensor.xx, sensor.yy, sensor.zz)
                             }
                         }
                     }
