@@ -117,7 +117,7 @@ function getLeftOffset(dataLen, index) {
 watchEffect(async () => {
   var parsedConfig = JSON.parse(props.config)
   await calculateTimestampLength();
-  updateConfig(parsedConfig.params.timeFilterTo, parsedConfig.params.timeFilterTo)
+  updateConfig(Math.min(...timestamps.value.values()), Math.min(...timestamps.value.values())-1)
 });
 
 </script>

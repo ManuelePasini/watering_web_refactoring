@@ -29,8 +29,8 @@ const props = defineProps({
   color: String
 });
 
-const chartData = ref({datasets: [], labels: []})
-const options = ref({responsive: true, maintainAspectRatio: false})
+const chartData = ref(null)
+const options = ref(null)
 const data = ref(new Array(20).fill(0))
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, TimeScale)
@@ -53,12 +53,12 @@ async function mountChart() {
   const parsed = JSON.parse(props.config);
 
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, props.endpoint, 'values.0.measures')
-  if(!chartDataResponse) {
-    return  
+
+  if(chartDataResponse) {
+    console.log(`È arrivato un dato: ${chartDataResponse[0].value}`)
+    addValueAndMaintainSize(chartDataResponse[0].value)
   }
-  console.log(`È arrivato un dato: ${chartDataResponse[0].value}`)
-  addValueAndMaintainSize(chartDataResponse[0].value)
-  
+
   chartData.value = {
     labels: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
     datasets: [{
@@ -97,7 +97,7 @@ async function mountChart() {
 
 <template>
   <div class="generic-line-chart">
-    <Line v-if="data.length > 0" :data="chartData" :options="options" />
+    <Line v-if="chartData" :data="chartData" :options="options" />
     <div v-else>Nessun dato disponibile.</div>
   </div>
 </template>
