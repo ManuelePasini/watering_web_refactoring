@@ -2,7 +2,7 @@ import { ViewDataOriginalWrapper } from '../querywrappers/ViewDataOriginalWrappe
 
 import { QueryTypes } from 'sequelize';
 
-const getResults = async (calculationType, detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, sequelize) => {
+const getResults = async (calculationType, detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod, sequelize) => {
 
     const query = `
             SELECT DISTINCT "refStructureName",
@@ -14,7 +14,7 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
                             "colture",
                             "coltureType",
                             ${calculationType} as value,
-                            "timestamp"
+                            "timestamp"/${aggregationPeriod}::int*${aggregationPeriod}+${aggregationPeriod/2} AS timestamp
             FROM view_data_original
             WHERE "detectedValueTypeId" = ANY ('{ ${detectedValueTypeDescription.map(value => `${value}`).join(', ')} }')
               AND "timestamp" >= '${timeFilterFrom}'
@@ -24,7 +24,7 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
               AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", "colture", "coltureType", "timestamp"
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", "colture", "coltureType", "timestamp"/${aggregationPeriod}::int*${aggregationPeriod}+${aggregationPeriod/2}
             ORDER BY timestamp ASC`;
 
     const results = await sequelize.query(query,
@@ -64,16 +64,16 @@ class ViewDataOriginalRepository {
         this.sequelize = sequelize;
     }
 
-    async findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
-        return getResults('AVG(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, this.sequelize);
+    async findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod) {
+        return getResults('AVG(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod, this.sequelize);
     }
 
-    async findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
-        return getResults('AVG(64.3 * \"value\" -15.2)', ['ELECT_COND'], timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, this.sequelize);
+    async findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod) {
+        return getResults('AVG(64.3 * \"value\" -15.2)', ['ELECT_COND'], timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod, this.sequelize);
     }
 
-    async findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
-        return getResults('SUM(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, this.sequelize);
+    async findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod) {
+        return getResults('SUM(\"value\")', detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod, this.sequelize);
     }
 }
 

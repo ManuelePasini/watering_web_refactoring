@@ -14,6 +14,9 @@ import initWateringField from '../persistency/model/WateringField.js';
 
 const dtoConverter = new DtoConverter();
 
+const MINUTE_TO_SECONDS = 60
+const MONTH_TO_SECONDS = MINUTE_TO_SECONDS * 60 * 24 * 30
+
 class FieldService {
 
     constructor(sequelize) {
@@ -61,17 +64,24 @@ class FieldService {
     }
 
     async getAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
-        const result = await this.viewDataOriginalRepository.findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
+        const requestPeriod = timeFilterTo - timeFilterFrom
+        let aggregationPeriod = MINUTE_TO_SECONDS //one minute minimum aggregation
+        if(requestPeriod > MONTH_TO_SECONDS){
+            aggregationPeriod = 2 * 60 * MINUTE_TO_SECONDS
+        } else if(requestPeriod > MINUTE_TO_SECONDS*60*24*14){//two weeks
+            aggregationPeriod = 60 * MINUTE_TO_SECONDS
+        }
+        const result = await this.viewDataOriginalRepository.findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod);
         return dtoConverter.convertViewDataOriginalWrapper(result);
     }
 
     async getEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
-        const result = await this.viewDataOriginalRepository.findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
+        const result = await this.viewDataOriginalRepository.findEcAverageByFieldReference(timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, MINUTE_TO_SECONDS);
         return dtoConverter.convertViewDataOriginalWrapper(result);
     }
 
     async getHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
-        const result = await this.viewDataOriginalRepository.findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
+        const result = await this.viewDataOriginalRepository.findHumidityEventsByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, MINUTE_TO_SECONDS);
         return dtoConverter.convertViewDataOriginalWrapper(result);
     }
 

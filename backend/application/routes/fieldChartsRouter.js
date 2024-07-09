@@ -196,7 +196,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
+        const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -289,7 +289,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const detectedValueTypeId = ['DRIPPER'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
+        const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
@@ -381,7 +381,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     try {
         const detectedValueTypeId = ['PLUV_CURR'];
 
-        const result = await fieldService.getAverageByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
+        const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 
         res.status(200).json(result);
     } catch (error) {
