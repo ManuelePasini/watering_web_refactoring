@@ -55,21 +55,92 @@ fieldsRouter.put('/setOptState', async (req, res) => {
   if(!req.body && req.body === '')
     throw new Error('Body is empty');
 
+  const refStructureName = req.params.refStructureName;
+  const companyName = req.params.companyName;
+  const fieldName = req.params.fieldName;
+  const sectorName = req.params.sectorName;
+  const plantRow = req.params.plantRow;
+  
   try {
-    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'SetOpt')))
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
       return res.status(401).json({message: 'Unauthorized request'});
 
     if(!req.body.validFrom || !req.body.optimalState)
       return res.status(400).json({message: 'Invalid request'});
 
-    const bodyRequest = new OptStateDto(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, req.body.validFrom, req.body.validTo, req.body.optimalState)
+    const bodyRequest = new OptStateDto(refStructureName, companyName, fieldName, sectorName, plantRow, req.body.validFrom, req.body.validTo, req.body.optimalState)
 
-    const thesisPoints = await fieldService.findThesisPoints(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
+    const thesisPoints = await fieldService.findThesisPoints(refStructureName, companyName, fieldName, sectorName, plantRow)
 
     if(!checkOptState(thesisPoints, req.body.optimalState))
       return res.status(400).json({error: "Opt state matrix does not match"})
 
     await fieldService.createMatrixOptState(bodyRequest)
+
+    return res.status(200).json({message: `Matrix opt state created with success`})
+  } catch (error) {
+    console.log(`Fail creating opt state caused by: ${error.message}`)
+    return res.status(500).json({error: "Error on creating field opt matrix"})
+  }
+
+});
+
+/**
+ * @swagger
+ * /fields/{refStructureName}/{companyName}/{fieldName}/{sectorName}/{plantRow}/setOptState:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Set optimal state for a field given timestamp of the desired optimal state
+ *     description: Set optimal state for a field given timestamp of the desired optimal state
+ *     tags: [Field Operations]
+ *     parametrs:
+ *      - in: query
+ *        name: timestamp
+ *        required: true
+ *        type: number
+ *     responses:
+ *       '200':
+ *         description: Matrix opt state created successfully.
+ *       '400':
+ *         description: Invalid request or given timestamp not found.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on creating field opt matrix.
+ */
+fieldsRouter.put('/:refStructureName/:companyName/:fieldName/:sectorName/:plantRow/setOptState', async (req, res) => {
+  let requestUserData
+  try {
+    requestUserData = await authenticationService.validateJwt(req.headers.authorization);
+  } catch (error) {
+    return res.status(403).json({message: 'Authentication failed'});
+  }
+
+  const refStructureName = req.params.refStructureName;
+  const companyName = req.params.companyName;
+  const fieldName = req.params.fieldName;
+  const sectorName = req.params.sectorName;
+  const plantRow = req.params.plantRow;
+
+  try {
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, refStructureName, companyName, fieldName, sectorName, plantRow, 'WA')))
+      return res.status(401).json({message: 'Unauthorized request'});
+
+    if(!req.query.timestamp)
+      return res.status(400).json({message: 'Invalid request'});
+
+    const interpolatedMatrix = await fieldService.getDataInterpolated(refStructureName, companyName, fieldName, sectorName, plantRow, req.query.timestamp)
+
+    if(!interpolatedMatrix || !(interpolatedMatrix.values.length > 0)){
+      return res.status(400).json({message: 'Invalid request, given timestamp not found'});
+    }
+
+    const selectedOptimal = new OptStateDto(refStructureName, companyName, fieldName, sectorName, plantRow, Date.now()/1000, null, interpolatedMatrix.values[0].measures[0].image)
+
+    await fieldService.createMatrixOptState(selectedOptimal)
 
     return res.status(200).json({message: `Matrix opt state created with success`})
   } catch (error) {
@@ -282,7 +353,7 @@ function checkOptState(thesisPoints, newOptimalPoints) {
   if (thesisPoints.points.length !== newOptimalPoints.length) return false;
 
   for (const point of thesisPoints.points) {
-    const match = newOptimalPoints.find(optPoint => optPoint.x === point.x && optPoint.y === point.y && optPoint.z === point.z);
+    const match = newOptimalPoints.find(optPoint => optPoint.xx === point.xx && optPoint.yy === point.yy && optPoint.zz === point.zz);
     if (!match) return false;
   }
 

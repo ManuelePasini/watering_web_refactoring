@@ -64,6 +64,26 @@ export class CommunicationService {
         })
     }
 
+    async setOptimalStateByTimestamp(environment, endpoint, thesisIdentifier, timestamp){
+        return axios.put(this.buildURL(environment.host, "/fields",thesisIdentifier,endpoint),{},{
+            params: {
+                timestamp: timestamp
+            },
+            headers: {
+                Authorization: 'Bearer ' + environment.token
+            }
+        }).then(response => {
+            console.log(`Success response: ${response.data}`)
+            if (response.data)
+                return response.data;
+            return null;
+        }).catch(error => {
+            console.error(`Error response: ${error}`)
+            console.error(`Error on communication service: ${error.message}`)
+            throw new Error(error.message);
+        })
+    }
+
     buildURL(host, primaryPath, pathsParams, endpoint) {
         let path = ""
         if (pathsParams) {

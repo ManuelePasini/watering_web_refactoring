@@ -20,11 +20,11 @@ class FieldRepository {
     return await model.save()
   }
 
-  async createMatrixField(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo) {
+  async createMatrixField(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, matrixId) {
     try {
       this.MatrixField.update(
         { 
-          timestamp_to: validFrom,
+          timestamp_to: Math.floor(validFrom),
           current: false 
         },
         {
@@ -33,25 +33,40 @@ class FieldRepository {
             companyName: companyName,
             fieldName: fieldName,
             sectorName: sectorName,
-            plantRow: plantRow,
             current: true
           }
         }
       )
 
-      const model = this.MatrixField.build({
-        refStructureName: structureName,
-        companyName: companyName,
-        fieldName: fieldName,
-        sectorName: sectorName,
-        plantRow: plantRow,
-        timestamp_from: Math.floor(new Date(validFrom).getTime() / 1000),
-        timestamp_to: validTo ? Math.floor(new Date(validTo).getTime() / 1000) : null,
-        current: true,
-        matrixId: this.MatrixProfile.max('matrixId') + 1
+      this.WateringFields.removeAttribute('id')
+      const sectorFields = await this.WateringFields.findAll({
+        where: {
+          refStructureName: structureName,
+          companyName: companyName,
+          fieldName: fieldName,
+          sectorName: sectorName
+        }
       })
 
-      return await model.save()
+      if( sectorFields.length > 0){
+        const newMatrixId = !matrixId ? await this.MatrixProfile.max('matrixId') + 1 : matrixId
+    
+        for( const field of sectorFields){
+          const model = this.MatrixField.build({
+            refStructureName: field.refStructureName,
+            companyName: field.companyName,
+            fieldName: field.fieldName,
+            sectorName: field.sectorName,
+            plantRow: field.plantRow,
+            timestamp_from: Math.floor(validFrom),
+            timestamp_to: validTo ? Math.floor(validTo) : null,
+            current: true,
+            matrixId: newMatrixId
+          })
+          await model.save()
+        }
+        return newMatrixId
+      } 
     } catch (error) {
       throw Error(error.message)
     }
@@ -235,8 +250,8 @@ class FieldRepository {
         }
       });
       const dripper = {
-        x: result ? result.dataValues.dripper_pos : 0,
-        y: 0
+        xx: result ? result.dataValues.dripper_pos : 0,
+        yy: 0
       }
       return dripper
     } catch (error) {

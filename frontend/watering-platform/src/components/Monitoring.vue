@@ -16,6 +16,7 @@ import HumidityDynamicHeatmap from "../../../abds-watering-charts-components/src
 import Calendar from "../../../abds-watering-charts-components/src/components/calendar.vue"
 import OptimalHumidityHeatmap from "../../../abds-watering-charts-components/src/components/optimal-humidity-heatmap-chart.ce.vue"
 import LogComponent from './LogComponent.vue';
+import UpdateOptimalStateComponent from './UpdateOptimalStateComponent.vue';
 import {useRouter} from "vue-router";
 import authService from '@/services/auth.service';
 
@@ -315,6 +316,7 @@ function selectedTime(time){
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Matrice dell'umidità</span>
           <div>
+            <UpdateOptimalStateComponent v-if="hasUserPermission('*')" :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"/>
             <button class="btn btn-sm btn-secondary m-1" type="button" @click="enableOptimalMatrix" id="optimal-heatmap-button">Mostra ottimo</button>
             <button class="btn btn-sm btn-secondary m-1" type="button" @click="enableDynamicHeatmap" id="dynamic-heatmap-button">Mostra evoluzione</button>
           </div>  
@@ -330,7 +332,7 @@ function selectedTime(time){
               <HumidityHeatmap :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"></HumidityHeatmap>
             </div>
           </div>
-          <OptimalHumidityHeatmap v-if="showOptimalMatrix" :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp"></OptimalHumidityHeatmap>
+          <OptimalHumidityHeatmap v-if="showOptimalMatrix" :config="JSON.stringify(connectionParams)" :selectedTimestamp="selectedTimestamp" :showDistance="hasUserPermission('*')"></OptimalHumidityHeatmap>
         </div>
       </div>
     </div>

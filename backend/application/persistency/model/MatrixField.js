@@ -38,7 +38,7 @@ function initMatrixField(sequelize) {
       },
       timestamp_to: {
         type: DataTypes.BIGINT,
-        allowNull: false
+        allowNull: true
       },
       current: {
         type: DataTypes.BOOLEAN,

@@ -7,7 +7,7 @@ import { luxonDateTimeToString } from "../common/dateUtils.js"
 const communicationService = new CommunicationService();
 const heatmapSeries = ref([]);
 const chartOptions = ref({emitsOptions: false})
-const images = ref([])
+const images = ref(new Map())
 const container = ref(null)
 
 const props = defineProps(['config', 'selectedTimestamp'])
