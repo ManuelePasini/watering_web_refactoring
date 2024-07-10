@@ -2,6 +2,7 @@
 import {nextTick, ref, watch, watchEffect} from "vue";
 import {CommunicationService} from "../services/CommunicationService.js";
 import VueApexCharts  from "vue3-apexcharts"
+import DistanceChart from "../components/distance-heatmap-chart.ce.vue"
 
 const communicationService = new CommunicationService();
 const heatmapSeries = ref([]);
@@ -11,7 +12,7 @@ const weightsChartOptions = ref({emitsOptions: false})
 const image = ref({})
 const containerOptimal = ref(null)
 
-const props = defineProps(['config', 'selectedTimestamp'])
+const props = defineProps(['config', 'selectedTimestamp', 'showDistance'])
 const showChart = ref(false)
 const endpoint = 'getOptimalState'
 
@@ -364,6 +365,9 @@ watch( () => props.selectedTimestamp, async () => {
       <div>
         <VueApexCharts type="heatmap" :options="optValueChartOptions" :series="heatmapSeries"></VueApexCharts>
       </div>
+    </div>
+    <div class="col-8 offset-lg-2">
+      <DistanceChart v-if="props.showDistance" :config="props.config" :selectedTimestamp="props.selectedTimestamp"></DistanceChart>
     </div>
   </div>
   <div class="text-center p-3" v-else>
