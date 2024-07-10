@@ -21,7 +21,9 @@ function showModal(){
 }
 
 function hideModal() {
-  successAlert.hide()
+  if(successAlert){
+    successAlert.hide()
+  }
   modal.hide()
   isModalShown.value = false;
 }
