@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import HumidityHeatmap from '../../../abds-watering-charts-components/src/components/humidityheatmap-chart.ce.vue';
 import { CommunicationService } from '../../../abds-watering-charts-components/src/services/CommunicationService';
-import { Alert, Modal, Collapse } from 'bootstrap'
+//import { Modal, Collapse } from 'bootstrap'
 
 const props = defineProps(['config', 'selectedTimestamp'])
 const isModalShown = ref(false)
@@ -12,20 +12,20 @@ let modal
 let successAlert
 
 onMounted(()=>{
-  modal = new Modal('#updateStateModal')
+  //modal = new Modal('#updateStateModal')
 })
 
 function showModal(){
-  modal.show()
   isModalShown.value = true;
+  modal.show()
 }
 
 function hideModal() {
+  isModalShown.value = false;
   if(successAlert){
     successAlert.hide()
   }
   modal.hide()
-  isModalShown.value = false;
 }
 
 async function setOptimal(){
