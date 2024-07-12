@@ -200,7 +200,8 @@ async function updateUserPermission(){
       accumulator.get(field).push(currentValue)
       return accumulator
     }, new Map())
-    fields.value = Array.from(activeThesis.keys().map(f => JSON.parse(f)))
+    
+    fields.value = Array(...activeThesis.keys()).map(f => JSON.parse(f))
   }
 }
 

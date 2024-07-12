@@ -12,7 +12,7 @@ watchEffect(async ()=>{
     if(props.config){
         const parsed = JSON.parse(props.config);
         const logs = await communicationService.getAPI(parsed.environment,"/logs",parsed.paths, parsed.params, "")
-        groupedLogs.value = groupByType(logs).entries().map(([k,v]) => {return [k,v.sort((a,b)=> b.timestamp - a.timestamp)]})
+        groupedLogs.value = Array(...groupByType(logs).entries()).map(([k,v]) => {return [k,v.sort((a,b)=> b.timestamp - a.timestamp)]})
     }
 })
 

@@ -84,7 +84,7 @@ async function mountChart() {
   const maxValue = Math.max(...values);
 
   const groupByData = groupByType(data);
-  totalGroups.value = new Map(groupByData.entries().map(([k,v])=> {
+  totalGroups.value = new Map(Array(...groupByData.entries()).map(([k,v])=> {
     return [k,v.reduce((a,b)=> a+parseFloat(JSON.parse(b).y),0)]
   }))
 
