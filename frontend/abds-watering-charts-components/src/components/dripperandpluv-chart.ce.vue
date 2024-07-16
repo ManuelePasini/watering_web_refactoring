@@ -128,8 +128,6 @@ async function mountChart() {
           text: 'L'
         },
         position: 'left',
-        suggestedMax: Math.max(...datasets.flatMap(d => d.data).map(e => e.y)) * 1.1,
-        suggestedMin: Math.min(...datasets.flatMap(d => d.data).map(e => e.y)) * 1.1
       },
       y1: {
         beginAtZero: true,
@@ -138,8 +136,6 @@ async function mountChart() {
           display: true,
           text: 'mm'
         },
-        suggestedMax: Math.max(...datasets.flatMap(d => d.data).map(e => e.y1)) * 1.1,
-        suggestedMin: Math.min(...datasets.flatMap(d => d.data).map(e => e.y1)) * 1.1
       }
     }
   }

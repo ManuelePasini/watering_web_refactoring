@@ -140,7 +140,7 @@ async function mountChart() {
       y: {
         title: {
           display: true,
-          text: '#Celle'
+          text: 'cbar'
         },
         ticks: {
           stepSize: 20
