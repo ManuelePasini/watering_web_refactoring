@@ -16,7 +16,6 @@ import 'chartjs-adapter-luxon';
 import {luxonDateTime} from '../common/dateUtils.js'
 import {CommunicationService} from "../services/CommunicationService.js";
 import {BarDatasetData} from "../common/BarDatasetData.js";
-import { group } from 'd3';
 
 const communicationService = new CommunicationService();
 
@@ -43,6 +42,8 @@ const colorFunction = (str) => {
     return '#FA4443C5'
   if (str === 'Expected Water (L)')
     return '#4CAF50C5'
+  if (str === 'Sprinkler (L)')
+    return '#99ceff'
 }
 
 const groupByType = (measures) => {
@@ -126,8 +127,9 @@ async function mountChart() {
           text: 'L'
         },
         position: 'left',
+        display: 'auto',
         suggestedMax: maxValue,
-        suggestedMin: minValue,
+        suggestedMin: minValue
       },
       y1: {
         beginAtZero: true,
@@ -137,7 +139,8 @@ async function mountChart() {
           text: 'mm'
         },
         suggestedMax: maxValue,
-        suggestedMin: minValue
+        suggestedMin: minValue,
+        display: 'auto'
       }
     }
   }
@@ -148,7 +151,7 @@ async function mountChart() {
 </script>
 
 <template>
-  <pre class="p-2"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
+  <pre class="p-2"><b>Advice</b>, <b>Pluv Curr</b>, <b>Pot Evap</b> espressi in <b>mm</b><br><b>Dripper</b>, <b>Sprinkler</b> espresso in <b>L</b></pre>
   <div class="d-flex flex-wrap justify-content-end">
     <div v-for="([group, total]) in totalGroups" :key="group" class="px-2 p-1 m-1 mx-auto" :style="{backgroundColor: colorFunction(group) , borderColor: colorFunction(group), borderRadius: '8px', borderWidth: '1px', borderStyle: 'solid' }">
         <div>Totale {{ group }}: {{ total.toFixed(2) }}</div>

@@ -51,6 +51,8 @@ function addUnitMeasure(key) {
     return 'Dripper (L)'
   if (key === 'Pluv Curr')
     return 'Pluv Curr (mm)'
+  if (key === 'Sprinkler')
+    return 'Sprinkler (L)'
 }
 
 const createDatasets = (groupedMeasures) => {
@@ -65,6 +67,8 @@ const colorFunction = (str) => {
     return '#339CFF'
   if (str === 'Pluv Curr (mm)')
     return '#FFCD3D'
+  if (str === 'Sprinkler (L)')
+    return '#99ceff'
 }
 
 watchEffect(async () => {
@@ -144,7 +148,7 @@ async function mountChart() {
 </script>
 
 <template>
-  <pre style="padding-left: 20px; padding-top: 10px;"><b>Pluv Curr</b> espresso in <b>mm</b><br><b>Dripper</b> espresso in <b>L</b></pre>
+  <pre style="padding-left: 20px; padding-top: 10px;"><b>Pluv Curr</b> espresso in <b>mm</b><br><b>Dripper</b>, <b>Sprinkler</b> espresso in <b>L</b></pre>
   <div class="card-body">
     <div v-if="showChart">
       <Line style="height: 320px;" :data="chartData" :options="options"/>

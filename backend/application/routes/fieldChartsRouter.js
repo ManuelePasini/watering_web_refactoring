@@ -194,7 +194,7 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
     }
 
     try {
-        const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR'];
+        const detectedValueTypeId = ['DRIPPER', 'PLUV_CURR', 'SPRINKLER'];
 
         const result = await fieldService.getHumidityEventsByFieldReference(detectedValueTypeId, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow);
 

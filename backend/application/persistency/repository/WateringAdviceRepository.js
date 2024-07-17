@@ -51,6 +51,25 @@ class WateringAdviceRepository {
               AND "plantRow" = '${plantRow}'
             GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
             ORDER BY rounded_timestamp ASC)
+            UNION            
+            (SELECT DISTINCT "refStructureName",
+                            "companyName",
+                            "fieldName",
+                            'Sprinkler (L)' as "detectedValueTypeDescription",
+                            "sectorName",
+                            "plantRow",
+                            SUM("value") as value, ((3600*24) * (timestamp / (3600*24))::INT) as rounded_timestamp
+            FROM view_data_original
+            WHERE "detectedValueTypeId" IN ('SPRINKLER')
+              AND "timestamp" >= '${timefilterFrom}'
+              AND "timestamp" <= '${timefilterTo}'
+              AND "refStructureName" = '${refStructureName}'
+              AND "companyName" = '${companyName}'
+              AND "fieldName" = '${fieldName}'
+              AND "sectorName" = '${sectorName}'
+              AND "plantRow" = '${plantRow}'
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", rounded_timestamp
+            ORDER BY rounded_timestamp ASC)
             UNION
             (SELECT DISTINCT "refStructureName",
                             "companyName",
