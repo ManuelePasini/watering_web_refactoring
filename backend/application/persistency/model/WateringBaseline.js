@@ -9,13 +9,14 @@ function initWateringBaseline(sequelize) {
         fieldName: DataTypes.TEXT,
         sectorName: DataTypes.TEXT,
         irrigation_master_thesis: DataTypes.TEXT,
-        date: DataTypes.DATEONLY,
         timestamp_from: DataTypes.DOUBLE,
         timestamp_to: DataTypes.DOUBLE,
         max_irrigation: DataTypes.DOUBLE,
         watering_capacity: DataTypes.DOUBLE,
         irrigation_baseline: DataTypes.DOUBLE,
-        watering_hour: DataTypes.TIME
+        watering_hour: DataTypes.TIME,
+        valve_id: DataTypes.TEXT,
+        sprinkler_capacity: DataTypes.DOUBLE
     }, {
         modelName: 'watering_baseline',
         timestamps: false,

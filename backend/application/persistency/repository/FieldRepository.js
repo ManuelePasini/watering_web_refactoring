@@ -3,11 +3,12 @@ import { WateringAdviceDto } from '../../dtos/wateringAdviceDto.js'
 
 class FieldRepository {
 
-  constructor(MatrixProfile, MatrixField, TranscodingField, WateringFields, sequelize) {
+  constructor(MatrixProfile, MatrixField, TranscodingField, WateringFields, WateringBaseline, sequelize) {
     this.MatrixProfile = MatrixProfile
     this.MatrixField = MatrixField
     this.TranscodingField = TranscodingField
     this.WateringFields = WateringFields
+    this.WateringBaseline = WateringBaseline
     this.sequelize = sequelize
 
     MatrixField.hasMany(MatrixProfile, { foreignKey: 'matrixId' });
@@ -258,6 +259,47 @@ class FieldRepository {
       console.error('Error on find field details:', error);
     }
   }
+
+  async setWateringBaseline(baseline){
+    this.WateringBaseline.removeAttribute('id')
+    const currentTimestamp = Math.floor(Date.now()/1000)
+    this.WateringBaseline.update(
+      { 
+        timestamp_to: currentTimestamp,
+      },
+      {
+        where: {
+          refStructureName: baseline.refStructureName,
+          companyName: baseline.companyName,
+          fieldName: baseline.fieldName,
+          sectorName: baseline.sectorName,
+          timestamp_from: { [Op.lt]: currentTimestamp },
+          timestamp_to: {
+            [Op.or]: {
+              [Op.is]: null,
+              [Op.gt]: currentTimestamp
+            },
+          }
+        }
+      }
+    )
+    const model = this.WateringBaseline.build({
+      refStructureName: baseline.refStructureName,
+      companyName: baseline.companyName,
+      fieldName: baseline.fieldName,
+      sectorName: baseline.sectorName,
+      irrigation_master_thesis: baseline.irrigationMasterThesis,
+      timestamp_from: currentTimestamp,
+      max_irrigation: baseline.maxIrrigation,
+      watering_capacity: baseline.wateringCapacity,
+      irrigation_baseline: baseline.irrigationBaseline,
+      watering_hour: baseline.wateringHour,
+      valve_id: baseline.valveId,
+      sprinkler_capacity: baseline.sprinklerCapacity
+    });
+    return model.save()
+  }
+
 }
 
 export default FieldRepository

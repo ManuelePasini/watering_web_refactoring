@@ -11,6 +11,7 @@ import initMatrixProfile from '../persistency/model/MatrixProfile.js';
 import initMatrixField from '../persistency/model/MatrixField.js';
 import initTranscodingField from '../persistency/model/TranscodingField.js';
 import initWateringField from '../persistency/model/WateringField.js';
+import initWateringBaseline from '../persistency/model/WateringBaseline.js';
 
 const dtoConverter = new DtoConverter();
 
@@ -25,7 +26,7 @@ class FieldService {
         this.humidityBinsRepository = new HumidityBinsRepository(sequelize);
         this.viewDataOriginalRepository = new ViewDataOriginalRepository(sequelize);
         this.wateringAdviceRepository = new WateringAdviceRepository(sequelize);
-        this.fieldRepository = new FieldRepository(initMatrixProfile(sequelize), initMatrixField(sequelize), initTranscodingField(sequelize), initWateringField(sequelize), sequelize);
+        this.fieldRepository = new FieldRepository(initMatrixProfile(sequelize), initMatrixField(sequelize), initTranscodingField(sequelize), initWateringField(sequelize), initWateringBaseline(sequelize), sequelize);
     }
 
     async getInterpolatedMeans(refStructureName, companyName, fieldName, sectorName, plantRow, timestampFrom, timestampTo) {
@@ -134,6 +135,10 @@ class FieldService {
 
     async findThesisPoints(refStructureName, companyName, fieldName, sectorName, plantRow) {
         return this.dataInterpolatedRepository.findThesisPoints(refStructureName, companyName, fieldName, sectorName, plantRow)
+    }
+
+    async setWateringBaseline(baseline) {
+        this.fieldRepository.setWateringBaseline(baseline)
     }
 
 }

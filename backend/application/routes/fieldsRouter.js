@@ -15,6 +15,7 @@ const authorizationService = new AuthorizationService(sequelize)
 const fieldService = new FieldService(sequelize)
 
 import { CreateFieldDto } from '../dtos/createFieldDto.js';
+import WateringBaseline from '../dtos/wateringBaselineDto.js';
 
 
 /**
@@ -359,5 +360,88 @@ function checkOptState(thesisPoints, newOptimalPoints) {
 
   return true;
 }
+
+
+/**
+ * @swagger
+ * /fields/{refStructureName}/{companyName}/{fieldName}/{sectorName}/setBaseline:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Set information about baseline irrigation for sector
+ *     description: Set information about baseline irrigation for sector
+ *     tags: [Field Operations]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/WateringBaseline'
+ *     responses:
+ *       '200':
+ *         description: Baseline updated successfully.
+ *       '400':
+ *         description: Invalid request.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on update baseline.
+ */
+fieldsRouter.put('/:refStructureName/:companyName/:fieldName/:sectorName/setBaseline', async (req, res) => {
+  let requestUserData
+  try {
+    requestUserData = await authenticationService.validateJwt(req.headers.authorization);
+  } catch (error) {
+    return res.status(403).json({message: 'Authentication failed'});
+  }
+
+  const { refStructureName, companyName, fieldName, sectorName } = req.params;
+
+  try {
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(requestUserData.userid, refStructureName, companyName, fieldName, sectorName, null, 'WA')))
+      return res.status(401).json({message: 'Unauthorized request'});
+
+    if(!req.body && req.body === '')
+      return res.status(400).json({message: 'Invalid request'});
+
+    console.log(req.body)
+
+    const {
+        maxIrrigation,
+        irrigationBaseline,
+        wateringCapacity,
+        valveId,
+        irrigation_master_thesis: irrigationMasterThesis,
+        watering_hour: wateringHour,
+        sprinkler_capacity: sprinklerCapacity
+    } = req.body;
+
+    const baselineData = {
+        refStructureName,
+        companyName,
+        fieldName,
+        sectorName,
+        maxIrrigation,
+        irrigationBaseline,
+        wateringCapacity,
+        valveId,
+        irrigationMasterThesis,
+        wateringHour,
+        sprinklerCapacity
+    };
+
+    const baseline = new WateringBaseline(baselineData);
+
+    await fieldService.setWateringBaseline(baseline)
+
+    return res.status(200).json({message: `Watering Baseline update with success`})
+  } catch (error) {
+    console.log(`Fail update watering baseline caused by: ${error.message}`)
+    return res.status(500).json({error: "Error on update watering baseline"})
+  }
+
+});
 
 export default fieldsRouter;
