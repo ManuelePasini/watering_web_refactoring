@@ -59,7 +59,7 @@ const groupByType = (measures) => {
 
 const createDatasets = (groupedMeasures) => {
   return Array.from(groupedMeasures, ([key, jsonValues]) => {
-    return new BarDatasetData(key, jsonValues, key.includes("(mm)") ? 'y1' : 'y', colorFunction);
+    return new BarDatasetData(key, jsonValues, 'y', colorFunction);
   });
 };
 
@@ -128,19 +128,14 @@ async function mountChart() {
         },
         position: 'left',
         display: 'auto',
-        suggestedMax: maxValue,
-        suggestedMin: minValue
-      },
-      y1: {
-        beginAtZero: true,
-        position: 'right',
-        title: {
-          display: true,
-          text: 'mm'
-        },
-        suggestedMax: maxValue,
-        suggestedMin: minValue,
-        display: 'auto'
+      }
+    },
+    legend: {
+      onClick: function(e, legendItem) {
+        di=legendItem.datasetIndex
+        myBarChart.data.datasets[di].hidden = !myBarChart.data.datasets[di].hidden;
+        myBarChart.options.scales.yAxes[0].ticks.suggestedMax=getMax(myBarChart)+100;
+        myBarChart.update()
       }
     }
   }
