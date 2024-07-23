@@ -1,7 +1,7 @@
 export class OptStateDto {
 
-  constructor(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, optimalState) {
-    this.structureName = structureName
+  constructor(refStructureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, optimalState) {
+    this.refStructureName = refStructureName
     this.companyName = companyName
     this.fieldName = fieldName
     this.sectorName = sectorName

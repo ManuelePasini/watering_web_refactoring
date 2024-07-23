@@ -100,7 +100,7 @@ class FieldService {
     }
 
     async createMatrixOptState(optStateDto) {
-        const matrixId = await this.fieldRepository.createMatrixField(optStateDto.structureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.sectorName, optStateDto.plantRow, optStateDto.validFrom, optStateDto.validTo)
+        const matrixId = await this.fieldRepository.createMatrixField(optStateDto.refStructureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.sectorName, optStateDto.plantRow, optStateDto.validFrom, optStateDto.validTo)
         if(!matrixId){
             throw Error("Impossible to create optimal matrix for this field")
         }

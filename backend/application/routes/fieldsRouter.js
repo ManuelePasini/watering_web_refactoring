@@ -191,10 +191,10 @@ fieldsRouter.post('/wateringAdvice', async (req, res) => {
       return res.status(401).json({message: 'Unauthorized request'});
 
 
-    if (!req.body || !req.body.structureName || !req.body.companyName || !req.body.fieldName || !req.body.sectorName || !req.body.plantRow)
+    if (!req.body || !req.body.refStructureName || !req.body.companyName || !req.body.fieldName || !req.body.sectorName || !req.body.plantRow)
       throw new Error('Body is not correct');
 
-    const result = await fieldService.getCurrentWateringAdvice(req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
+    const result = await fieldService.getCurrentWateringAdvice(req.body.refStructureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow)
 
     return res.status(200).json(result)
   } catch (error) {

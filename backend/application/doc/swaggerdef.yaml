@@ -160,7 +160,7 @@ components:
     UserGrantDto:
       type: object
       properties:
-        structureName:
+        refStructureName:
           type: string
         companyName:
           type: string
@@ -180,7 +180,7 @@ components:
     OptStateDto:
       type: object
       properties:
-        structureName:
+        refStructureName:
           type: string
         companyName:
           type: string

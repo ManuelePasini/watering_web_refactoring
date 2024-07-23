@@ -21,7 +21,7 @@ class FieldRepository {
     return await model.save()
   }
 
-  async createMatrixField(structureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, matrixId) {
+  async createMatrixField(refStructureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, matrixId) {
     try {
       this.MatrixField.update(
         { 
@@ -30,7 +30,7 @@ class FieldRepository {
         },
         {
           where: {
-            refStructureName: structureName,
+            refStructureName: refStructureName,
             companyName: companyName,
             fieldName: fieldName,
             sectorName: sectorName,
@@ -42,7 +42,7 @@ class FieldRepository {
       this.WateringFields.removeAttribute('id')
       const sectorFields = await this.WateringFields.findAll({
         where: {
-          refStructureName: structureName,
+          refStructureName: refStructureName,
           companyName: companyName,
           fieldName: fieldName,
           sectorName: sectorName

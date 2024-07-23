@@ -142,7 +142,7 @@ wateringScheduleRouter.put("/updateWateringEvent", async (req, res) => {
     if (!req.body && req.body === '')
         return res.status(400).json({ message: 'Invalid request' })
 
-    if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, req.body.structureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'WA')))
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, req.body.refStructureName, req.body.companyName, req.body.fieldName, req.body.sectorName, req.body.plantRow, 'WA')))
         return res.status(401).json({ message: 'Unauthorized request' });
 
     try {

@@ -43,7 +43,7 @@ class UserService {
             const affiliationFields = await this.userRepository.findFieldsByAffiliation(affiliation)
 
             request.grants.map(grant => {
-                const key = `${grant.structureName} - ${grant.companyName} - ${grant.fieldName} - ${grant.sectorName} - ${grant.plantRow}`;
+                const key = `${grant.refStructureName} - ${grant.companyName} - ${grant.fieldName} - ${grant.sectorName} - ${grant.plantRow}`;
                 if (!affiliationFields.has(key))
                     throw Error(`Affiliation ${affiliation} has no permission to create grants for field ${key}`)
             })
@@ -55,7 +55,7 @@ class UserService {
                 throw new Error(`Affiliation mismatch between user ${userToGrant.affiliation} and requestor ${affiliation}]`)
 
             for(const permit of grant.permits)
-                await this.userRepository.createFieldPermit(userToGrant.userid, userToGrant.affiliation, grant.structureName, grant.companyName, grant.fieldName, grant.sectorName, grant.plantRow, permit)
+                await this.userRepository.createFieldPermit(userToGrant.userid, userToGrant.affiliation, grant.refStructureName, grant.companyName, grant.fieldName, grant.sectorName, grant.plantRow, permit)
         }
     }
 
