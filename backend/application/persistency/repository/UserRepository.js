@@ -104,10 +104,11 @@ class UserRepository {
     }
 
 
-    async createUser(user, auth_type, affiliation, pwd, name) {
+    async createUser(username, auth_type, affiliation, pwd, name) {
         try {
             let userCreated = this.User.build({
-                userid: user,
+                userid: await this.User.max('userid') + 1,
+                email: username,
                 auth_type: auth_type,
                 affiliation: affiliation,
                 pwd: pwd,
