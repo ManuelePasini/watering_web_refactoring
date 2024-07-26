@@ -43,7 +43,7 @@ class DeltaRepository {
                         AND weighted."yy" = di."yy"
                         AND di."timestamp" > weighted."timestamp_from" AND (di."timestamp" < weighted."timestamp_to" OR weighted."timestamp_to" IS NULL)
                 JOIN (
-                    SELECT (("watering_start" / 3600)::INT * 3600) - 3600 AS timestamp
+                    SELECT (("advice_timestamp" / 3600)::INT * 3600) AS timestamp
                     FROM watering_schedule
                     WHERE latest = true
                         AND "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}'

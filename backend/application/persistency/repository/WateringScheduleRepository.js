@@ -102,12 +102,12 @@ class WateringScheduleRepository {
                         companyName: companyName,
                         fieldName: fieldName,
                         sectorName: sectorName,
-                            plantRow: activeEvent.plantRow,
-                            latest: true,
-                            date: date,
-                            update_timestamp: {
-                                [Op.gte]: Math.floor(activeEvent.update_timestamp),
-                                [Op.lt]: Math.ceil(activeEvent.update_timestamp)
+                        plantRow: activeEvent.plantRow,
+                        latest: true,
+                        date: date,
+                        update_timestamp: {
+                            [Op.gte]: Math.floor(activeEvent.update_timestamp),
+                            [Op.lt]: Math.ceil(activeEvent.update_timestamp)
                         }
                     }
                 })

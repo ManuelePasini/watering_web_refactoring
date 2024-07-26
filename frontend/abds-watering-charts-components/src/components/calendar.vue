@@ -111,8 +111,8 @@ async function mountChart(timeFilter) {
       <p class="mb-0"><strong>Acqua extra sistema:</strong> ${e.expectedWater ? e.expectedWater : 0} L</p>
       <p class="form-text">Es.(fertirrigazione, pioggia prevista)</p>
       <p><strong>Consiglio irriguo:</strong> ${e.advice !== null ? e.advice + " L" : "Non calcolato"} </p>
-      <p><strong>Durata:</strong> ${e.duration !== null ? e.duration : "Non calcolata"}</p>
-      ${ e.adviceTimestamp ? "<p><strong>Orario di calcolo:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
+      <p><strong>Durata:</strong> ${e.duration !== null ? e.duration + " minuti" : "Non calcolata"}</p>
+      ${ e.adviceTimestamp ? "<p><strong>Profilo di suolo considerato:</strong> " + luxonDateTimeToString(e.adviceTimestamp) + "</p>": ""}
       ${e.note ? ("<p><strong>Note:</strong> " + e.note + "</p>") : ""}
       ${ e.wateringStart * 1000 > Date.now() + SCHEDULE_SAFE_PERIOD ? "<button type=\"button\" class=\"btn btn-primary update-event\" id=" + e.date + ">Modifica</button>":""}`
 
