@@ -19,8 +19,8 @@ class DeltaRepository {
                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(q1."timestamp"))) ::INT AS timestamp, 
              'Media Pot. Idr. Giornaliera' as "detectedValueTypeDescription"
             FROM (
-                SELECT di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp", AVG (CASE WHEN di."value" > -300 THEN LN(ABS(di."value")) * weighted."weight"
-                ELSE LN(ABS(-300)) * weighted."weight" END) as "value", di."xx", di."yy"
+                SELECT di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp" AS interpolated_timestamp, AVG (CASE WHEN di."value" > -300 THEN LN(ABS(di."value")) * weighted."weight"
+                ELSE LN(ABS(-300)) * weighted."weight" END) as "value", di."xx", di."yy", wa."watering_start" AS timestamp
                 FROM data_interpolated as di
                 JOIN (
                         SELECT "refStructureName", "companyName", "fieldName", "sectorName", "plantRow", "xx", "yy", "weight", fi."matrixId", "timestamp_from", "timestamp_to"
@@ -43,7 +43,7 @@ class DeltaRepository {
                         AND weighted."yy" = di."yy"
                         AND di."timestamp" > weighted."timestamp_from" AND (di."timestamp" < weighted."timestamp_to" OR weighted."timestamp_to" IS NULL)
                 JOIN (
-                    SELECT (("advice_timestamp" / 3600)::INT * 3600) AS timestamp
+                    SELECT (("advice_timestamp" / 3600)::INT * 3600) AS timestamp, "watering_start"
                     FROM watering_schedule
                     WHERE latest = true
                         AND "watering_start" BETWEEN '${timestampFrom}' AND '${timestampTo}'
@@ -60,7 +60,7 @@ class DeltaRepository {
                     AND di."sectorName" = '${sectorName}'
                     AND di."plantRow" = '${plantRow}'
                     AND wa."timestamp" BETWEEN '${timestampFrom}' AND '${timestampTo}'
-                GROUP BY di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp", di."xx", di."yy"
+                GROUP BY di."refStructureName", di."companyName", di."fieldName", di."sectorName", di."plantRow", di."timestamp", di."xx", di."yy", wa."watering_start"
                 ) as q1
             GROUP BY q1."refStructureName", q1."companyName", q1."fieldName", q1."sectorName", q1."plantRow", q1."timestamp"
             UNION

@@ -14,7 +14,7 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
                             "colture",
                             "coltureType",
                             ${calculationType} as value,
-                            "timestamp"/${aggregationPeriod}::int*${aggregationPeriod}+${aggregationPeriod/2} AS timestamp
+                            round("timestamp"::numeric/${aggregationPeriod})*${aggregationPeriod} AS timestamp
             FROM view_data_original
             WHERE "detectedValueTypeId" = ANY ('{ ${detectedValueTypeDescription.map(value => `${value}`).join(', ')} }')
               AND "timestamp" >= '${timeFilterFrom}'
@@ -24,7 +24,7 @@ const getResults = async (calculationType, detectedValueTypeDescription, timeFil
               AND "fieldName" = '${fieldName}'
               AND "sectorName" = '${sectorName}'
               AND "plantRow" = '${plantRow}'
-            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", "colture", "coltureType", "timestamp"/${aggregationPeriod}::int*${aggregationPeriod}+${aggregationPeriod/2}
+            GROUP BY "refStructureName", "companyName", "fieldName", "detectedValueTypeDescription", "sectorName", "plantRow", "colture", "coltureType", round("timestamp"::numeric/${aggregationPeriod})*${aggregationPeriod}
             ORDER BY timestamp ASC`;
 
     const results = await sequelize.query(query,
