@@ -57,7 +57,6 @@ const fieldService = new FieldService(sequelize);
  *         name: timeFilterFrom
  *         schema:
  *           type: string
- *           format: date-time
  *         description: Time filter from
  *       - in: query
  *         name: timeFilterTo
@@ -1337,7 +1336,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *         name: timestamp
  *         schema:
  *           type: string
- *           format: date-time
  *         description: The timestamp in which find the information
  *     responses:
  *       '200':
@@ -1430,7 +1428,6 @@ fieldChartRouter.get('/:refStructureName/:companyName/:fieldName/:sectorName/:pl
  *         name: timestamp
  *         schema:
  *           type: string
- *           format: date-time
  *         description: The timestamp in which find the information
  *     responses:
  *       '200':
