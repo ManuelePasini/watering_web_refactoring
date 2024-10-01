@@ -39,7 +39,6 @@ components:
           type: string
         timestamp:
           type: string
-          format: date-time
         value:
           type: number
 
@@ -50,7 +49,6 @@ components:
           type: number
         timestamp:
           type: string
-          format: date-time
         count:
           type: number
 
@@ -90,10 +88,8 @@ components:
       properties:
         timestampFrom:
           type: string
-          format: date-time
         timestampTo:
           type: string
-          format: date-time
         profiles:
           type: array
           items:
@@ -192,10 +188,8 @@ components:
           type: string
         validFrom:
           type: string
-          format: date-time
         validTo:
           type: string
-          format: date-time
         optimalState:
           type: array
           items:
@@ -288,7 +282,6 @@ components:
           type: number
         adviceTime:
           type: string
-          format: date-time
         wateringType:
           type: string
         theses:
@@ -374,10 +367,8 @@ components:
           format: date
         wateringStart:
           type: string
-          format: date-time
         wateringEnd:
           type: string
-          format: date-time
         duration:
           type: number
         enabled:
@@ -388,12 +379,10 @@ components:
           type: number
         adviceTimestamp:
           type: string
-          format: date-time
         updatedBy: 
           type: string
         updateTimestamp:
           type: string
-          format: date-time
         note:
           type: string
     

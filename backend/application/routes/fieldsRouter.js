@@ -303,7 +303,6 @@ fieldsRouter.put('/createFields', async (req, res) => {
  *         name: timestamp
  *         schema:
  *           type: string
- *           format: date-time
  *         description: The timestamp in which find the information
  *     responses:
  *       '200':

@@ -56,13 +56,11 @@ const logService = new LogService(sequelize)
  *         name: timeFilterFrom
  *         schema:
  *           type: string
- *           format: date-time
  *         description: The timestamp in which find the information
  *       - in: query
  *         name: timestampFilterTo
  *         schema:
  *           type: string
- *           format: date-time
  *         description: The timestamp in which find the information
  *     responses:
  *       '200':
