@@ -5,10 +5,12 @@ import sequelize from '../configs/dbConfig.js';
 import WateringScheduleService from '../services/WateringScheduleService.js';
 import AuthenticationService from '../services/AuthenticationService.js';
 import AuthorizationService from '../services/AuthorizationService.js';
+import FieldService from '../services/FieldService.js';
 
 
 const wateringScheduleRouter = Router();
 const wateringScheduleService = new WateringScheduleService(sequelize);
+const fieldService = new FieldService(sequelize);
 const authenticationService = new AuthenticationService(sequelize);
 const authorizationService = new AuthorizationService(sequelize)
 
@@ -148,6 +150,83 @@ wateringScheduleRouter.put("/updateWateringEvent", async (req, res) => {
     try {
         const result = await wateringScheduleService.updateWateringEvent(req.body, user.userid)
         res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+})
+
+/**
+ * @swagger
+ * /wateringSchedule/{refStructureName}/{companyName}/{fieldName}/{sectorName}/endIrrigationSeason:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Stop the irrigation season deleting all watering event after a given timestamp or now by default
+ *     description:  Stop the watering advice and the irrigation season deleting all watering event after a given timestamp or now by default
+ *     tags: [Watering Schedule Operation]
+ *     parameters:
+ *       - in: path
+ *         name: refStructureName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The reference structure name
+ *       - in: path
+ *         name: companyName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The company name
+ *       - in: path
+ *         name: fieldName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The field name
+ *       - in: path
+ *         name: sectorName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The sector name
+ *       - in: query
+ *         name: timestamp
+ *         description: The timestamp of the end of watering season
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Field updated successfully
+ *       '400':
+ *         description: Invalid request.
+ *       '401':
+ *         description: Unauthorized request.
+ *       '403':
+ *         description: Authentication failed.
+ *       '500':
+ *         description: Error on update data.
+ */
+wateringScheduleRouter.post("/:refStructureName/:companyName/:fieldName/:sectorName/endIrrigationSeason", async (req, res) => {
+    let user
+    try {
+        user = await authenticationService.validateJwt(req.headers.authorization);
+    } catch (error) {
+        console.log(error)
+        return res.status(403).json({ message: 'Authentication failed' });
+    }
+    const refStructureName = req.params.refStructureName;
+    const companyName = req.params.companyName;
+    const fieldName = req.params.fieldName;
+    const sectorName = req.params.sectorName;
+    const timestamp = req.query.timestamp || Date.now()/1000
+
+    if (!(await authorizationService.isUserAuthorizedByFieldAndId(user.userid, refStructureName, companyName, fieldName, sectorName, null, '*')))
+        return res.status(401).json({ message: 'Unauthorized request' });
+
+    try {
+        await wateringScheduleService.deleteWateringEvents(refStructureName, companyName, fieldName, sectorName, timestamp)
+        await fieldService.disablePrescriptiveField(refStructureName, companyName, fieldName, sectorName, timestamp)
+        res.status(200).json({message: `Irrigation season stopped with success`});
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

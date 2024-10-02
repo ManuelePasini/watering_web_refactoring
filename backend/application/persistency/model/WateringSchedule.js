@@ -26,7 +26,8 @@ function initWateringSchedule(sequelize) {
         pluv: DataTypes.DOUBLE,
         delta: DataTypes.DOUBLE,
         kp: DataTypes.DOUBLE,
-        ki: DataTypes.DOUBLE
+        ki: DataTypes.DOUBLE,
+        deleted: DataTypes.BOOLEAN
     }, {
         modelName: 'watering_schedule',
         timestamps: false,

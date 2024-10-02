@@ -57,6 +57,7 @@ class WateringScheduleRepository {
                     fieldName: fieldName,
                     sectorName: sectorName,
                     latest: true,
+                    deleted: false,
                     date: {
                         [Op.gte]: new Date(parseFloat(timestampFrom) * 1000).toISOString().split('T')[0],
                         [Op.lte]: new Date(parseFloat(timestampTo) * 1000).toISOString().split('T')[0],
@@ -85,6 +86,7 @@ class WateringScheduleRepository {
                     fieldName: fieldName,
                     sectorName: sectorName,
                     latest: true,
+                    deleted: false,
                     date: date
                 }
             })
@@ -104,6 +106,7 @@ class WateringScheduleRepository {
                         sectorName: sectorName,
                         plantRow: activeEvent.plantRow,
                         latest: true,
+                        deleted: false,
                         date: date,
                         update_timestamp: {
                             [Op.gte]: Math.floor(activeEvent.update_timestamp),
@@ -142,6 +145,53 @@ class WateringScheduleRepository {
         } catch (error) {
             console.error('Error on update watering event:', error);
         }
+    }
+
+    async deleteWateringEvents(refStructureName, companyName, fieldName, sectorName, timestamp){
+        const numAdviceAfterTimestamp = await this.WateringSchedule.count({
+            where:{
+                refStructureName: refStructureName,
+                companyName: companyName,
+                fieldName: fieldName,
+                sectorName: sectorName,
+                latest: true,
+                deleted: false,
+                watering_start: {
+                    [Op.gt]: timestamp
+                },
+                date: {
+                    [Op.gte]: new Date(timestamp*1000).toISOString().split('T')[0]
+                },
+                r: {
+                    [Op.not]: null
+                },
+                advice: {
+                    [Op.not]: null
+                }
+            }
+        })
+
+        if(numAdviceAfterTimestamp > 0){
+            throw Error("Invalid end season timestamp: there are advice computed after given timestamp")
+        }
+
+        await this.WateringSchedule.update({
+            deleted: true
+        }, {
+            where: {
+                refStructureName: refStructureName,
+                companyName: companyName,
+                fieldName: fieldName,
+                sectorName: sectorName,
+                deleted: false,
+                watering_start: {
+                    [Op.gt]: timestamp
+                },
+                date: {
+                    [Op.gte]: new Date(timestamp*1000).toISOString().split('T')[0]
+                }
+            }
+        })
     }
 }
 

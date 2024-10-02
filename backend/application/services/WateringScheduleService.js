@@ -27,6 +27,10 @@ class WateringScheduleService {
         return
     }
 
+    async deleteWateringEvents(refStructureName, companyName, fieldName, sectorName, timestamp){
+        await this.wateringScheduleRepository.deleteWateringEvents(refStructureName, companyName, fieldName, sectorName, timestamp)  
+    }
+
 }
 
 export default WateringScheduleService;

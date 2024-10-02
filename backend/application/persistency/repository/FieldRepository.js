@@ -300,6 +300,50 @@ class FieldRepository {
     return model.save()
   }
 
+  async disablePrescriptiveField(refStructureName, companyName, fieldName, sectorName, timestamp){
+    await this.WateringBaseline.update(
+      {
+        timestamp_to: timestamp
+      },
+      {
+        where:{
+          refStructureName: refStructureName,
+          companyName: companyName,
+          fieldName: fieldName,
+          sectorName: sectorName,
+          timestamp_from: {
+            [Op.lt]: timestamp
+          },
+          timestamp_to: {
+            [Op.is]: null
+          },
+        }
+      }
+    )
+
+    // Disable all thesis of a sector
+    await this.WateringFields.update(
+      {
+        timestamp_to: timestamp
+      },
+      {
+        where:{
+          refStructureName: refStructureName,
+          companyName: companyName,
+          fieldName: fieldName,
+          sectorName: sectorName,
+          timestamp_from: {
+            [Op.lt]: timestamp
+          },
+          timestamp_to: {
+            [Op.is]: null
+          },
+        }
+      }
+    )
+
+  }
+
 }
 
 export default FieldRepository
