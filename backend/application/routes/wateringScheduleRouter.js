@@ -225,7 +225,7 @@ wateringScheduleRouter.post("/:refStructureName/:companyName/:fieldName/:sectorN
 
     try {
         await wateringScheduleService.deleteWateringEvents(refStructureName, companyName, fieldName, sectorName, timestamp)
-        await fieldService.disablePrescriptiveField(refStructureName, companyName, fieldName, sectorName, timestamp)
+        await fieldService.disableWateringBaseline(refStructureName, companyName, fieldName, sectorName, timestamp)
         res.status(200).json({message: `Irrigation season stopped with success`});
     } catch (error) {
         return res.status(500).json({ message: error.message });

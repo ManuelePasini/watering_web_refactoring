@@ -141,8 +141,8 @@ class FieldService {
         await this.fieldRepository.setWateringBaseline(baseline)
     }
 
-    async disablePrescriptiveField(refStructureName, companyName, fieldName, sectorName, timestamp) {
-        await this.fieldRepository.disablePrescriptiveField(refStructureName, companyName, fieldName, sectorName, timestamp)
+    async disableWateringBaseline(refStructureName, companyName, fieldName, sectorName, timestamp) {
+        await this.fieldRepository.disableWateringBaseline(refStructureName, companyName, fieldName, sectorName, timestamp)
     }
 
 }
