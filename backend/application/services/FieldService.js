@@ -100,7 +100,7 @@ class FieldService {
     }
 
     async createMatrixOptState(optStateDto) {
-        const matrixId = await this.fieldRepository.createMatrixField(optStateDto.refStructureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.sectorName, optStateDto.plantRow, optStateDto.validFrom, optStateDto.validTo)
+        const matrixId = await this.fieldRepository.createMatrixField(optStateDto.refStructureName, optStateDto.companyName, optStateDto.fieldName, optStateDto.sectorName, optStateDto.validFrom, optStateDto.validTo)
         if(!matrixId){
             throw Error("Impossible to create optimal matrix for this field")
         }
@@ -143,6 +143,10 @@ class FieldService {
 
     async disableWateringBaseline(refStructureName, companyName, fieldName, sectorName, timestamp) {
         await this.fieldRepository.disableWateringBaseline(refStructureName, companyName, fieldName, sectorName, timestamp)
+    }
+
+    async disableOptimalState(refStructureName, companyName, fieldName, sectorName, timestamp){
+        await this.fieldRepository.disableOptimalState(refStructureName, companyName, fieldName, sectorName, timestamp)
     }
 
 }

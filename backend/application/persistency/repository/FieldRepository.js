@@ -21,7 +21,7 @@ class FieldRepository {
     return await model.save()
   }
 
-  async createMatrixField(refStructureName, companyName, fieldName, sectorName, plantRow, validFrom, validTo, matrixId) {
+  async createMatrixField(refStructureName, companyName, fieldName, sectorName, validFrom, validTo, matrixId) {
     try {
       this.MatrixField.update(
         { 
@@ -340,6 +340,26 @@ class FieldRepository {
           timestamp_to: {
             [Op.is]: null
           },
+        }
+      }
+    )
+
+  }
+
+  async disableOptimalState(refStructureName, companyName, fieldName, sectorName, timestamp){
+    // Disable all thesis of a sector
+    await this.MatrixField.update(
+      {
+        timestamp_to: timestamp,
+        current: false
+      },
+      {
+        where:{
+          refStructureName: refStructureName,
+          companyName: companyName,
+          fieldName: fieldName,
+          sectorName: sectorName,
+          current: true
         }
       }
     )
