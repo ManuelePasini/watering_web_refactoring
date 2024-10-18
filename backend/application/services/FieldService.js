@@ -67,9 +67,13 @@ class FieldService {
     async getAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow) {
         const requestPeriod = timeFilterTo - timeFilterFrom
         let aggregationPeriod = MINUTE_TO_SECONDS //one minute minimum aggregation
-        if(requestPeriod > MONTH_TO_SECONDS){
-            aggregationPeriod = 2 * 60 * MINUTE_TO_SECONDS
+        if(requestPeriod > 2 * MONTH_TO_SECONDS){
+            aggregationPeriod = 12 * 60 * MINUTE_TO_SECONDS
+        } else if(requestPeriod > MONTH_TO_SECONDS){
+            aggregationPeriod = 6 * 60 * MINUTE_TO_SECONDS
         } else if(requestPeriod > MINUTE_TO_SECONDS*60*24*14){//two weeks
+            aggregationPeriod = 2 * 60 * MINUTE_TO_SECONDS
+        } else if(requestPeriod > MINUTE_TO_SECONDS*60*24){ //one day
             aggregationPeriod = 60 * MINUTE_TO_SECONDS
         }
         const result = await this.viewDataOriginalRepository.findAverageByFieldReference(detectedValueTypeDescription, timeFilterFrom, timeFilterTo, refStructureName, companyName, fieldName, sectorName, plantRow, aggregationPeriod);
