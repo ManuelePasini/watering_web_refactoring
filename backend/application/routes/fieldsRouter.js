@@ -92,10 +92,10 @@ fieldsRouter.put('/setOptState', async (req, res) => {
  *   put:
  *     security:
  *       - bearerAuth: []
- *     summary: Set optimal state for a field given timestamp of the desired optimal state
- *     description: Set optimal state for a field given timestamp of the desired optimal state
+ *     summary: Set optimal state for all field of the sector as the interpolation at given timestamp in the indicated thesis
+ *     description: Set optimal state for all field of the sector as the interpolation at given timestamp in the indicated thesis
  *     tags: [Field Operations]
- *     parametrs:
+ *     parameters:
  *      - in: query
  *        name: timestamp
  *        required: true
