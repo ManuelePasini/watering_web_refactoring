@@ -53,7 +53,9 @@ async function mountChart() {
   const parsed = JSON.parse(props.config);
 
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, props.endpoint, 'values.0.measures')
-
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(chartDataResponse) {
     console.log(`È arrivato un dato: ${chartDataResponse[0].value}`)
     addValueAndMaintainSize(chartDataResponse[0].value)

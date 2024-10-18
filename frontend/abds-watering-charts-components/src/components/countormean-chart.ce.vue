@@ -10,6 +10,7 @@ const chartRef = ref(null);
 const props = defineProps(['config'])
 const endpoint = 'statisticsChart'
 const showChart = ref(false)
+const loadingFlag = ref(false)
 const container = ref(null)
 const imageStyle = ref({width:"", height:""})
 
@@ -23,8 +24,12 @@ watchEffect(async () => {
 async function mountChart() {
   const parsed = JSON.parse(props.config);
   let data = []
-
+  showChart.value = false
+  loadingFlag.value = true
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'values.0.measures')
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(chartDataResponse) {
     data = chartDataResponse
     showChart.value = data.length > 0
@@ -192,6 +197,7 @@ async function mountChart() {
       chartRef.value.replaceChildren(svg.node());
     }
   })
+  loadingFlag.value = false
 }
 
 </script>
@@ -199,6 +205,11 @@ async function mountChart() {
 <template>
   <div ref="container">
     <svg v-if="showChart" :style="imageStyle" ref="chartRef"></svg>
+    <div v-else-if="loadingFlag" class="d-flex justify-content-center align-items-center">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Caricamento...</span>
+    </div>
+  </div>
     <div v-else>Nessun dato disponibile.</div>
   </div>
 </template>

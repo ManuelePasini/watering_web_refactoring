@@ -26,6 +26,7 @@ import * as d3 from "d3";
 let chartData = ref({datasets: [], labels: []})
 let options = ref({responsive: true, maintainAspectRatio: false})
 let showChart = ref(false)
+const loadingFlag = ref(false)
 
 const props = defineProps(['config','selectedTimestamp'])
 const emit = defineEmits(['selectTimestamp'])
@@ -93,8 +94,12 @@ watchEffect(async () => {
 async function mountChart() {
   const parsed = JSON.parse(props.config);
   let data = []
-
+  showChart.value = false
+  loadingFlag.value = true
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'values.0.measures')
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(chartDataResponse) {
     data = chartDataResponse
     showChart.value = data.length > 0
@@ -201,13 +206,19 @@ async function mountChart() {
       }
     }
   }
+  loadingFlag.value = false
 }
 
 </script>
 
 <template>
   <div v-if="showChart">
-    <Line style="height: 300px" :data="chartData" :options="options"/>
+    <Line style="height: 300px" :data="chartData" :options="options" ref="myChart"/>
+  </div>
+  <div v-else-if="loadingFlag" class="d-flex justify-content-center align-items-center">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Caricamento...</span>
+    </div>
   </div>
   <div v-else>Nessun dato disponibile.</div>
 </template>

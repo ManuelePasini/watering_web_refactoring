@@ -88,12 +88,14 @@ async function mountChart(timeFilter) {
   eventsData = []
 
   if(!timeFilter){
-    timeFilter = parsed.params
+    timeFilter = {...parsed.params}
     timeFilter.timeFilterTo = timeFilter.timeFilterTo + 604800 //one week
   }
 
   const calendarResponse = await communicationService.getWateringSchedule(parsed.environment, parsed.paths, timeFilter, getEventsEndpoint)
-
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(calendarResponse) {
     eventsData = calendarResponse.events
     const eventsCalendar = [] 

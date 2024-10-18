@@ -11,6 +11,7 @@ const container = ref(null)
 
 const props = defineProps(['config', 'selectedTimestamp'])
 const showChart = ref(false)
+const loadingFlag = ref(false)
 const endpoint = 'getDistanceFromOptimalState'
 
 watchEffect( async () => {
@@ -188,8 +189,15 @@ async function drawImage(){
 
 async function mountChart() {
   const parsed = JSON.parse(props.config);
-  parsed.params["timestamp"] = props.selectedTimestamp
-  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'measures')
+  const selectedTimestamp = props.selectedTimestamp
+  const params = {...parsed.params}
+  params["timestamp"] = props.selectedTimestamp
+  showChart.value = false
+  loadingFlag.value = true
+  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, params, endpoint, 'measures')
+  if(JSON.stringify(parsed) !== props.config || selectedTimestamp !== props.selectedTimestamp){
+      return
+  }
   if(chartDataResponse) {
     showChart.value = chartDataResponse.length > 0
     if(showChart.value){
@@ -198,7 +206,8 @@ async function mountChart() {
     }
   } else {
     showChart.value = false
-  } 
+  }
+  loadingFlag.value = false
 }
 
 watch( () => props.selectedTimestamp, async () => {
@@ -209,6 +218,11 @@ watch( () => props.selectedTimestamp, async () => {
 <template>
   <div v-if="showChart" ref="container">
     <VueApexCharts type="heatmap" :options="chartOptions" :series="heatmapSeries"></VueApexCharts>
+  </div>
+  <div v-else-if="loadingFlag" class="d-flex justify-content-center align-items-center">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Caricamento...</span>
+    </div>
   </div>
 </template>
 

@@ -18,7 +18,6 @@ export class CommunicationService {
                 Authorization: 'Bearer ' + environment.token
             }
         }).then(response => {
-            console.log(`Success response: ${response.data}`)
             if (response.data)
                 return response.data;
             return null;

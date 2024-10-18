@@ -45,6 +45,9 @@ function updateConfig(currentTimestamp, lastTimestamp) {
 async function calculateTimestampLength() {
   const parsed = JSON.parse(props.config);
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'values.0.measures')
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(chartDataResponse) {
     data.value = chartDataResponse
     timestamps.value = new Set()

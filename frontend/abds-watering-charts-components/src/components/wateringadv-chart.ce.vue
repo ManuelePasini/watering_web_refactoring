@@ -24,6 +24,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 const chartData = ref({datasets: [], labels: []})
 const options = ref({responsive: true, maintainAspectRatio: false})
 const showChart = ref(false)
+const loadingFlag = ref(false)
 
 const props = defineProps(['config'])
 
@@ -73,7 +74,12 @@ watchEffect(async () => {
 async function mountChart() {
   const parsed = JSON.parse(props.config);
   let data = []
+  showChart.value = false
+  loadingFlag.value = true
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'values.0.measures')
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(chartDataResponse) {
     data = chartDataResponse
     showChart.value = data.length > 0
@@ -139,6 +145,7 @@ async function mountChart() {
       }
     }
   }
+  loadingFlag.value = false
 }
 
 
@@ -155,6 +162,11 @@ async function mountChart() {
   <div class="card-body">
     <div v-if="showChart">
       <Bar style="height: 320px;" :data="chartData" :options="options" />
+    </div>
+    <div v-else-if="loadingFlag" class="d-flex justify-content-center align-items-center">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Caricamento...</span>
+      </div>
     </div>
     <div v-else>Nessun dato disponibile.</div>
   </div>  

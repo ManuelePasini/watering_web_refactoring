@@ -14,6 +14,7 @@ const containerOptimal = ref(null)
 
 const props = defineProps(['config', 'selectedTimestamp', 'showDistance'])
 const showChart = ref(false)
+const loadingFlag = ref(false)
 const endpoint = 'getOptimalState'
 
 watchEffect( async () => {
@@ -52,6 +53,9 @@ async function drawValuesImage(){
  
   const parsed = JSON.parse(props.config);
   const dripperPos = await communicationService.getFieldInfo(parsed.environment, parsed.paths, parsed.params, "dripperInfo")
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
 
   const [xValues, series] = buildHeatmapSeries("optValue")
 
@@ -334,9 +338,15 @@ async function drawWeightsImage(){
 
 async function mountChart() {
   const parsed = JSON.parse(props.config);
-  parsed.params["timestamp"] = props.selectedTimestamp
-  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'optimalState')
-
+  const selectedTimestamp = props.selectedTimestamp
+  const params = {...parsed.params}
+  params["timestamp"] = props.selectedTimestamp
+  showChart.value = false
+  loadingFlag.value = true
+  const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, params, endpoint, 'optimalState')
+  if(JSON.stringify(parsed) !== props.config || selectedTimestamp !== props.selectedTimestamp){
+      return
+  }
   if(chartDataResponse) {
     showChart.value = chartDataResponse.length > 0
     if(showChart.value){
@@ -346,7 +356,8 @@ async function mountChart() {
     }
   } else {
     showChart.value = false
-  } 
+  }
+  loadingFlag.value = false
 } 
 
 watch( () => props.selectedTimestamp, async () => {
@@ -368,6 +379,11 @@ watch( () => props.selectedTimestamp, async () => {
     </div>
     <div class="col-8 offset-lg-2">
       <DistanceChart v-if="props.showDistance" :config="props.config" :selectedTimestamp="props.selectedTimestamp"></DistanceChart>
+    </div>
+  </div>
+  <div v-else-if="loadingFlag" class="d-flex justify-content-center align-items-center">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Caricamento...</span>
     </div>
   </div>
   <div class="text-center p-3" v-else>

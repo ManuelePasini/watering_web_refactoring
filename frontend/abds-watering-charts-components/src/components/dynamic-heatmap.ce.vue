@@ -11,6 +11,7 @@ const container = ref(null)
 
 const props = defineProps(['config', 'selectedTimestamp'])
 const showChart = ref(false)
+const loadingFlag = ref(false)
 const endpoint = 'heatmap'
 
 watchEffect( async () => {
@@ -183,7 +184,9 @@ async function mountChart() {
   const parsed = JSON.parse(props.config);
 
   const chartDataResponse = await communicationService.getChartData(parsed.environment, parsed.paths, parsed.params, endpoint, 'values.0.measures')
-
+  if(JSON.stringify(parsed) !== props.config){
+      return
+  }
   if(chartDataResponse) {
     images.value = new Map(chartDataResponse.map(obj => [obj.timestamp, obj.image]))
     showChart.value = images.value.size > 0
