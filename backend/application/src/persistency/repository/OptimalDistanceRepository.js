@@ -35,6 +35,8 @@ class OptimalDistanceRepository {
             throw new Error("Watering algorithm params not defined")
         }
 
+        const utcOffset = new Date().getTimezoneOffset()*-60
+
         const timestampQuery = !alghoritmViewFlag ? `
                 SELECT 
                     EXTRACT(EPOCH FROM gs.hour_timestamp)::bigint AS watering_start,
@@ -103,7 +105,7 @@ class OptimalDistanceRepository {
                 wd.device_id as "deviceId",
                 ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit,  
                 ROUND((SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("ic.value")} * fd.weight)/SUM(fd.weight))::numeric,6) as value, 
-                EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset  as timestamp, 
                 'Media giornaliera' as "valueType"
             FROM watering_data wd 
             ${alghoritmViewFlag ? "JOIN advices a ON wd.watering_start = a.watering_start": ""}
@@ -135,7 +137,7 @@ class OptimalDistanceRepository {
                     wd.device_id as "deviceId",
                     ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                     ROUND((SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.value")} * fd.weight)/SUM(fd.weight))::numeric,6) as value,
-                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                     'Media ottimale' as "valueType"
                 FROM watering_data wd 
                 JOIN field_data fd 
@@ -149,7 +151,7 @@ class OptimalDistanceRepository {
                     wd.device_id as "deviceId",
                     ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                     ${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.optimal_dry_bound")} as value,
-                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                     'Asciutto' as "valueType" 
                 FROM watering_data wd 
                 JOIN field_data fd 
@@ -161,7 +163,7 @@ class OptimalDistanceRepository {
                     wd.device_id as "deviceId",
                     ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                     ${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.optimal_wet_bound")} as value,  
-                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                     'Capacità di campo' as "valueType" 
                 FROM watering_data wd 
                 JOIN field_data fd 
@@ -173,7 +175,7 @@ class OptimalDistanceRepository {
                     wd.device_id as "deviceId",
                     ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                     ROUND((SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.value")} * fd.weight)/SUM(fd.weight) + ABS(SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.value")} * fd.weight)/SUM(fd.weight))* fd.stop_threshold/100)::numeric,6) as value,
-                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                     'Stop irrigazione' as "valueType" 
                 FROM watering_data wd 
                 JOIN field_data fd 
@@ -190,7 +192,8 @@ class OptimalDistanceRepository {
                 HUMIDITY_DEVICE_TYPE,
                 thesisId,
                 timeFilterFrom,
-                timeFilterTo
+                timeFilterTo,
+                utcOffset
             }
         });
         return results
@@ -231,6 +234,8 @@ class OptimalDistanceRepository {
         if(!errorFunction){
             throw new Error("Watering algorithm params not defined")
         }
+
+        const utcOffset = new Date().getTimezoneOffset()*-60
 
         const timestampQuery = !alghoritmViewFlag ? `
                 SELECT 
@@ -316,7 +321,7 @@ class OptimalDistanceRepository {
                     wd.device_id as "deviceId",
                     ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit,  
                     ROUND((SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("ic.value")} * fd.weight)/SUM(fd.weight))::numeric,6) as value, 
-                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                    EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                     'Media giornaliera' as "valueType",
                     wd.thesis_weight
                 FROM watering_data wd 
@@ -349,7 +354,7 @@ class OptimalDistanceRepository {
                         wd.device_id as "deviceId",
                         ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                         ROUND((SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.value")} * fd.weight)/SUM(fd.weight))::numeric,6) as value,
-                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                         'Media ottimale' as "valueType",
                         wd.thesis_weight
                     FROM watering_data wd 
@@ -363,7 +368,7 @@ class OptimalDistanceRepository {
                         wd.device_id as "deviceId",
                         ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                         ${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.optimal_dry_bound")} as value,
-                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                         'Asciutto' as "valueType",
                         wd.thesis_weight
                     FROM watering_data wd 
@@ -376,7 +381,7 @@ class OptimalDistanceRepository {
                         wd.device_id as "deviceId",
                         ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                         ${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.optimal_wet_bound")} as value,  
-                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                         'Capacità di campo' as "valueType",
                         wd.thesis_weight
                     FROM watering_data wd 
@@ -388,7 +393,7 @@ class OptimalDistanceRepository {
                         wd.device_id as "deviceId",
                         ${errorFunctionsUnits[errorFunction.errorFunction]("wd.unit")} as unit, 
                         ROUND((SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.value")} * fd.weight)/SUM(fd.weight) + ABS(SUM(${errorFunctionsSQLWrapper[errorFunction.errorFunction]("fd.value")} * fd.weight)/SUM(fd.weight))* fd.stop_threshold/100)::numeric,6) as value,
-                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT  as timestamp, 
+                        EXTRACT(EPOCH FROM DATE_TRUNC('day', TO_TIMESTAMP(wd.watering_start)))::INT - :utcOffset as timestamp, 
                         'Stop irrigazione' as "valueType",
                         wd.thesis_weight
                     FROM watering_data wd 
@@ -408,7 +413,8 @@ class OptimalDistanceRepository {
                 HUMIDITY_DEVICE_TYPE,
                 sectorId,
                 timeFilterFrom,
-                timeFilterTo
+                timeFilterTo,
+                utcOffset
             }
         });
         return results
