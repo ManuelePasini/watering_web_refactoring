@@ -1,6 +1,6 @@
 # Fase 1: Costruzione della build
 # Utilizza un'immagine di base Node.js
-FROM node:25.7-slim AS build
+FROM node:26.3-slim AS build
 
 # Imposta la directory di lavoro
 WORKDIR /app
@@ -8,20 +8,13 @@ WORKDIR /app
 # Copia tutto il codice sorgente dell'app
 COPY . .
 
-WORKDIR /app/watering-platform-dashboard
-RUN npm install
-RUN npm run build
-
 WORKDIR /app/SMARTER-frontend
 RUN npm install
 RUN npm run build
 
 # Fase 2: Servire i file statici con Nginx
 # Usa un'immagine base di Nginx
-FROM nginx:1.29-alpine
-
-# Copia i file di build dalla fase precedente nella directory di lavoro di Nginx
-COPY --from=build /app/watering-platform-dashboard/dist /usr/share/nginx/html/dashboard
+FROM nginx:1.31-alpine
 
 COPY --from=build /app/SMARTER-frontend/dist /usr/share/nginx/html/smarter
 
