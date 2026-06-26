@@ -37,6 +37,7 @@ class ThesesAllSignalsRepository {
 
 
     async getResults(thesisId, signalTypes, timeFilterFrom, timeFilterTo, sqlAggregation, aggregationPeriod, offset = 0) {
+        const utcOffset = new Date().getTimezoneOffset()*-60
         const query = `
             SELECT
                 thesis_name AS "thesisName",
@@ -50,7 +51,7 @@ class ThesesAllSignalsRepository {
                 virtual,
                 COALESCE(scaled_unit, unit) AS "unit",
                 computed,
-                FLOOR((timestamp::NUMERIC + :offset) / :aggregationPeriod) * :aggregationPeriod AS "timestamp",
+                FLOOR((timestamp::NUMERIC + :offset + :utcOffset) / :aggregationPeriod) * :aggregationPeriod - :utcOffset AS "timestamp",
                 COALESCE(to_jsonb(${sqlAggregation}), to_jsonb(ARRAY_AGG(raw_value) FILTER (WHERE raw_value IS NOT NULL))) AS "value"
             FROM theses_all_signals tas
             LEFT JOIN measurements m
@@ -75,7 +76,7 @@ class ThesesAllSignalsRepository {
                 unit,
                 scaled_unit,
                 computed,
-                FLOOR((timestamp::NUMERIC + :offset) / :aggregationPeriod) * :aggregationPeriod
+                FLOOR((timestamp::NUMERIC + :offset + :utcOffset) / :aggregationPeriod) * :aggregationPeriod - :utcOffset
             ORDER BY timestamp ASC;
             `;
 
@@ -83,6 +84,7 @@ class ThesesAllSignalsRepository {
         replacements: {
             aggregationPeriod,
             offset,
+            utcOffset,
             signalTypes,
             timeFilterFrom,
             timeFilterTo,
@@ -125,7 +127,7 @@ class ThesesAllSignalsRepository {
         aggregationPeriod,
         offset = 0
     ){
-
+        const utcOffset = new Date().getTimezoneOffset()*-60
         const query = `
             WITH valid_advices_table AS (
                 SELECT td.thesis_id,
@@ -164,12 +166,12 @@ class ThesesAllSignalsRepository {
                     'ADV' AS "signalType",
                     'Advice' AS "signalTypeDescription",
                     'L' AS unit,
-                    FLOOR((va.watering_start::NUMERIC + :offset) / :aggregationPeriod) * :aggregationPeriod AS timestamp,
+                    FLOOR((va.watering_start::NUMERIC + :offset + :utcOffset) / :aggregationPeriod) * :aggregationPeriod - :utcOffset AS timestamp,
                     COALESCE(SUM(va.advice), 0) AS value
                 FROM valid_advices_table va
                 GROUP BY
                     va.thesis_name,
-                    FLOOR((va.watering_start::NUMERIC + :offset) / :aggregationPeriod) * :aggregationPeriod
+                    FLOOR((va.watering_start::NUMERIC + :offset + :utcOffset) / :aggregationPeriod) * :aggregationPeriod - :utcOffset
                 UNION
                 SELECT
                     vew.thesis_name AS "thesisName",
@@ -177,12 +179,12 @@ class ThesesAllSignalsRepository {
                     'EXP' AS "signalType",
                     'Expected Water' AS "signalTypeDescription",
                     'L' AS unit,
-                    FLOOR((vew.watering_start::NUMERIC + :offset) / :aggregationPeriod) * :aggregationPeriod AS timestamp,
+                    FLOOR((vew.watering_start::NUMERIC + :offset + :utcOffset) / :aggregationPeriod) * :aggregationPeriod - :utcOffset AS timestamp,
                     COALESCE(SUM(vew.expected_water), 0) AS value
                 FROM valid_expected_water_table vew
                 GROUP BY
                     vew.thesis_name,
-                    FLOOR((vew.watering_start::NUMERIC + :offset) / :aggregationPeriod) * :aggregationPeriod
+                    FLOOR((vew.watering_start::NUMERIC + :offset + :utcOffset) / :aggregationPeriod) * :aggregationPeriod - :utcOffset
             ) AS merged_results
             ORDER BY timestamp ASC;
         `;
@@ -193,7 +195,8 @@ class ThesesAllSignalsRepository {
             timeFilterFrom,
             timeFilterTo,
             aggregationPeriod,
-            offset
+            offset,
+            utcOffset
         },
             type: QueryTypes.SELECT
         });

@@ -162,7 +162,7 @@ class FieldService {
 
         const measurements = await this.thesesAllSignalsRepository.getMeasurementsByThesis(
             thesisId,
-            ['DRIPPER', 'SPRINKLER', 'PLUV_CURR'],
+            ['DRIPPER', 'SPRINKLER', 'PLUV_CURR', 'FOGGER'],
             timeFilterFrom,
             timeFilterTo,
             'SUM',
