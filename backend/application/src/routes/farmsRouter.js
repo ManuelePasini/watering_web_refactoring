@@ -625,7 +625,7 @@ const farmsRouter = ({ authenticationService, authorizationService, fieldService
                 dripperCapacity,
                 sprinklerCapacity,
                 doubleWing,
-                createdAt
+                createdAt ?? Math.floor(Date.now()/1000)
             );
 
             const sectorId = await fieldService.createSector(userId, sector);
