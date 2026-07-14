@@ -71,15 +71,15 @@ class FarmRepository {
                 json_agg(DISTINCT jsonb_build_object('id', s.id, 'sectorName', s.sector_name, 'createdAt', s.created_at, 'disabledAt', s.disabled_at)) FILTER (WHERE s.id IS NOT NULL) AS sectors
             FROM farms f
                 JOIN companies c ON f.company_id = c.id
-                LEFT JOIN sectors s 
-                    ON s.farm_id = f.id 
-                    AND s.created_at < :timeFilterTo 
-                    AND (s.disabled_at > :timeFilterFrom OR s.disabled_at IS NULL)
                 LEFT JOIN (SELECT DISTINCT company_id, farm_id, sector_id FROM master_data_permits 
                     WHERE user_id = :userId) p ON 
                     p.company_id = c.id
                     AND p.farm_id = f.id
-                    AND p.sector_id IS NOT DISTINCT FROM s.id
+                LEFT JOIN sectors s 
+                    ON s.farm_id = f.id 
+                    AND s.created_at < :timeFilterTo 
+                    AND (s.disabled_at > :timeFilterFrom OR s.disabled_at IS NULL)
+                    AND p.sector_id = s.id
             WHERE f.id = :farmId AND (
                 :isAdmin = true
                 OR p.farm_id IS NOT NULL
