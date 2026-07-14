@@ -59,7 +59,7 @@ class CompanyRepository {
                     ON f.company_id = c.id
                     AND f.created_at < :timeFilterTo 
                     AND (f.disabled_at > :timeFilterFrom OR f.disabled_at IS NULL)
-                    AND p.farm_id = f.id
+                    AND (p.farm_id = f.id OR :isAdmin = true)
                 LEFT JOIN companies_organizations co ON co.company_id = c.id
                 LEFT JOIN organizations o ON o.id = co.organization_id
             WHERE c.id = :companyId AND (

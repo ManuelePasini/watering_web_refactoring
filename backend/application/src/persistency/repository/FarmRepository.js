@@ -79,7 +79,7 @@ class FarmRepository {
                     ON s.farm_id = f.id 
                     AND s.created_at < :timeFilterTo 
                     AND (s.disabled_at > :timeFilterFrom OR s.disabled_at IS NULL)
-                    AND p.sector_id = s.id
+                    AND (p.sector_id = s.id OR :isAdmin = true)
             WHERE f.id = :farmId AND (
                 :isAdmin = true
                 OR p.farm_id IS NOT NULL
