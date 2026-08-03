@@ -337,18 +337,55 @@ describe('Device and Signal Setup Integration Test', () => {
      */ 
     it('should delete a device and all related data', async () => {
 
+        const signalIds = (await table(db, 'devices_signals').where('device_id', TEST_DELETE_DEVICE_ID)).map( ds => ds.signal_id)
+        const signalAssociations = signalIds.length > 0
+            ? await table(db, 'devices_signals')
+                .whereIn('signal_id', signalIds)
+                .distinct('signal_id', 'device_id')
+                .select('signal_id', 'device_id')
+            : [];
+        const signalDeviceCounts = signalAssociations.reduce((counts, association) => {
+            counts[association.signal_id] = (counts[association.signal_id] || 0) + 1;
+            return counts;
+        }, {});
+
+        const singleDeviceSignalIds = Object.entries(signalDeviceCounts)
+            .filter(([, count]) => count === 1)
+            .map(([signalId]) => Number(signalId));
+
+        const sharedSignalIds = Object.entries(signalDeviceCounts)
+            .filter(([, count]) => count > 1)
+            .map(([signalId]) => Number(signalId));
+
+
         await request(app)
             .delete(`/devices/${TEST_DELETE_DEVICE_ID}/delete`)
             .set('Authorization', `Bearer ${authToken}`)
             .expect(200)
 
-        // DB Persistence Check
-        // If no device found we can assume all related entity are correctly
-        // deleted otherwise foreign key checks prevents deletion
         const devicePersistence = await table(db, 'devices')
             .where('id', TEST_DELETE_DEVICE_ID)
 
         expect(devicePersistence).toHaveLength(0)
+
+        const remainingSingleDeviceSignals = await table(db, 'signals')
+            .whereIn('id', singleDeviceSignalIds)
+            .select('id');
+
+        expect(remainingSingleDeviceSignals).toHaveLength(0)
+
+        const remainingSharedSignals = await table(db, 'signals')
+            .whereIn('id', sharedSignalIds)
+            .select('id');
+
+        expect(remainingSharedSignals).toHaveLength(sharedSignalIds.length)
+
+        const remainingMeasurements = await table(db, 'measurements')
+            .whereIn('signal_id', singleDeviceSignalIds)
+            .select('value', 'signal_id', 'timestamp');
+
+        expect(remainingMeasurements).toHaveLength(0)
+
     })
 
 

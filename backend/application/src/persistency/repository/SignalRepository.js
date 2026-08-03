@@ -186,9 +186,9 @@ class SignalRepository {
             const signalInfo = await this.SignalsDenormalized.findAll({
                 where: {
                     signalId: signalId,
-                    validFrom: { [Op.lt]: timestamp },
+                    validFrom: { [Op.lt]: timestamp || Infinity },
                     [Op.or]: [
-                        { validTo: { [Op.gt]: timestamp } },
+                        { validTo: { [Op.gt]: timestamp || -Infinity } },
                         { validTo: null }
                     ]
                 },
@@ -276,7 +276,7 @@ class SignalRepository {
                 }
             })
         } catch (error) {
-            throw new Error(`Error deleting signal coused by: ${error.message}`);
+            throw new Error(`Error deleting signal caused by: ${error.message}`);
         }
     }
 }
