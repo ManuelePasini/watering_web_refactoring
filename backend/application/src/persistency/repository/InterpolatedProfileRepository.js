@@ -153,7 +153,7 @@ class InterpolatedProfileRepository {
     }
 
     async deleteInterpolatedProfiles(gridId) {
-        const batchSize = 10000;
+        const batchSize = 5000;
         let profileExists = true
 
         while (profileExists) {
