@@ -152,30 +152,45 @@ class InterpolatedProfileRepository {
         return results;
     }
 
-    async deleteInterpolatedProfiles(gridId){
-        const query = `
-            SELECT id 
-            FROM interpolated_profiles
-            WHERE grid_id = :gridId`;
-        const results = await this.sequelize.query(query,
-            {
+    async deleteInterpolatedProfiles(gridId) {
+        const batchSize = 5000;
+        let profileExists = true
+
+        while (profileExists) {
+            const query = `
+                SELECT id
+                FROM interpolated_profiles
+                WHERE grid_id = :gridId
+                ORDER BY id
+                LIMIT :batchSize
+            `;
+
+            const results = await this.sequelize.query(query, {
                 type: QueryTypes.SELECT,
-                replacements: {
-                    gridId
-                }
+                replacements: { gridId, batchSize }
+            });
+
+            if (results.length > 0) {
+                const profileIds = results.map(profile => profile.id);
+                const profileIdList = profileIds.join(', ');
+
+                await this.sequelize.query(`
+                    DELETE FROM interpolated_cells
+                    WHERE profile_id IN (${profileIdList})
+                `, {
+                    type: QueryTypes.DELETE
+                });
+
+                await this.sequelize.query(`
+                DELETE FROM interpolated_profiles
+                WHERE id IN (${profileIdList})
+            `, {
+                    type: QueryTypes.DELETE
+                });
+            } else {
+                profileExists = false
             }
-        );
-        await Promise.all(results.map(async profile => {
-            const q = `DELETE FROM interpolated_cells WHERE profile_id=:profileId`
-            await this.sequelize.query(q, { type: QueryTypes.DELETE, replacements: { profileId: profile["id"] } })
-        }))
-        const deleteQuery = `
-            DELETE FROM interpolated_profiles WHERE grid_id = :gridId
-        `
-        await this.sequelize.query(deleteQuery, {
-            type: QueryTypes.DELETE,
-            replacements: { gridId: gridId }
-        })
+        }
     }
 }
 

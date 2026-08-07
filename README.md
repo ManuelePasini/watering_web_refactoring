@@ -169,3 +169,9 @@ The stack exposes:
 
 The frontend container serves the static build through Nginx and proxies `/api/`
 requests to the backend service.
+
+## Deploy and run a local demo version
+
+```bash
+./run-demo.sh
+```

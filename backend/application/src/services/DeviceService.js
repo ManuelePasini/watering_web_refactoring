@@ -240,12 +240,12 @@ class DeviceService {
             const signalIds = (await this.getDevice(deviceId))?.signals?.map(signal => signal.id)
             const signalsToDelete = []
             for(const signalId of signalIds){
-                const deviceIds = new Set((await this.signalRepository.getSignalInfo(signalId, Date.now()/1000)).map(s=> s.deviceId))
-                if(deviceIds.size === 1 && deviceIds.has(deviceId)) {
+                const deviceIds = new Set((await this.signalRepository.getSignalInfo(signalId, null)).map(s=> s.deviceId))
+
+                if(deviceIds.size === 1 && deviceIds.has(Number(deviceId))) {
                     signalsToDelete.push(signalId)              
                 }
             }
-
 
             const signalDeviceIds = await this.deviceRepository.deleteDeviceSignals(deviceId);
             if (Array.isArray(signalDeviceIds) && signalDeviceIds.length > 0) {

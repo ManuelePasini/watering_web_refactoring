@@ -1,0 +1,44 @@
+services:
+  smarter-web-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    image: watering_web_frontend:demo
+    ports:
+      - "43080:80"
+    networks:
+      - demo-network
+
+  smarter-web-backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    image: watering_web_backend:demo
+    ports:
+      - "8081:8081"
+    networks:
+      - demo-network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: bigunibo/postgresql:1.0.0
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=smarter_demo
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - pgdata_demo:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - demo-network
+
+networks:
+  demo-network:
+    driver: bridge
+volumes:
+  pgdata_demo:
+    driver: local

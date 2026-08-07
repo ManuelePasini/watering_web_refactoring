@@ -193,12 +193,15 @@ components:
           description: Optional signal description
         x:
           type: number
+          nullable: true
           description: Signal x coordinate
         y:
           type: number
+          nullable: true
           description: Signal y coordinate
         z:
           type: number
+          nullable: true
           description: Signal z coordinate
         virtual:
           type: boolean
