@@ -619,7 +619,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
 
         const userId = requestUserData.userId
-        const deviceId = req.params.deviceId
+        const deviceId = Number(req.params.deviceId)
         
         if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', deviceId))) {
             return res.status(403).json({ message: 'Unauthorized request' });
@@ -757,7 +757,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
 
         const userId = requestUserData.userId
-        const deviceId = req.params.deviceId
+        const deviceId = Number(req.params.deviceId)
         
         if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', deviceId))) {
             return res.status(403).json({ message: 'Unauthorized request' });
@@ -1026,7 +1026,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = req.query.validTo ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) ?? currentTimestamp;
 
         if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', deviceId))) {
             return res.status(403).json({ message: 'Unauthorized request' });
@@ -1274,20 +1274,19 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
             if (!device) {
                 return res.status(404).json({
                     error: "Information not found for the device at the given timestamp"
-                });
+                })
             }
 
             const deviceAssociations = await deviceService.getDeviceAssociations(deviceId, timestamp, requestUserData.userId, requestUserData.isAdmin)
 
-            return res.status(200).json({...device, ...deviceAssociations});
+            return res.status(200).json({...device, ...deviceAssociations})
         } catch (error) {
-            console.log(`Fail retrieving devices caused by: ${error.message}`);
-            return res.status(500).json({ error: "Error while retrieving devices" });
+            console.log(`Fail retrieving devices caused by: ${error.message}`)
+            return res.status(500).json({ error: "Error while retrieving devices" })
         }
-    });
+    })
 
-
-    return router;
+    return router
 }
 
-export default devicesRouter;
+export default devicesRouter

@@ -89,7 +89,7 @@ const swaggerOptions = {
       }
     ]
   },
-  apis: ['./doc/*.yaml', './src/routes/*.js']
+  apis: ['./doc/*.yaml', './dist/routes/*.js']
 }
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions)

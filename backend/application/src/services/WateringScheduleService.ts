@@ -5,7 +5,11 @@ import DtoConverter from "./DtoConverter.js";
 const dtoConverter = new DtoConverter;
 
 class WateringScheduleService {
-    constructor(wateringScheduleRepository, wateringAdviceRepository, userActionService) {
+    wateringScheduleRepository: any
+    wateringAdviceRepository: any
+    userActionService: any
+
+    constructor(wateringScheduleRepository: any, wateringAdviceRepository: any, userActionService: any) {
         this.wateringScheduleRepository = wateringScheduleRepository
         this.wateringAdviceRepository = wateringAdviceRepository
         this.userActionService = userActionService
@@ -56,13 +60,13 @@ class WateringScheduleService {
 
         if (!event) {
             const error = new Error("Event not found");
-            error.code = "EVENT_NOT_FOUND"; 
+            (error as any).code = "EVENT_NOT_FOUND"; 
             throw error;
         }
 
         if (event.advice === null) {
             const error = new Error("Event has not yet been computed");
-            error.code = "EVENT_NOT_COMPUTED";
+            (error as any).code = "EVENT_NOT_COMPUTED";
             throw error;
         }
     }

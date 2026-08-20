@@ -115,7 +115,7 @@ const usersRouter = ({ userService, authenticationService, authorizationService 
             return res.status(500).json({ error: 'Error while retrieving user data' });
         }
     })
-
+    
     /**
      * @swagger
      * /users/login:
@@ -638,7 +638,7 @@ const usersRouter = ({ userService, authenticationService, authorizationService 
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = req.query.validTo ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) ?? currentTimestamp;
 
         if (!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.ADMINISTRATOR, requestUserData.isAdmin))) {
             return res.status(403).json({ message: 'Unauthorized request' });
@@ -655,7 +655,6 @@ const usersRouter = ({ userService, authenticationService, authorizationService 
             return res.status(500).json({ error: "Internal error disabling user" })
         }
     })
-
 
     /**
      * @swagger
@@ -757,7 +756,7 @@ const usersRouter = ({ userService, authenticationService, authorizationService 
 
         try {
             const userId = requestUserData.userId
-            const minRole = req.query.role.toLowerCase()
+            const minRole = req.query.role.toString().toLowerCase()
             const entity = req.query.entityType
             const id = req.query.id
             const service = req.query.service
@@ -1028,6 +1027,6 @@ const usersRouter = ({ userService, authenticationService, authorizationService 
         }
     })
     return router;
-}
+};
 
 export default usersRouter;

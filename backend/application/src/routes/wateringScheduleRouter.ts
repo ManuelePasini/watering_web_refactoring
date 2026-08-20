@@ -220,7 +220,6 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
      *                 message:
      *                   type: string
      */
-
     router.put('/:sectorId/:eventId/update', async (req, res) => {
         let requestUserData;
         try {
@@ -354,7 +353,7 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
      *                 message:
      *                   type: string
     */
-
+    
     router.post('/:sectorId/createEvent', async (req, res) => {
         let requestUserData;
         try {
@@ -366,7 +365,7 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
         try {
             const userId = requestUserData.userId
 
-            const sectorId = req.params.sectorId
+            const sectorId = Number(req.params.sectorId)
             const exists = await fieldService.sectorExists(sectorId);
             if (!exists) {
                 return res.status(404).json({ message: 'Sector not found' });
@@ -518,7 +517,7 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
 
         try {
             const userId = requestUserData.userId
-            const sectorId = req.params.sectorId;
+            const sectorId = Number(req.params.sectorId);
             const exists = await fieldService.sectorExists(sectorId);
             if (!exists) {
                 return res.status(404).json({ message: 'Sector not found' });
@@ -526,8 +525,8 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
             if (!(await authorizationService.isUserAuthorized(userId, ROLES.PLANNER, requestUserData.isAdmin, 'SECTOR', sectorId, 'Watering Advice'))) {
                 return res.status(403).json({ message: 'Unauthorized request' });
             }
-            const timestampFrom = req.query.timestampFrom;
-            const timestampTo = req.query.timestampTo;
+            const timestampFrom = Number(req.query.timestampFrom);
+            const timestampTo = Number(req.query.timestampTo);
 
             if(timestampFrom > timestampTo || timestampFrom < Date.now()/1000 + SCHEDULE_SAFE_INTERVAL){
                 return res.status(400).json({message: 'Invalid time range params! It is not possible create event in the past'})
@@ -653,8 +652,8 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
                 return res.status(403).json({ message: 'Unauthorized request' });
             }
 
-            const timestamp = req.query.timestamp || now + SCHEDULE_SAFE_INTERVAL
-            if (req.query.timestamp < now + SCHEDULE_SAFE_INTERVAL) {
+            const timestamp = Number(req.query.timestamp) || now + SCHEDULE_SAFE_INTERVAL
+            if (Number(req.query.timestamp) < now + SCHEDULE_SAFE_INTERVAL) {
                 return res.status(400).json({ message: "End timestamp is too soon" });
             }
 
@@ -752,7 +751,6 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
      *                 message:
      *                   type: string
      */
-
     router.put('/:sectorId/:eventId/schedule', async (req, res) => {
         let requestUserData;
         try {

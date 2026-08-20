@@ -937,7 +937,7 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
         }
 
         const validFrom = req.query.validFrom ? Number(req.query.validFrom) : Math.floor(Date.now() / 1000);
-        const validTo = req.query.validTo
+        const validTo = req.query.validTo ? Number(req.query.validTo) : null
 
         const {
             stopThreshold: stopThreshold,
@@ -1384,7 +1384,7 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = req.query.validTo ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) ?? currentTimestamp;
 
         try {
             if (!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'THESIS', thesisId))) {
