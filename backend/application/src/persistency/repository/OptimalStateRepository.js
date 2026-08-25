@@ -14,9 +14,9 @@ class OptimalStateRepository {
         try {
             let newMatrixId
             if (profileId) {
-                const result = await this.GridOptimalProfileAssignment.findAll({
+                const result = await this.OptimalProfile.findAll({
                     where: {
-                        optimalProfileId: profileId
+                        profileId: profileId
                     }
                 })
                 if (result.length > 0) {
@@ -25,7 +25,7 @@ class OptimalStateRepository {
                     throw Error("Optimal profile not found")
                 }
             } else {
-                const maxId = await this.GridOptimalProfileAssignment.max('optimalProfileId')
+                const maxId = await this.OptimalProfile.max('profileId')
                 newMatrixId = (maxId ?? 0) + 1;
             }
 
