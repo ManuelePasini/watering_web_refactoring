@@ -131,15 +131,16 @@ class InterpolatedProfileRepository {
     async findThesisPoints(gridId) {
 
         const query = `
-            SELECT "x", "y", "z" 
-            FROM interpolated_profiles
-            WHERE grid_id = :gridId
-                AND  timestamp = (
-                    SELECT MAX(timestamp) 
-                    FROM interpolated_profiles
-                    WHERE grid_id = :gridId
-                )
-            ORDER BY "x", "y", "z"`;
+            SELECT ic."x", ic."y", ic."z"
+            FROM interpolated_cells AS ic
+            JOIN (
+                SELECT id
+                FROM interpolated_profiles
+                WHERE grid_id = :gridId
+                ORDER BY timestamp DESC
+                LIMIT 1
+            ) AS ip ON ip.id = ic.profile_id
+            ORDER BY ic."x", ic."y", ic."z"`;
 
         const results = await this.sequelize.query(query,
             {
