@@ -1,11 +1,11 @@
 import { Model, DataTypes } from 'sequelize';
 
-class Sector extends Model {
+export class SectorModel extends Model {
 
 }
 
 function initSector(sequelize) {
-    Sector.init({
+    SectorModel.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -66,7 +66,7 @@ function initSector(sequelize) {
         sequelize
     });
 
-    return Sector;
+    return SectorModel;
 }
 
 export default initSector;

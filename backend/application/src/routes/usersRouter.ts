@@ -638,7 +638,7 @@ const usersRouter = ({ userService, authenticationService, authorizationService 
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = Number(req.query.validTo) ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) || currentTimestamp;
 
         if (!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.ADMINISTRATOR, requestUserData.isAdmin))) {
             return res.status(403).json({ message: 'Unauthorized request' });

@@ -76,16 +76,16 @@ export class OptimalDistanceData {
   }
 }
 
-export class GridOptimalProfiles {
+export class GridOptimalProfile {
   gridId: number
   validFrom?: number | null
   validTo?: number | null
   stopThreshold?: number | null
   optimalDryBound?: number | null
   optimalWetBound?: number | null
-  optimalProfile: unknown[]
+  optimalProfile: OptimalProfileData[]
 
-  constructor(gridId: number, validFrom: number | null | undefined, validTo: number | null | undefined, stopThreshold: number | null | undefined, optimalDryBound: number | null | undefined, optimalWetBound: number | null | undefined, optimalProfile: unknown[]) {
+  constructor(gridId: number, validFrom: number | null | undefined, validTo: number | null | undefined, stopThreshold: number | null | undefined, optimalDryBound: number | null | undefined, optimalWetBound: number | null | undefined, optimalProfile: OptimalProfileData[]) {
     this.gridId = gridId
     this.validFrom = validFrom
     this.validTo = validTo

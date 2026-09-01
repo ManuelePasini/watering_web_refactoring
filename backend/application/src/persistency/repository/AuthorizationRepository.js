@@ -13,7 +13,7 @@ class AuthorizationRepository {
     async getUserFieldAvailableIds(userId, entity, service) {
         try {
             const query = `
-                SELECT DISTINCT role, ${COMPANIES_PERMITS_COLUMN_MAPPING[entity]} AS id
+                SELECT DISTINCT role, ${COMPANIES_PERMITS_COLUMN_MAPPING[entity]} AS "idKey"
                 FROM master_data_permits
                 WHERE user_id = :userId
                 AND ${COMPANIES_PERMITS_COLUMN_MAPPING[entity]} IS NOT NULL
@@ -33,7 +33,7 @@ class AuthorizationRepository {
     async getUserDeviceAvailableIds(userId, entity) {
         try {
             const query = `
-                SELECT DISTINCT role, ${DEVICE_PERMITS_COLUMN_MAPPING[entity]} AS id
+                SELECT DISTINCT role, ${DEVICE_PERMITS_COLUMN_MAPPING[entity]} AS "idKey"
                 FROM devices_signals_permits
                 WHERE user_id = :userId
                 AND ${DEVICE_PERMITS_COLUMN_MAPPING[entity]} IS NOT NULL

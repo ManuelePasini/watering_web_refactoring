@@ -3,3 +3,15 @@ export const removeUndefined = <T extends Record<string, unknown>>(obj: T): Part
     Object.entries(obj).filter(([_, value]) => value !== undefined)
   ) as Partial<T>
 }
+
+export const toArray = <T>(value: T | T[] | undefined): T[] | undefined => {
+    return value === undefined
+        ? undefined
+        : Array.isArray(value)
+            ? value
+            : [value];
+}
+
+export const toNumberArray = <T>(value: T | T[] | undefined): number[] | undefined => {
+    return toArray(value)?.map(Number);
+}

@@ -1,11 +1,11 @@
 import { Model, DataTypes } from 'sequelize';
 
-class Company extends Model {
+export class CompanyModel extends Model {
 
 }
 
 function initCompany(sequelize) {
-    Company.init({
+    CompanyModel.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -37,7 +37,7 @@ function initCompany(sequelize) {
         sequelize
     });
 
-    return Company;
+    return CompanyModel;
 }
 
 export default initCompany;

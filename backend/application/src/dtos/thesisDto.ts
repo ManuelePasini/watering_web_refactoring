@@ -60,3 +60,8 @@ export class ThesisData {
     this.sector = sector
   }
 }
+
+export interface ThesisContribution {
+    id: number;
+    weight?: number | null;
+}

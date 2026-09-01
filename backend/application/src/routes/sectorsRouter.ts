@@ -882,7 +882,7 @@ const sectorsRouter = ({ authenticationService, authorizationService, fieldServi
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = Number(req.query.validTo) ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) || currentTimestamp;
         if(!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'SECTOR', sectorId))){
             return res.status(403).json({ message: 'Unauthorized request' });
         }

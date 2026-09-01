@@ -1,11 +1,24 @@
 import { google } from "googleapis";
-import { Buffer } from "buffer";
+
+interface EmailOptions {
+    to: string | string[];
+    subject: string;
+    text?: string;
+    html?: string;
+}
+
+interface RawEmailOptions {
+    to: string;
+    from: string;
+    subject: string;
+    text?: string;
+    html?: string;
+}
 
 const oauth2Client = new google.auth.OAuth2({
     clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 });
-
 
 oauth2Client.setCredentials({
     refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
@@ -18,10 +31,16 @@ function getGmailClient() {
     });
 }
 
-function createRawEmail({ to, from, subject, text, html }) {
-    const boundary = "boundary_" + Date.now();
+function createRawEmail({
+    to,
+    from,
+    subject,
+    text,
+    html,
+}: RawEmailOptions): string {
+    const boundary = `boundary_${Date.now()}`;
 
-    let messageParts = [
+    const messageParts: string[] = [
         `From: ${from}`,
         `To: ${to}`,
         `Subject: ${subject}`,
@@ -29,16 +48,16 @@ function createRawEmail({ to, from, subject, text, html }) {
         `Content-Type: multipart/alternative; boundary="${boundary}"`,
         "",
         `--${boundary}`,
-        `Content-Type: text/plain; charset="UTF-8"`,
+        'Content-Type: text/plain; charset="UTF-8"',
         "",
-        text || "",
+        text ?? "",
     ];
 
     if (html) {
         messageParts.push(
             "",
             `--${boundary}`,
-            `Content-Type: text/html; charset="UTF-8"`,
+            'Content-Type: text/html; charset="UTF-8"',
             "",
             html
         );
@@ -48,19 +67,24 @@ function createRawEmail({ to, from, subject, text, html }) {
 
     const rawMessage = messageParts.join("\n");
 
-    return Buffer.from(rawMessage)
+    return Buffer.from(rawMessage, "utf-8")
         .toString("base64")
         .replace(/\+/g, "-")
         .replace(/\//g, "_")
         .replace(/=+$/, "");
 }
 
-export async function sendEmail({ to, subject, text, html }) {
-    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+export async function sendEmail({
+    to,
+    subject,
+    text,
+    html,
+}: EmailOptions): Promise<string | undefined> {
+    const gmail = getGmailClient();
 
     const raw = createRawEmail({
         to: Array.isArray(to) ? to.join(", ") : to,
-        from: process.env.GMAIL_USER,
+        from: process.env.GMAIL_USER ?? "",
         subject,
         text,
         html,
@@ -78,8 +102,7 @@ export async function sendEmail({ to, subject, text, html }) {
     }
 }
 
-
-export async function verifyGmailConnection() {
+export async function verifyGmailConnection(): Promise<boolean> {
     try {
         const gmail = getGmailClient();
         await gmail.users.getProfile({

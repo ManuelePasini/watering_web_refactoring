@@ -1,11 +1,6 @@
 import { removeUndefined } from './utils.js'
 
-type EntityData = {
-  id: number
-  [key: string]: unknown
-}
-
-type RepositoryUpdateFunction = (id: number, fields: Partial<EntityData>) => Promise<{
+type RepositoryUpdateFunction = (id: number, fields: any) => Promise<{
   get(args: { plain: true }): unknown
 } | null | undefined>
 
@@ -13,7 +8,7 @@ type UserActionService = {
   logUpdate(userId: number, table: string, id: number, previousValue: unknown, nextValue: unknown): Promise<unknown>
 }
 
-export const _updateEntity = async (userId: number, data: EntityData, repositoryFunction: RepositoryUpdateFunction, userActionService: UserActionService, updateLogTable: string): Promise<void> => {
+export const _updateEntity = async (userId: number, data: any, repositoryFunction: RepositoryUpdateFunction, userActionService: UserActionService, updateLogTable: string): Promise<void> => {
   try {
     const { id, ...fields } = data
 

@@ -1,19 +1,31 @@
-import { Op } from 'sequelize';
+import { Op, QueryTypes, Sequelize } from 'sequelize';
 import { _deleteFromModelByParams } from '../../commons/repositoryUtils.js';
+import { Sector } from '../../dtos/sectorDto.js';
+import { ThesisInSectorModel } from '../model/ThesisInSector.js';
+import { ThesisModel } from '../model/Thesis.js';
+import { SectorModel } from '../model/Sector.js';
+import { FarmModel } from '../model/Farm.js';
+import { CompanyModel } from '../model/Company.js';
+import { ThesisContribution } from '../../dtos/thesisDto.js';
 
 class SectorRepository {
 
-    constructor(models, sequelize) {
+    private readonly Company: typeof CompanyModel
+    private readonly Farm: typeof FarmModel
+    private readonly Thesis: typeof ThesisModel
+    private readonly ThesisInSector: typeof ThesisInSectorModel
+    private readonly sequelize: Sequelize
+
+    constructor(models, sequelize: Sequelize) {
         this.Company = models.Company
         this.Farm = models.Farm
-        this.Sector = models.Sector
         this.Thesis = models.Thesis
         this.ThesisInSector = models.ThesisInSector
         this.sequelize = sequelize
     }
 
     async sectorExists(sectorId) {
-        const count = await this.Sector.count({
+        const count = await SectorModel.count({
             where: { id: sectorId }
         });
         return count > 0;
@@ -29,13 +41,13 @@ class SectorRepository {
         sprinklerCapacity,
         doubleWing,
         createdAt
-    }) {
+    }: Sector) {
         try {
-            const farm = await this.Farm.findByPk(farmId);
+            const farm = await FarmModel.findByPk(farmId);
             if (!farm) {
                 throw new Error(`Farm with ID ${farmId} does not exist.`);
             }
-            const sectorCreated = await this.Sector.create({
+            const sectorCreated = await SectorModel.create({
                 sectorName: name,
                 farmId,
                 culture,
@@ -54,7 +66,7 @@ class SectorRepository {
     }
 
     async getSectorDetails(sectorId, timeFilterFrom, timeFilterTo) {
-        const sector = await this.Sector.findByPk(sectorId, {
+        const sector = await SectorModel.findByPk(sectorId, {
             attributes: ['id', 'sectorName', 'culture', 'cultureType', 'farmId', 'location', 'dripperCapacity', 'sprinklerCapacity', 'doubleWing', 'createdAt', 'disabledAt'],
             include: [
                 {
@@ -132,14 +144,14 @@ class SectorRepository {
 
         const results = await this.sequelize.query(query, {
             replacements: { filteringIds, timeFilterFrom, timeFilterTo },
-            type: this.sequelize.QueryTypes.SELECT
+            type: QueryTypes.SELECT
         });
 
         return results;
     }
 
     async getSectorsByFarm(farmId) {
-        return await this.Sector.findAll({
+        return await SectorModel.findAll({
             where: {
                 farmId: farmId
             }
@@ -148,7 +160,7 @@ class SectorRepository {
 
     async updateSector(sectorId, updates) {
         try {
-            const sector = await this.Sector.findByPk(sectorId);
+            const sector = await SectorModel.findByPk(sectorId);
             if (!sector) throw new Error("Sector not found");
             const { name, culture, cultureType, location, dripperCapacity, sprinklerCapacity, doubleWing } = updates
             return await sector.update({ sectorName: name, culture, cultureType, location, dripperCapacity, sprinklerCapacity, doubleWing });
@@ -159,7 +171,7 @@ class SectorRepository {
 
     async disableSector(sectorId, validTo) {
         try {
-            await this.Sector.update(
+            await SectorModel.update(
                 { disabledAt: validTo },
                 { where: { id: sectorId, disabledAt: { [Op.is]: null } } }
             );
@@ -171,14 +183,14 @@ class SectorRepository {
 
     async deleteSector(sectorId) {
         try {
-            return await _deleteFromModelByParams(this.Sector, { id: sectorId })
+            return await _deleteFromModelByParams(SectorModel as any, { id: sectorId })
         } catch (error) {
             throw new Error(`Error deleting sector: ${error.message}`);
         }
     }
 
-    async assignThesisToSector(thesisId, sectorId, weight, validFrom, validTo) {
-        const model = await this.ThesisInSector.create({
+    async assignThesisToSector(thesisId, sectorId, weight, validFrom, validTo?) {
+        const model: any = await ThesisInSectorModel.create({
             thesisId,
             sectorId,
             weight,

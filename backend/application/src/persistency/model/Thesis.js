@@ -1,11 +1,11 @@
 import { Model, DataTypes } from 'sequelize';
 
-class Thesis extends Model {
+export class ThesisModel extends Model {
 
 }
 
 function initThesis(sequelize) {
-    Thesis.init({
+    ThesisModel.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -33,7 +33,7 @@ function initThesis(sequelize) {
         sequelize
     });
 
-    return Thesis;
+    return ThesisModel;
 }
 
 export default initThesis;

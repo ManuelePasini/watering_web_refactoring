@@ -2,8 +2,12 @@ import { Router } from 'express';
 
 import { CreateDevice, UpdateDevice, DeviceAssociation } from '../dtos/deviceDto.js';
 import { ROLES } from '../commons/permissionRoles.js';
+import AuthenticationService from '../services/AuthenticationService.js';
+import AuthorizationService from '../services/AuthorizationService.js';
+import DeviceService from '../services/DeviceService.js';
+import { toArray, toNumberArray } from '../commons/utils.js';
 
-const devicesRouter = ({ authenticationService, authorizationService, userService, deviceService }) => {
+const devicesRouter = ({ authenticationService, authorizationService, deviceService }: {authenticationService: AuthenticationService, authorizationService: AuthorizationService, deviceService: DeviceService}) => {
     const router = Router();
 
     /**
@@ -140,13 +144,13 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
             return res.status(401).json({ message: 'Authentication failed' });
         }
 
-        const timeFilterFrom = req.query.timeFilterFrom ?? Math.floor(Date.now() / 1000)
-        const timeFilterTo = req.query.timeFilterTo ?? Math.ceil(Date.now() / 1000)
-        const providerIds = req.query.providerIds
-        const types = req.query.types
-        const companyIds = req.query.companyIds
-        const page = req.query.page ?? 1
-        const itemsPerPage = req.query.itemsPerPage ?? 50
+        const timeFilterFrom = Number(req.query.timeFilterFrom) || Math.floor(Date.now() / 1000)
+        const timeFilterTo = Number(req.query.timeFilterTo) || Math.ceil(Date.now() / 1000)
+        const providerIds = toNumberArray(req.query.providerIds)
+        const types = toArray(req.query.types) as string[]
+        const companyIds = toNumberArray(req.query.companyIds)
+        const page = Number(req.query.page) || 1
+        const itemsPerPage = Number(req.query.itemsPerPage) || 50
 
         try {
             let userAvailableIds = await authorizationService.getAvailableEntityIds(requestUserData.userId, 'DEVICE', ROLES.VIEWER, requestUserData.isAdmin)
@@ -155,7 +159,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
                 if (userAvailableIds.includes('ALL')) {
                     userAvailableIds = null
                 }
-                const devices = await deviceService.getDevices(userAvailableIds, timeFilterFrom, timeFilterTo, providerIds, types, companyIds, page, itemsPerPage);
+                const devices = await deviceService.getDevices(userAvailableIds as number[], timeFilterFrom, timeFilterTo, providerIds, types, companyIds, page, itemsPerPage);
                 return res.status(200).json(devices);
             }
             return res.status(404).json({
@@ -375,13 +379,13 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
         try {
             const userId = requestUserData.userId
-            if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', req.params.deviceId))) {
+            if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', Number(req.params.deviceId)))) {
                 return res.status(403).json({ message: 'Unauthorized request' });
             }
 
             const validFrom = req.body.timestamp ?? Date.now() / 1000;
 
-            await deviceService.connectSignalsToDevice(userId, req.params.deviceId, req.body.signalIds, validFrom);
+            await deviceService.connectSignalsToDevice(userId, Number(req.params.deviceId), req.body.signalIds, validFrom);
             return res.status(200).json({ message: `Signals connected to device with success` });
         } catch (error) {
             console.log(`Failed connecting signals to Device caused by: ${error.message}`);
@@ -493,13 +497,13 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
         try {
             const userId = requestUserData.userId
-            if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', req.params.deviceId))) {
+            if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', Number(req.params.deviceId)))) {
                 return res.status(403).json({ message: 'Unauthorized request' });
             }
 
             const validTo = req.body.timestamp ?? Date.now() / 1000;
 
-            await deviceService.disconnectSignalsFromDevice(userId, req.params.deviceId, req.body.signalIds, validTo);
+            await deviceService.disconnectSignalsFromDevice(userId, Number(req.params.deviceId), req.body.signalIds, validTo);
             return res.status(200).json({ message: `Signals disconnected from device with success` });
         } catch (error) {
             console.log(`Failed disconnecting signals from Device caused by: ${error.message}`);
@@ -1018,7 +1022,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
 
         const userId = requestUserData.userId
-        const deviceId = req.params.deviceId;
+        const deviceId = Number(req.params.deviceId);
 
         const exists = await deviceService.deviceExists(deviceId);
         if (!exists) {
@@ -1026,7 +1030,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = Number(req.query.validTo) ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) || currentTimestamp;
 
         if (!(await authorizationService.isUserAuthorized(userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'DEVICE', deviceId))) {
             return res.status(403).json({ message: 'Unauthorized request' });
@@ -1147,7 +1151,7 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
         }
 
         const userId = requestUserData.userId
-        const deviceId = req.params.deviceId;
+        const deviceId = Number(req.params.deviceId);
 
         const exists = await deviceService.deviceExists(deviceId);
         if (!exists) {
@@ -1262,8 +1266,8 @@ const devicesRouter = ({ authenticationService, authorizationService, userServic
             return res.status(401).json({ message: 'Authentication failed' });
         }
 
-        const deviceId = req.params.deviceId
-        const timestamp = req.query.timestamp ? req.query.timestamp : Date.now() / 1000;
+        const deviceId = Number(req.params.deviceId)
+        const timestamp = req.query.timestamp ? Number(req.query.timestamp) : Date.now() / 1000;
 
         if (!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.VIEWER, requestUserData.isAdmin, 'DEVICE', deviceId))) {
             return res.status(403).json({ message: 'Unauthorized request' });

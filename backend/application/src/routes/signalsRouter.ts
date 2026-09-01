@@ -431,7 +431,7 @@ const signalsRouter = ({ authenticationService, authorizationService, signalServ
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = Number(req.query.validTo) ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) || currentTimestamp;
         try {
             if (validTo < currentTimestamp - (24*60*60)) {
                 return res.status(400).json({ message: 'Invalid validTo timestamp provided. It must be a timestamp in the last 24 hours' })

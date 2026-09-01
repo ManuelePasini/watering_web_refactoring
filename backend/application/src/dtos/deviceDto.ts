@@ -69,10 +69,10 @@ export class DeviceAssociation {
   sourceId: number
   targetType: DeviceTargetType
   targetId: number
-  validFrom: number | null
-  validTo: number | null
+  validFrom?: number
+  validTo?: number
 
-  constructor(sourceId: number, targetType: DeviceTargetType, targetId: number, validFrom: number | null = null, validTo: number | null = null) {
+  constructor(sourceId: number, targetType: DeviceTargetType, targetId: number, validFrom?: number, validTo?: number) {
     this.sourceId = sourceId
     this.targetType = targetType
     this.targetId = targetId

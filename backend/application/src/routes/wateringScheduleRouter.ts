@@ -532,7 +532,7 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
                 return res.status(400).json({message: 'Invalid time range params! It is not possible create event in the past'})
             }
 
-            const newEventIds = await wateringScheduleService.createPeriodicWateringEvent(userId, sectorId, Number(timestampFrom), Number(timestampTo));
+            const newEventIds = await wateringScheduleService.createPeriodicWateringEvent(userId, sectorId, timestampFrom, timestampTo);
             res.status(200).json({ message: 'Watering events created successfully', eventIds: newEventIds });
         } catch (error) {
             console.error(`Error creating watering events: ${error.message}`);
@@ -653,11 +653,11 @@ const wateringScheduleRouter = ({ authenticationService, authorizationService, w
             }
 
             const timestamp = Number(req.query.timestamp) || now + SCHEDULE_SAFE_INTERVAL
-            if (Number(req.query.timestamp) < now + SCHEDULE_SAFE_INTERVAL) {
+            if (timestamp < now + SCHEDULE_SAFE_INTERVAL) {
                 return res.status(400).json({ message: "End timestamp is too soon" });
             }
 
-            const deletedEventsIds = await wateringScheduleService.deleteWateringEvents(userId, sectorId, timestamp);
+            await wateringScheduleService.deleteWateringEvents(userId, sectorId, timestamp);
             res.status(200).json({ message: 'Irrigation season ended successfully' });
         } catch (error) {
             console.log(`Failed ending watering seasons caused by: ${error.message}`);

@@ -1,9 +1,9 @@
 import { Model, DataTypes } from 'sequelize';
 
-class ThesisInSector extends Model {}
+export class ThesisInSectorModel extends Model {}
 
 function initThesisInSector(sequelize) {
-    ThesisInSector.init({
+    ThesisInSectorModel.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -40,7 +40,7 @@ function initThesisInSector(sequelize) {
         sequelize
     });
 
-    return ThesisInSector;
+    return ThesisInSectorModel;
 }
 
 export default initThesisInSector;

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { HUMIDITY_DEVICE_TYPE } from '../commons/constants.js'
-import { GridOptimalProfiles } from '../dtos/optStateDto.js'
+import { GridOptimalProfile } from '../dtos/optStateDto.js'
 import { WateringParams } from '../dtos/wateringParamsDto.js'
 import { ROLES } from '../commons/permissionRoles.js'
 
@@ -109,8 +109,8 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
         }
 
         const thesisId = Number(req.params.thesisId)
-        const timeFilterFrom = Number(req.query.timeFilterFrom) ?? Math.floor(Date.now() / 1000);
-        const timeFilterTo = Number(req.query.timeFilterTo) ?? Math.ceil(Date.now() / 1000);
+        const timeFilterFrom = Number(req.query.timeFilterFrom) || Math.floor(Date.now() / 1000);
+        const timeFilterTo = Number(req.query.timeFilterTo) || Math.ceil(Date.now() / 1000);
 
         if(!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.VIEWER, requestUserData.isAdmin, 'THESIS', thesisId))){
             return res.status(403).json({ message: 'Unauthorized request' });
@@ -982,8 +982,8 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
                     weight: 1
                 }))
 
-                const gridOptimalProfiles = new GridOptimalProfiles(gridId, validFrom, validTo, stopThreshold, optimalDryBound, optimalWetBound, optimalProfile)
-                optimalProfileAssignmentId = await fieldService.createMatrixOptimalState(userId, gridOptimalProfiles)
+                const gridOptimalProfile = new GridOptimalProfile(gridId, validFrom, validTo, stopThreshold, optimalDryBound, optimalWetBound, optimalProfile)
+                optimalProfileAssignmentId = await fieldService.createMatrixOptimalState(userId, gridOptimalProfile)
             }
             else {
                 const optimalProfile = req.body.optimalProfile
@@ -996,8 +996,8 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
                 if (!checkOptState(thesisPoints, optimalProfile))
                     return res.status(400).json({ error: "Optimal profile matrix does not match" })
 
-                const gridOptimalProfiles = new GridOptimalProfiles(gridId, validFrom, validTo, stopThreshold, optimalDryBound, optimalWetBound, optimalProfile)
-                optimalProfileAssignmentId = await fieldService.createMatrixOptimalState(userId, gridOptimalProfiles)
+                const gridOptimalProfile = new GridOptimalProfile(gridId, validFrom, validTo, stopThreshold, optimalDryBound, optimalWetBound, optimalProfile)
+                optimalProfileAssignmentId = await fieldService.createMatrixOptimalState(userId, gridOptimalProfile)
             }
             return res.status(200).json({ message: 'Optimal state set successfully' });
         } catch (error) {
@@ -1384,7 +1384,7 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
         }
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const validTo = Number(req.query.validTo) ?? currentTimestamp;
+        const validTo = Number(req.query.validTo) || currentTimestamp;
 
         try {
             if (!(await authorizationService.isUserAuthorized(requestUserData.userId, ROLES.ACCOUNTER, requestUserData.isAdmin, 'THESIS', thesisId))) {

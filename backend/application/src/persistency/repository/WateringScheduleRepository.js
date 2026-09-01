@@ -219,8 +219,8 @@ class WateringScheduleRepository {
     async createWateringEvent({
         sectorId, 
         wateringStart, 
-        expectedWater, 
-        note, 
+        expectedWater = null, 
+        note = null, 
         enabled = true,
         scheduled = false
     }) {

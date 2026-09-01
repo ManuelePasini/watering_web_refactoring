@@ -1,11 +1,11 @@
 import { Model, DataTypes } from 'sequelize';
 
-class Farm extends Model {
+export class FarmModel extends Model {
 
 }
 
 function initFarm(sequelize) {
-    Farm.init({
+    FarmModel.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -42,7 +42,7 @@ function initFarm(sequelize) {
         sequelize
     });
 
-    return Farm;
+    return FarmModel;
 }
 
 export default initFarm;

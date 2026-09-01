@@ -122,9 +122,9 @@ const organizationService = new OrganizationService(organizationRepository, user
 const userService = new UserService(userRepository, userActionService)
 const authenticationService = new AuthenticationService(userService)
 const sectorServicesService = new SectorServicesService(serviceRepository, userActionService)
-const fieldService = new FieldService(companyRepository, farmRepository, sectorRepository, thesisRepository, thesesAllSignalsRepository, interpolatedProfileRepository, humidityBinsRepository, optimalDistanceRepository, wateringAdviceRepository, deviceRepository, wateringScheduleRepository, optimalStateRepository, serviceRepository, sectorServicesService, userActionService)
-const authorizationService = new AuthorizationService(userService, authorizationRepository, userActionService)
-const deviceService = new DeviceService(deviceRepository, signalRepository, thesisRepository, interpolatedProfileRepository, optimalStateRepository, userActionService)
+const fieldService = new FieldService(farmRepository, sectorRepository, thesisRepository, thesesAllSignalsRepository, interpolatedProfileRepository, humidityBinsRepository, optimalDistanceRepository, wateringAdviceRepository, deviceRepository, wateringScheduleRepository, optimalStateRepository, serviceRepository, sectorServicesService, userActionService)
+const authorizationService = new AuthorizationService(authorizationRepository, userActionService)
+const deviceService = new DeviceService(deviceRepository, signalRepository, interpolatedProfileRepository, optimalStateRepository, userActionService)
 const signalService = new SignalService(signalRepository, userActionService)
 const companyService = new CompanyService(companyRepository, farmRepository, deviceRepository, deviceService, fieldService, userActionService)
 const wateringScheduleService = new WateringScheduleService(wateringScheduleRepository, wateringAdviceRepository, userActionService)
@@ -175,7 +175,7 @@ app.use(
 
 app.use(
   '/devices',
-  (devicesRouter as any)({ authenticationService, authorizationService, userService, deviceService })
+  (devicesRouter as any)({ authenticationService, authorizationService, deviceService })
 )
 
 app.use(

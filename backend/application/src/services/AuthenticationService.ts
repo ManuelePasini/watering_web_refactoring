@@ -2,19 +2,9 @@ import pkg from 'jsonwebtoken'
 import type { JwtPayload } from 'jsonwebtoken'
 import { jwtSecret } from '../commons/constants.js'
 import type { UserTokenRequest } from '../dtos/authenticationDto.js'
+import UserService from './UserService.js'
 
 const { sign, verify } = pkg
-
-type AuthenticatedUser = {
-  id: number
-  name?: string | null
-  password: string
-}
-
-type AuthUserService = {
-  findUserByEmail(email: string, includePassword: boolean): Promise<AuthenticatedUser | null | undefined>
-  isAdmin(userId: number): Promise<boolean>
-}
 
 export type AuthenticatedUserPayload = {
   userId: number
@@ -23,9 +13,9 @@ export type AuthenticatedUserPayload = {
 }
 
 class AuthenticationService {
-  private userService: AuthUserService
+  private userService: UserService
 
-  constructor(userService: AuthUserService) {
+  constructor(userService: UserService) {
     this.userService = userService
   }
 

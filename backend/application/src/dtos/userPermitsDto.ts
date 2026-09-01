@@ -1,3 +1,5 @@
+import { TableName } from "../commons/constants.js"
+
 export class UserRole {
   role: string
   table: string
@@ -32,4 +34,10 @@ export class UserResourcePermit {
     this.role = role
     this.extraAttributes = extraAttributes
   }
+}
+
+export interface Permission {
+    idKey: number;
+    role: string;
+    table?: TableName;
 }
