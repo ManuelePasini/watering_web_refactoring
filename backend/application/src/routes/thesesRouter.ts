@@ -968,13 +968,13 @@ const thesesRouter = ({ authenticationService, authorizationService, fieldServic
                 const sourceThesisId = Number(req.query.thesisId);
                 const imageTimestamp = Number(req.query.imageTimestamp);
 
-                const interpolatedMatrix = await fieldService.getInterpolatedProfiles(sourceThesisId, imageTimestamp, imageTimestamp)
+                const interpolatedMatrix = await fieldService.getHeatmapByThesis(sourceThesisId, imageTimestamp, imageTimestamp)
 
-                if (!interpolatedMatrix || !(interpolatedMatrix.length > 0)) {
+                if (interpolatedMatrix?.images.length === 0) {
                     return res.status(400).json({ message: 'Invalid request, given timestamp not found' });
                 }
 
-                const optimalProfile = interpolatedMatrix.map(cell => ({
+                const optimalProfile = interpolatedMatrix.images[0].image.map(cell => ({
                     x: cell.x,
                     y: cell.y,
                     z: cell.z,

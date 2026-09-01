@@ -815,19 +815,6 @@ class FieldService {
         return matrixData.optimalProfileAssignmentId;
     }
 
-    async getInterpolatedProfiles(
-        thesisId: number,
-        timeFilterFrom: number,
-        timeFilterTo: number
-    ) {
-        return this.interpolatedProfileRepository
-            .getInterpolatedProfiles(
-                thesisId,
-                timeFilterFrom,
-                timeFilterTo
-            );
-    }
-
     async setThesesContributions(
         userId: number,
         sectorId: number,

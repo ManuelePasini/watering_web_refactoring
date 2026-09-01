@@ -13,6 +13,7 @@ class OptimalStateRepository {
     async createMatrixOptimalState(gridId, validFrom, validTo, stopThreshold, optimalDryBound, optimalWetBound, profileId) {
         try {
             let newMatrixId
+            this.OptimalProfile.removeAttribute('id')
             if (profileId) {
                 const result = await this.OptimalProfile.findAll({
                     where: {
