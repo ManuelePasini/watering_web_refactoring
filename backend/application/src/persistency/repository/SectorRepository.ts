@@ -1,12 +1,11 @@
 import { Op, QueryTypes, Sequelize } from 'sequelize';
 import { _deleteFromModelByParams } from '../../commons/repositoryUtils.js';
 import { Sector } from '../../dtos/sectorDto.js';
-import { ThesisInSectorModel } from '../model/ThesisInSector.js';
-import { ThesisModel } from '../model/Thesis.js';
-import { SectorModel } from '../model/Sector.js';
-import { FarmModel } from '../model/Farm.js';
-import { CompanyModel } from '../model/Company.js';
-import { ThesisContribution } from '../../dtos/thesisDto.js';
+import { ThesisInSectorModel } from '../model/ThesisInSectorModel.js';
+import { ThesisModel } from '../model/ThesisModel.js';
+import { SectorModel } from '../model/SectorModel.js';
+import { FarmModel } from '../model/FarmModel.js';
+import { CompanyModel } from '../model/CompanyModel.js';
 
 class SectorRepository {
 

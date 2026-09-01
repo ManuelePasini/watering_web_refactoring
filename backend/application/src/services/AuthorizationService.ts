@@ -1,61 +1,14 @@
 import {
     COMPANIES_PERMITS_COLUMN_MAPPING,
+    DEVICE_PERMITS_COLUMN_MAPPING,
     isRoleAtLeast,
     Role,
 } from "../commons/permissionRoles.js";
-import { TABLES } from "../commons/constants.js";
+import { TableName, TABLES } from "../commons/constants.js";
 import DtoConverter from "./DtoConverter.js";
 import UserActionService from "./UserActionService.js";
 import { Permission, UserRole } from "../dtos/userPermitsDto.js";
-
-interface AuthorizationRepository {
-    getUserFieldAvailableIds(
-        userId: number,
-        entity: string,
-        service: string | null
-    ): Promise<Permission[]>;
-
-    getUserDeviceAvailableIds(
-        userId: number,
-        entity: string
-    ): Promise<Permission[]>;
-
-    getUserFieldsRoles(
-        userId: number,
-        entity: string | null,
-        id: number | null,
-        service: string | null
-    ): Promise<UserRole[]>;
-
-    getUserDeviceRoles(
-        userId: number,
-        entity: string,
-        id: number | null
-    ): Promise<UserRole[]>;
-
-    grantUser(
-        targetUserId: number,
-        entityType: string,
-        entityId: number,
-        role: string,
-        extraAttributes?: unknown
-    ): Promise<{ id?: number } | null>;
-
-    removeOldPermits(
-        targetUserId: number,
-        entityType: string,
-        entityId: number
-    ): Promise<number[] | null>;
-
-    getResourceRelatedPermissions(
-        entityType: string,
-        entityId: number
-    ): Promise<unknown[]>;
-
-    getCompanyUsers(
-        companyId: number
-    ): Promise<unknown[]>;
-}
+import AuthorizationRepository from "../persistency/repository/AuthorizationRepository.js";
 
 const dtoConverter = new DtoConverter;
 
@@ -67,7 +20,7 @@ class AuthorizationService {
 
     async getAvailableEntityIds(
         userId: number,
-        entity: string,
+        entity: keyof typeof COMPANIES_PERMITS_COLUMN_MAPPING | keyof typeof DEVICE_PERMITS_COLUMN_MAPPING,
         minRole: string,
         isAdmin: boolean = false,
         service: string | null = null
@@ -82,14 +35,14 @@ class AuthorizationService {
             availableIds =
                 await this.authorizationRepository.getUserFieldAvailableIds(
                     userId,
-                    entity,
+                    entity as keyof typeof COMPANIES_PERMITS_COLUMN_MAPPING,
                     service
                 );
         } else {
             availableIds =
                 await this.authorizationRepository.getUserDeviceAvailableIds(
                     userId,
-                    entity
+                    entity as keyof typeof DEVICE_PERMITS_COLUMN_MAPPING
                 );
         }
 
@@ -106,9 +59,9 @@ class AuthorizationService {
         userId: number,
         requiredRole: Role,
         isAdmin: boolean = false,
-        entity: string | null = null,
-        id: number | null = null,
-        service: string | null = null
+        entity?: keyof typeof COMPANIES_PERMITS_COLUMN_MAPPING | keyof typeof DEVICE_PERMITS_COLUMN_MAPPING,
+        id?: number,
+        service?: string
     ): Promise<boolean> {
         if (isAdmin) {
             return true;
@@ -123,7 +76,7 @@ class AuthorizationService {
             userRoles =
                 await this.authorizationRepository.getUserFieldsRoles(
                     userId,
-                    entity,
+                    entity as keyof typeof COMPANIES_PERMITS_COLUMN_MAPPING,
                     id,
                     service
                 );
@@ -131,7 +84,7 @@ class AuthorizationService {
             userRoles =
                 await this.authorizationRepository.getUserDeviceRoles(
                     userId,
-                    entity,
+                    entity as keyof typeof DEVICE_PERMITS_COLUMN_MAPPING,
                     id
                 );
         }
@@ -147,9 +100,9 @@ class AuthorizationService {
         userId: number,
         targetUserId: number,
         role: Role,
-        entityType: string,
+        entityType: keyof typeof COMPANIES_PERMITS_COLUMN_MAPPING | keyof typeof DEVICE_PERMITS_COLUMN_MAPPING,
         entityId: number,
-        extraAttributes?: unknown
+        extraAttributes?: any
     ): Promise<void> {
         const validRequest =
             (role === "accounter" && entityType === "COMPANY") ||
@@ -161,7 +114,7 @@ class AuthorizationService {
                 targetUserId,
                 "accounter",
                 false,
-                entityType,
+                entityType ,
                 entityId
             );
 
@@ -176,7 +129,7 @@ class AuthorizationService {
             const permit =
                 await this.authorizationRepository.grantUser(
                     targetUserId,
-                    entityType,
+                    entityType as TableName,
                     entityId,
                     role,
                     extraAttributes
@@ -197,7 +150,7 @@ class AuthorizationService {
     async deleteUserPermission(
         userId: number,
         targetUserId: number,
-        entityType: string,
+        entityType: "COMPANY" | "SECTOR",
         entityId: number
     ): Promise<void> {
         try {
@@ -231,7 +184,7 @@ class AuthorizationService {
     ) {
         const res =
             await this.authorizationRepository.getResourceRelatedPermissions(
-                entityType,
+                entityType as TableName,
                 entityId
             );
 
