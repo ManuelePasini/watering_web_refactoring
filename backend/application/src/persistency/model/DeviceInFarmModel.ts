@@ -6,6 +6,7 @@ import {
   Model,
   Sequelize,
 } from "sequelize";
+import { DeviceModel } from "./DeviceModel.js";
 
 export class DeviceInFarmModel extends Model<
   InferAttributes<DeviceInFarmModel>,
@@ -16,6 +17,7 @@ export class DeviceInFarmModel extends Model<
   declare deviceId: number;
   declare validFrom: number;
   declare validTo: number | null;
+  declare device?: DeviceModel;
 }
 
 export function initDeviceInFarm(

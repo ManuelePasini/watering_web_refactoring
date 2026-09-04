@@ -29,3 +29,13 @@ export type TableName = typeof TABLES[keyof typeof TABLES]
 
 export const LOGIN_URL = 'https://big.csr.unibo.it/projects/watering/#/login'
 export const APP_NAME = 'SMARTER'
+
+export const ActionTypes = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+  DISABLE: 'DISABLE',
+  SCHEDULE: 'SCHEDULE'
+} as const
+
+export type ActionType = typeof ActionTypes[keyof typeof ActionTypes]

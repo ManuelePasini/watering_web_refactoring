@@ -8,7 +8,7 @@ import ThesisRepository from "../persistency/repository/ThesisRepository.js";
 import ThesesAllSignalsRepository from "../persistency/repository/ThesesAllSignalsRepository.js";
 import InterpolatedProfileRepository from "../persistency/repository/InterpolatedProfileRepository.js";
 import HumidityBinsRepository from "../persistency/repository/HumidityBinsRepository.js";
-import OptimalDistanceRepository from "../persistency/repository/OptimalDistanceRepository.js";
+import OptimalDistanceRepository, { OptimalDistanceResult } from "../persistency/repository/OptimalDistanceRepository.js";
 import WateringAdviceRepository from "../persistency/repository/WateringAdviceRepository.js";
 import DeviceRepository from "../persistency/repository/DeviceRepository.js";
 import WateringScheduleRepository from "../persistency/repository/WateringScheduleRepository.js";
@@ -19,6 +19,7 @@ import UserActionService from "./UserActionService.js";
 import { Farm } from "../dtos/farmDto.js";
 import { Sector, SectorData } from "../dtos/sectorDto.js";
 import { Thesis, ThesisContribution } from "../dtos/thesisDto.js";
+import { getErrorMessage } from "../commons/utils.js";
 
 const dtoConverter = new DtoConverter();
 
@@ -94,10 +95,7 @@ class FieldService {
             return undefined;
         } catch (error) {
             console.error(
-                `Error creating farm ${farm.name}: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error creating farm ${farm.name}: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -160,10 +158,7 @@ class FieldService {
             return undefined;
         } catch (error) {
             console.error(
-                `Error creating sector ${sector.name}: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error creating sector ${sector.name}: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -191,7 +186,7 @@ class FieldService {
     ): Promise<number> {
         const newThesisId =
             await this.thesisRepository.createThesis(
-                thesis
+                { name: thesis.name, validFrom: thesis.validFrom || Date.now() / 1000 }
             );
 
         if (!newThesisId) {
@@ -601,10 +596,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error retrieving binning info: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error retrieving binning info: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -671,7 +663,7 @@ class FieldService {
         timeFilterTo: number,
         algorithmViewFlag: boolean
     ) {
-        let result: unknown;
+        let result: OptimalDistanceResult[] = [];
 
         if (scope === "sector") {
             result =
@@ -1023,10 +1015,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error disabling thesis: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error disabling thesis: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -1090,10 +1079,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error deleting thesis: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error deleting thesis: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -1209,10 +1195,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error disabling sector ${sectorId}: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error disabling sector ${sectorId}: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -1297,10 +1280,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error deleting sector: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error deleting sector: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -1381,10 +1361,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error disabling farm: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error disabling farm: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -1437,10 +1414,7 @@ class FieldService {
             );
         } catch (error) {
             console.error(
-                `Error deleting farm: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error deleting farm: ${getErrorMessage(error)}`
             );
 
             throw error;

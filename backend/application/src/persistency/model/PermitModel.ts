@@ -1,4 +1,5 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, Sequelize } from "sequelize";
+import { UserModel } from "./UserModel.js";
 
 export class PermitModel extends Model<
   InferAttributes<PermitModel>,
@@ -10,6 +11,7 @@ export class PermitModel extends Model<
   declare idKey: number | null;
   declare userId: number;
   declare extraAttributes: Record<string, unknown> | null;
+  declare user?: UserModel;
 }
 
 export function initPermit(sequelize: Sequelize): typeof PermitModel {

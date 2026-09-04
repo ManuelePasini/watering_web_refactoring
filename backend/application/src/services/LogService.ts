@@ -4,11 +4,9 @@ type LogRepository = {
 
 class LogService {
   private logRepository: LogRepository
-  private userActionService: unknown
 
-  constructor(logRepository: LogRepository, userActionService: unknown) {
+  constructor(logRepository: LogRepository) {
     this.logRepository = logRepository
-    this.userActionService = userActionService
   }
 
   async getThesisLogs(thesisId: number, timestampFrom?: number | null, timestampTo?: number | null): Promise<unknown[]> {

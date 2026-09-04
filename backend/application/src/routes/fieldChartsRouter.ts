@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ROLES } from '../commons/permissionRoles.js';
+import { toArray } from '../commons/utils.js';
 const fieldChartRouter = ({ authenticationService, authorizationService, fieldService }) => {
     const router = Router();
 
@@ -156,11 +157,10 @@ const fieldChartRouter = ({ authenticationService, authorizationService, fieldSe
         const timeFilterFrom = Number(req.query.timeFilterFrom)
         const timeFilterTo = Number(req.query.timeFilterTo)
 
-        const signalTypes = req.query.signalTypes
+        const signalTypes = toArray(req.query.signalTypes) as string[]
         const aggregationType = req.query.aggregationType
         const aggregationPeriod = req.query.aggregationPeriod ? Number(req.query.aggregationPeriod) : undefined
         const offset = req.query.timeAggregationOffset ? Number(req.query.timeAggregationOffset) : undefined
-
         try {
             const results = await fieldService.getMeasurementsByThesis(
                 thesisId,

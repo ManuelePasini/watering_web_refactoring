@@ -34,8 +34,8 @@ type CreateSignalArgs = {
   createdAt?: number | null
 }
 
-type SignalInfoArgs = SignalArgs & {
-  devices?: unknown[]
+export type SignalInfoArgs = SignalArgs & {
+  devices?: { deviceId: number, deviceType: string, deviceDescription: string }[]
 }
 
 export class Signal {
@@ -151,7 +151,7 @@ export class CreateSignal {
 }
 
 export class SignalInfo extends Signal {
-  devices?: unknown[]
+  devices?: { deviceId: number, deviceType: string, deviceDescription: string }[]
 
   constructor({ devices, ...signal }: SignalInfoArgs) {
     super(signal)

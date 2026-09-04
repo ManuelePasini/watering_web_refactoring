@@ -10,6 +10,7 @@ import { UserModel } from "../model/UserModel.js";
 import { Where } from "sequelize/lib/utils";
 import { UserRole } from "../../dtos/userPermitsDto.js";
 import { PermitModel } from "../model/PermitModel.js";
+import { getErrorMessage } from "../../commons/utils.js";
 
 
 
@@ -22,7 +23,7 @@ interface GrantExtraAttributes {
     [key: string]: unknown;
 }
 
-interface CompanyUserRow {
+export interface UserRoles {
     id: number;
     name: string;
     email: string;
@@ -78,9 +79,7 @@ class AuthorizationRepository {
             return results;
         } catch (error) {
             console.error(
-                `Fail retrieving authorization data: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Fail retrieving authorization data: ${getErrorMessage(error)}`
             );
             throw error;
         }
@@ -113,9 +112,7 @@ class AuthorizationRepository {
             return results;
         } catch (error) {
             console.error(
-                `Fail retrieving authorization data: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Fail retrieving authorization data: ${getErrorMessage(error)}`
             );
             throw error;
         }
@@ -159,9 +156,7 @@ class AuthorizationRepository {
             });
         } catch (error) {
             console.error(
-                `Fail retrieving authorization data: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Fail retrieving authorization data: ${getErrorMessage(error)}`
             );
             throw error;
         }
@@ -195,9 +190,7 @@ class AuthorizationRepository {
             });
         } catch (error) {
             console.error(
-                `Fail retrieving authorization data: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Fail retrieving authorization data: ${getErrorMessage(error)}`
             );
             throw error;
         }
@@ -237,9 +230,7 @@ class AuthorizationRepository {
             });
         } catch (error) {
             throw new Error(
-                `Error saving new user permits caused by: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Error saving new user permits caused by: ${getErrorMessage(error)}`
             );
         }
     }
@@ -332,9 +323,7 @@ class AuthorizationRepository {
             );
         } catch (error) {
             throw new Error(
-                `Error saving new user permits caused by: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Error saving new user permits caused by: ${getErrorMessage(error)}`
             );
         }
     }
@@ -348,7 +337,7 @@ class AuthorizationRepository {
                 "role",
                 "extraAttributes",
             ],
-            group: ["role", "extraAttributes"],
+            group: ["role", "extraAttributes", "user.id", "user.name", "user.email"],
             where: {
                 table: TABLES[entityType],
                 idKey: entityId,
@@ -370,7 +359,7 @@ class AuthorizationRepository {
 
     async getCompanyUsers(
         companyId: number
-    ): Promise<CompanyUserRow[]> {
+    ): Promise<UserRoles[]> {
         try {
             const query = `
                 SELECT
@@ -388,7 +377,7 @@ class AuthorizationRepository {
                     u.email
             `;
 
-            return await this.sequelize.query<CompanyUserRow>(
+            return await this.sequelize.query<UserRoles>(
                 query,
                 {
                     replacements: { companyId },
@@ -397,9 +386,7 @@ class AuthorizationRepository {
             );
         } catch (error) {
             console.error(
-                `Fail retrieving company users: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Fail retrieving company users: ${getErrorMessage(error)}`
             );
             throw error;
         }

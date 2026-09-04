@@ -129,7 +129,7 @@ const signalService = new SignalService(signalRepository, userActionService)
 const companyService = new CompanyService(companyRepository, farmRepository, deviceRepository, deviceService, fieldService, userActionService)
 const wateringScheduleService = new WateringScheduleService(wateringScheduleRepository, wateringAdviceRepository, userActionService)
 const wateringAdviceService = new WateringAdviceService(wateringAdviceRepository, sectorRepository, thesisRepository, interpolatedProfileRepository, optimalDistanceRepository, thesesAllSignalsRepository, userActionService)
-const logService = new LogService(logRepository, userActionService)
+const logService = new LogService(logRepository)
 
 app.use(express.json())
 app.use(cors())
@@ -236,5 +236,7 @@ const validationErrorHandler: ErrorRequestHandler = (error: OpenApiValidationErr
 app.use(validationErrorHandler)
 
 app.use('/api-docs', serve, setup(swaggerSpec))
+
+app.set("query parser", "extended");
 
 verifyGmailConnection()

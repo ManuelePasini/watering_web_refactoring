@@ -7,70 +7,60 @@ import { DistanceValue, OptimalDistanceData, DistanceProfile, OptimalProfileData
 import { WateringAdvice } from "../dtos/wateringAdviceDto.js";
 import { SectorCompact, SectorData, SectorService, Service } from "../dtos/sectorDto.js";
 import { Device, DeviceTargetType } from "../dtos/deviceDto.js";
-import { Signal, SignalInfo, SignalType } from "../dtos/signalDto.js";
-import { ThesisData, ThesisRef } from "../dtos/thesisDto.js";
+import { Signal, SignalInfo, SignalInfoArgs, SignalType } from "../dtos/signalDto.js";
+import { EntityRef, ThesisData } from "../dtos/thesisDto.js";
 import { WateringParams } from "../dtos/wateringParamsDto.js";
 import { Farm, FarmData } from "../dtos/farmDto.js";
 import { User } from "../dtos/userDto.js";
 import { UserResourcePermit } from "../dtos/userPermitsDto.js";
+import { OrganizationModel } from "../persistency/model/OrganizationModel.js";
+import { CompanyModel } from "../persistency/model/CompanyModel.js";
+import { SectorResult } from "../persistency/repository/SectorRepository.js";
+import { SectorModel } from "../persistency/model/SectorModel.js";
+import { FarmModel } from "../persistency/model/FarmModel.js";
+import { ThesisInSectorModel } from "../persistency/model/ThesisInSectorModel.js";
+import { ThesisModel } from "../persistency/model/ThesisModel.js";
+import { FarmDetails } from "../persistency/repository/FarmRepository.js";
+import { OptimalStateResult, ThesisDetailsResult } from "../persistency/repository/ThesisRepository.js";
+import { MeasurementByThesisResult } from "../persistency/repository/ThesesAllSignalsRepository.js";
+import { InterpolatedMeanResult, InterpolatedProfileResult } from "../persistency/repository/InterpolatedProfileRepository.js";
+import { BinningInfoResult, HumidityBinsResult } from "../persistency/repository/HumidityBinsRepository.js";
+import { DeviceAssociationResult, DeviceResult } from "../persistency/repository/DeviceRepository.js";
+import { SignalInfoResult, SignalResult } from "../persistency/repository/SignalRepository.js";
+import { SignalTypeModel } from "../persistency/model/SignalTypeModel.js";
+import { WateringScheduleRow } from "../persistency/repository/WateringScheduleRepository.js";
+import { WateringAlgorithmParamsModel } from "../persistency/model/WateringAlgorithmParamsModel.js";
+import { AdviceModel } from "../persistency/model/AdviceModel.js";
+import { OptimalDistanceResult, PunctualDistanceResult } from "../persistency/repository/OptimalDistanceRepository.js";
+import { ServiceModel } from "../persistency/model/ServiceModel.js";
+import { SectorServicesModel } from "../persistency/model/SectorServicesModel.js";
+import { UserModel } from "../persistency/model/UserModel.js";
+import { PermitModel } from "../persistency/model/PermitModel.js";
+import { UserRoles } from "../persistency/repository/AuthorizationRepository.js";
 
 class DtoConverter {
 
-    convertOrganizationsDataWrapper(organizationsData) {
+    convertOrganizationsDataWrapper(organizationsData: OrganizationModel[]): Organization[] {
         if (!Array.isArray(organizationsData)) return []
         return organizationsData.map(o => new Organization(o.organizationName, o.id))
     }
 
-    convertOrganizationDataWrapper(organizationData) {
-        if (!organizationData) return null
-        const companies = (organizationData.companies || []).map(company => ({
-            id: company.id,
-            name: company.companyName
-        }))
-
-        return new OrganizationData(
-            organizationData.organizationName,
-            organizationData.id,
-            companies
-        )
-    }
-
-    convertCompanies(companiesData) {
+    convertCompanies(companiesData: CompanyModel[]): Company[] {
         return companiesData.map(c => this.convertCompany(c))
     }
 
-    convertCompany(company) {
+    convertCompany(company: CompanyModel): Company {
         return new Company(
             company.companyName,
             company.address,
-            company.organizationIds,
+            undefined,
             company.id,
             company.createdAt,
             company.disabledAt
         );
     }
 
-    convertCompanyDataWrapper(companyData) {
-        if (!companyData) return null;
-        const organizations = (companyData.organizations || []).map((organization) => new Organization(organization.organizationName, organization.id))
-        const farms = (companyData.farms || []).map(farm => ({
-            id: farm.id,
-            name: farm.farmName,
-            createdAt: farm.createdAt,
-            disabledAt: farm.disabledAt
-        }));
-        return new CompanyData(
-            companyData.id,
-            companyData.companyName,
-            companyData.address,
-            organizations,
-            farms,
-            companyData.createdAt,
-            companyData.disabledAt
-        );
-    }
-
-    convertSectorsDataWrapper(sectorsData) {
+    convertSectorsDataWrapper(sectorsData: SectorResult[]): SectorCompact[] {
         if (!Array.isArray(sectorsData)) return [];
 
         return sectorsData.map(s => new SectorCompact(
@@ -94,7 +84,7 @@ class DtoConverter {
 
 
 
-    convertSectorDataWrapper(sectorData) {
+    convertSectorDataWrapper(sectorData: SectorModel & { farm: FarmModel & { company: CompanyModel }, thesisInSector: (ThesisInSectorModel & { thesis: ThesisModel })[] }) {
         const theses = sectorData.thesisInSector?.map(t => ({
             id: t.thesisId,
             name: t.thesis?.thesisName,
@@ -132,11 +122,11 @@ class DtoConverter {
         );
     }
 
-    convertFarms(farmsData) {
+    convertFarms(farmsData: FarmModel[]): Farm[] {
         return farmsData.map(farm => new Farm(farm.farmName, farm.companyId, farm.location, farm.id, farm.createdAt, farm.disabledAt))
     }
 
-    convertFarmDataWrapper(farmData) {
+    convertFarmDataWrapper(farmData: FarmDetails): FarmData {
 
         const company = {
             id: farmData.companyId,
@@ -161,7 +151,7 @@ class DtoConverter {
         );
     }
 
-    convertThesisDataWrapper(thesisData) {
+    convertThesisDataWrapper(thesisData: ThesisDetailsResult): ThesisData {
         const company = {
             id: thesisData.sector.farm.company.id,
             name: thesisData.sector.farm.company.companyName
@@ -197,8 +187,26 @@ class DtoConverter {
         );
     }
 
-    convertMeasurementsDataWrapper(wrappers) {
-        const grouped = wrappers.reduce((acc, curr) => {
+    convertMeasurementsDataWrapper(wrappers: MeasurementByThesisResult[]): SignalTypeData[] {
+        type GroupedSignalType = {
+            thesisName: string;
+            signalType: string;
+            signalTypeDescription: string;
+            signals: Record<string, {
+                signalId: number;
+                deviceId: number | null;
+                signalDescription: string | null;
+                sensorTechnology: string | null;
+                x: number | null;
+                y: number | null;
+                z: number | null;
+                virtual: boolean | null;
+                unit: string | null;
+                values: MeasurementByThesisResult[];
+            }>;
+        };
+
+        const grouped = wrappers.reduce<Record<string, GroupedSignalType>>((acc, curr) => {
             const typeKey = `${curr.thesisName}_${curr.signalType}_${curr.signalTypeDescription}`;
             if (!acc[typeKey]) {
                 acc[typeKey] = {
@@ -252,7 +260,7 @@ class DtoConverter {
         return signalTypeDataArray;
     }
 
-    convertHeatmapDataWrapper(wrappers) {
+    convertHeatmapDataWrapper(wrappers: InterpolatedProfileResult[]): InterpolatedDataResponse | null {
         if (!wrappers || wrappers.length === 0) {
             return null;
         }
@@ -260,7 +268,7 @@ class DtoConverter {
 
         const validRows = wrappers.filter(w => w.timestamp != null);
 
-        const imagesMap = validRows.reduce((acc, curr) => {
+        const imagesMap: Record<number, { timestamp: number; measures: InterpolatedMeasureData[] }> = validRows.reduce((acc, curr) => {
             const key = curr.timestamp;
 
             if (!acc[key]) {
@@ -285,7 +293,7 @@ class DtoConverter {
     }
 
 
-    convertHumidityBinsDataWrapper(wrappers) {
+    convertHumidityBinsDataWrapper(wrappers: HumidityBinsResult[]): HumidityBinsDataResponse | null {
         if (!wrappers || wrappers.length === 0) {
             return null;
         }
@@ -305,8 +313,8 @@ class DtoConverter {
         return new HumidityBinsDataResponse(thesisName, deviceId, measures);
     };
 
-    convertDevicesDataWrapper(devicesData) {
-        const grouped = devicesData.reduce((acc, curr) => {
+    convertDevicesDataWrapper(devicesData: DeviceResult[]): Device[] {
+        const grouped: Record<string, any> = devicesData.reduce((acc, curr) => {
             const deviceKey = `${curr.deviceId}`;
             if (!acc[deviceKey]) {
                 acc[deviceKey] = {
@@ -362,8 +370,8 @@ class DtoConverter {
         return devicesArray;
     }
 
-    convertSignalInfoEntries(signalInfo) {
-        const signals = signalInfo.reduce((acc, curr) => {
+    convertSignalInfoEntries(signalInfo: SignalInfoResult[]): SignalInfo[] {
+        const signals: Record<number, SignalInfoArgs> = signalInfo.reduce((acc, curr) => {
             if (!acc[curr.signalId]) {
                 acc[curr.signalId] = {
                     signalId: curr.signalId,
@@ -392,12 +400,12 @@ class DtoConverter {
         return Object.values(signals).map(s => new SignalInfo(s));
     }
 
-    convertSignalWrapper(signalWrappers) {
+    convertSignalWrapper(signalWrappers: SignalResult[]): Signal[] {
         return signalWrappers.map(s => new Signal(s))
     }
 
-    convertSignalsDataWrapper(wrappers) {
-        const grouped = wrappers.reduce((acc, curr) => {
+    convertSignalsDataWrapper(wrappers: SignalResult[]): SignalTypeData[] {
+        const grouped: Record<string, { signalType: string, signalTypeDescription: string, signals: SignalResult[] }> = wrappers.reduce((acc, curr) => {
             const typeKey = `${curr.signalType}_${curr.signalTypeDescription}`;
             if (!acc[typeKey]) {
                 acc[typeKey] = {
@@ -427,11 +435,11 @@ class DtoConverter {
         return signalTypeDataArray;
     }
 
-    convertSignalTypes(signalTypes) {
+    convertSignalTypes(signalTypes: SignalTypeModel[]): SignalType[] {
         return signalTypes.map(st => new SignalType(st));
     }
 
-    convertAssociationsEntries(associations) {
+    convertAssociationsEntries(associations: DeviceAssociationResult[]): { theses: EntityRef[], sectors: EntityRef[], farms: EntityRef[] } {
         const theses = [
             ...new Map(
                 associations
@@ -457,8 +465,8 @@ class DtoConverter {
         return { theses: theses, sectors: sectors, farms: farms }
     }
 
-    convertCalendarWrapper(wrappers) {
-        const groupedMap = wrappers.reduce((acc, curr) => {
+    convertCalendarWrapper(wrappers: WateringScheduleRow[]): WateringScheduleResponse[] {
+        const groupedMap: Record<number, { sectorId: number, sectorName: string, events: any[] }> = wrappers.reduce((acc, curr) => {
             const sectorIdKey = curr.sectorId;
 
             if (!acc[sectorIdKey]) {
@@ -534,7 +542,7 @@ class DtoConverter {
         return response
     }
 
-    convertWateringAlgorithmParamsWrapper(results) {
+    convertWateringAlgorithmParamsWrapper(results: WateringAlgorithmParamsModel): WateringParams {
         const {
             maxWatering,
             minWatering,
@@ -548,23 +556,23 @@ class DtoConverter {
         return new WateringParams(maxWatering, minWatering, wateringBaseline, wateringFrequency, ki, kp, errorFunction, description)
     }
 
-    convertOptimalStateWrapper(results) {
+    convertOptimalStateWrapper(results: OptimalStateResult[]): OptimalStateData {
         const optimalProfile = results.map(v => new OptimalProfileData(v.x, v.y, v.z, v.value, v.weight))
         return new OptimalStateData(results[0].thesisName, results[0].optimalProfileId, results[0].binningId, results[0].validFrom, results[0].validTo, results[0].stopThreshold, results[0].optimalDryBound, results[0].optimalWetBound, optimalProfile)
     }
 
-    convertWateringAdviceWrapper(adviceWrapper) {
+    convertWateringAdviceWrapper(adviceWrapper: AdviceModel & { thesisName: string }): WateringAdvice {
         return new WateringAdvice(adviceWrapper.thesisName, adviceWrapper.advice, adviceWrapper.duration, adviceWrapper.imageTimestamp,
             adviceWrapper.wateringStart, adviceWrapper.r, adviceWrapper.lastWatering);
     }
 
-    convertPunctualDistanceWrapper(results) {
+    convertPunctualDistanceWrapper(results: PunctualDistanceResult[]): DistanceProfile {
         const distances = results.map(v => new OptimalProfileData(v.x, v.y, v.z, v.distance, v.weight))
         return new DistanceProfile(results[0].thesisName, results[0].timestamp, distances)
     }
 
-    convertOptimalDistanceWrapper(wrappers) {
-        const grouped = wrappers.reduce((acc, curr) => {
+    convertOptimalDistanceWrapper(wrappers: OptimalDistanceResult[]): OptimalDistanceData[] {
+        const grouped: Record<string, any> = wrappers.reduce((acc, curr) => {
             const typeKey = `${curr.thesisName}_${curr.deviceId}_${curr.valueType}`;
             if (!acc[typeKey]) {
                 acc[typeKey] = {
@@ -601,7 +609,7 @@ class DtoConverter {
         return signalTypeDataArray;
     }
 
-    convertInterpolatedMeansWrapper(results) {
+    convertInterpolatedMeansWrapper(results: InterpolatedMeanResult[]): InterpolatedMeansData | null {
         if (!results || results.length === 0) {
             return null;
         }
@@ -616,19 +624,19 @@ class DtoConverter {
         return new InterpolatedMeansData(thesisName, deviceId, binningId, measures);
     }
 
-    convertServices(services) {
+    convertServices(services: ServiceModel[]): Service[] {
         if (!Array.isArray(services)) return []
         return services.map(s => new Service(s.serviceName, s.id))
     }
 
-    convertSectorServices(result) {
+    convertSectorServices(result: SectorServicesModel[]): SectorService[] {
         if (!Array.isArray(result)) return []
         return result.map(s => new SectorService(s.service.serviceName, s.service.id, s.validFrom, s.validTo))
     }
 
-    convertBinningInfoWrapper(binningData) {
+    convertBinningInfoWrapper(binningData: BinningInfoResult[]): BinningInfo[] {
         if (!Array.isArray(binningData)) return []
-        const grouped = binningData.reduce((acc, curr) => {
+        const grouped: Record<number, { id: number; description: string; bins: HumidityBin[] }> = binningData.reduce((acc, curr) => {
             if (!acc[curr.binningId]) {
                 acc[curr.binningId] = {
                     id: curr.binningId,
@@ -647,15 +655,15 @@ class DtoConverter {
         return binnings;
     }
 
-    convertUserData(userData) {
+    convertUserData(userData: UserModel): User {
         return new User(userData.id, userData.email, userData.name)
     }
 
-    convertUsersResourcePermits(usersData) {
+    convertUsersResourcePermits(usersData: PermitModel[]): UserResourcePermit[] {
         return usersData.map(u => new UserResourcePermit(new User(u.user.id, u.user.email, u.user.name), u.role?.toUpperCase(), u.extraAttributes))
     }
 
-    convertUserRoles(users) {
+    convertUserRoles(users: UserRoles[]): { user: User, roles: string[] }[] {
         return users.map(u => ({ user: new User(u.id, u.email, u.name), roles: u.roles.map(r => r.toUpperCase()) }))
     }
 }

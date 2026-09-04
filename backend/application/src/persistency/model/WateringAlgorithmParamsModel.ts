@@ -10,6 +10,7 @@ export class WateringAlgorithmParamsModel extends Model<
   InferAttributes<WateringAlgorithmParamsModel>,
   InferCreationAttributes<WateringAlgorithmParamsModel>
 > {
+  declare id: number;
   declare thesisId: number;
   declare minWatering: number | null;
   declare maxWatering: number | null;
@@ -28,6 +29,11 @@ export function initWateringAlgorithmParams(
 ): typeof WateringAlgorithmParamsModel {
   WateringAlgorithmParamsModel.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       thesisId: {
         type: DataTypes.INTEGER,
         allowNull: false,

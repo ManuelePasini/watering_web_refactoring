@@ -1,3 +1,5 @@
+import { EntityRef } from "./thesisDto.js"
+
 export class Organization {
   name: string
   id?: number | null
@@ -11,9 +13,9 @@ export class Organization {
 export class OrganizationData {
   id: number
   name: string
-  companies: unknown[]
+  companies: EntityRef[]
 
-  constructor(organizationId: number, organizationName: string, companies: unknown[]) {
+  constructor(organizationId: number, organizationName: string, companies: EntityRef[]) {
     this.id = organizationId
     this.name = organizationName
     this.companies = companies

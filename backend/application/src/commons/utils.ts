@@ -15,3 +15,9 @@ export const toArray = <T>(value: T | T[] | undefined): T[] | undefined => {
 export const toNumberArray = <T>(value: T | T[] | undefined): number[] | undefined => {
     return toArray(value)?.map(Number);
 }
+
+export const getErrorMessage = (error: unknown): string => {
+  return error instanceof Error ? error.message : String(error);
+}
+
+export type GeoJsonGeometry = Record<string, unknown>

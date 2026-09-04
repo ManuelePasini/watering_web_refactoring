@@ -6,11 +6,7 @@ import {
   Model,
   Sequelize,
 } from "sequelize";
-
-export interface DeviceLocation {
-  type: "Point";
-  coordinates: [number, number];
-}
+import { GeoJsonGeometry } from "../../commons/utils.js";
 
 export class DeviceModel extends Model<
   InferAttributes<DeviceModel>,
@@ -19,7 +15,7 @@ export class DeviceModel extends Model<
   declare id: CreationOptional<number>;
   declare type: string;
   declare description: string | null;
-  declare location: DeviceLocation | null;
+  declare location: GeoJsonGeometry | null;
   declare binningId: number | null;
   declare companyId: number | null;
   declare createdAt: number;

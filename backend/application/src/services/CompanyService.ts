@@ -1,5 +1,6 @@
 import { TABLES } from "../commons/constants.js";
 import { _updateEntity } from "../commons/entityServiceUtils.js";
+import { getErrorMessage } from "../commons/utils.js";
 import { Company } from "../dtos/companyDto.js";
 import CompanyRepository from "../persistency/repository/CompanyRepository.js";
 import DeviceRepository from "../persistency/repository/DeviceRepository.js";
@@ -56,9 +57,7 @@ class CompanyService {
             throw new Error("Company creation error");
         } catch (error) {
             console.error(
-                `Error creating Company ${company.name}: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Error creating Company ${company.name}: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -96,7 +95,7 @@ class CompanyService {
                 isAdmin
             );
 
-        return dtoConverter.convertCompanyDataWrapper(result);
+        return result;
     }
 
     async updateCompany(
@@ -164,9 +163,7 @@ class CompanyService {
             );
         } catch (error) {
             console.error(
-                `Error disabling company: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Error disabling company: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -217,9 +214,7 @@ class CompanyService {
             );
         } catch (error) {
             console.error(
-                `Error deleting company: ${
-                    error instanceof Error ? error.message : error
-                }`
+                `Error deleting company: ${getErrorMessage(error)}`
             );
 
             throw error;

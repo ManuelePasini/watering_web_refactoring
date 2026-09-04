@@ -5,6 +5,7 @@ import PaginationService from "./PaginationService.js";
 import SignalRepository from "../persistency/repository/SignalRepository.js";
 import UserActionService from "./UserActionService.js";
 import { AddMeasurementsRequest, CreateSignal, SignalUpdate } from "../dtos/signalDto.js";
+import { getErrorMessage } from "../commons/utils.js";
 
 const dtoConverter = new DtoConverter();
 const paginationService = new PaginationService();
@@ -39,11 +40,7 @@ class SignalService {
             return undefined;
         } catch (error) {
             console.error(
-                `Error creating signal: ${
-                    error instanceof Error
-                        ? error.message
-                        : error
-                }`
+                `Error creating signal: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -114,11 +111,7 @@ class SignalService {
             );
         } catch (error) {
             console.error(
-                `Error creating measurements: ${
-                    error instanceof Error
-                        ? error.message
-                        : error
-                }`
+                `Error creating measurements: ${getErrorMessage(error)}`
             );
 
             throw error;

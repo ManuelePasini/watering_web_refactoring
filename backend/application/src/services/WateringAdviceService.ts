@@ -248,7 +248,7 @@ export class WateringAdviceService {
                             measurements[0]?.value ?? 0;
 
                         return new WateringAdvice(
-                            thesisDetails.thesisName,
+                            thesisDetails.thesis.thesisName,
                             advice,
                             duration,
                             Number(lastImageTimestamp),
@@ -284,7 +284,7 @@ export class WateringAdviceService {
                 );
 
             return new WateringAdvice(
-                thesisDetails.thesisName,
+                thesisDetails.thesis.thesisName,
                 advice,
                 duration,
                 Number(lastImageTimestamp),

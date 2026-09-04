@@ -1,3 +1,5 @@
+import { EntityRef } from "./thesisDto.js"
+
 type GeoJsonGeometry = Record<string, unknown> | null | undefined
 
 export class Farm {
@@ -29,8 +31,8 @@ export class FarmData {
   id: number
   name: string
   location?: GeoJsonGeometry
-  company?: unknown
-  sectors?: unknown[]
+  company?: EntityRef
+  sectors?: EntityRef[]
   createdAt?: number | null
   disabledAt?: number | null
 
@@ -38,8 +40,8 @@ export class FarmData {
     farmId: number,
     farmName: string,
     location?: GeoJsonGeometry,
-    company?: unknown,
-    sectors?: unknown[],
+    company?: EntityRef,
+    sectors?: EntityRef[],
     createdAt?: number | null,
     disabledAt?: number | null
   ) {

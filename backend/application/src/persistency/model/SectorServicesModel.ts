@@ -6,6 +6,7 @@ import {
   Model,
   Sequelize,
 } from "sequelize";
+import { ServiceModel } from "./ServiceModel.js";
 
 export class SectorServicesModel extends Model<
   InferAttributes<SectorServicesModel>,
@@ -16,6 +17,7 @@ export class SectorServicesModel extends Model<
   declare serviceId: number;
   declare validFrom: number;
   declare validTo: number | null;
+  declare service?: ServiceModel;
 }
 
 export function initSectorServices(

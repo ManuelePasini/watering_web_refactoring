@@ -6,6 +6,7 @@ import {
   Model,
   Sequelize,
 } from "sequelize";
+import { GeoJsonGeometry } from "../../commons/utils.js";
 
 export class SectorModel extends Model<
   InferAttributes<SectorModel>,
@@ -16,7 +17,7 @@ export class SectorModel extends Model<
   declare farmId: number;
   declare culture: string;
   declare cultureType: string | null;
-  declare location: Object | null;
+  declare location: GeoJsonGeometry | null;
   declare dripperCapacity: number | null;
   declare sprinklerCapacity: number | null;
   declare doubleWing: boolean | null;

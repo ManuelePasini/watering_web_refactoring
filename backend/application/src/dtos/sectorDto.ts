@@ -1,3 +1,5 @@
+import { EntityRef, ThesisData } from "./thesisDto.js"
+
 type GeoJsonGeometry = Record<string, unknown> | null | undefined
 
 export class Sector {
@@ -42,10 +44,10 @@ export class SectorCompact {
   location?: GeoJsonGeometry
   createdAt?: number | null
   disabledAt?: number | null
-  farm?: unknown
-  company?: unknown
+  farm?: EntityRef
+  company?: EntityRef
 
-  constructor(sectorId: number, sectorName: string, culture: string | null | undefined, cultureType: string | null | undefined, location: GeoJsonGeometry, farm: unknown, company: unknown, createdAt?: number | null, disabledAt?: number | null) {
+  constructor(sectorId: number, sectorName: string, culture: string | null | undefined, cultureType: string | null | undefined, location: GeoJsonGeometry, farm: EntityRef, company: EntityRef, createdAt?: number | null, disabledAt?: number | null) {
     this.id = sectorId
     this.name = sectorName
     this.culture = culture
@@ -67,9 +69,9 @@ export class SectorData {
   dripperCapacity?: number | null
   sprinklerCapacity?: number | null
   doubleWing?: boolean | null
-  farm?: unknown
-  company?: unknown
-  theses?: unknown[]
+  farm?: EntityRef | {location: GeoJsonGeometry}
+  company?: EntityRef
+  theses?: ThesisData[]
   createdAt?: number | null
   disabledAt?: number | null
 
@@ -82,9 +84,9 @@ export class SectorData {
     dripperCapacity?: number | null,
     sprinklerCapacity?: number | null,
     doubleWing?: boolean | null,
-    farm?: unknown,
-    company?: unknown,
-    theses?: unknown[],
+    farm?: EntityRef | {location: GeoJsonGeometry},
+    company?: EntityRef,
+    theses?: EntityRef[],
     createdAt?: number | null,
     disabledAt?: number | null
   ) {

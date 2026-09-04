@@ -6,6 +6,7 @@ import {
   Model,
   Sequelize,
 } from "sequelize";
+import { GeoJsonGeometry } from "../../commons/utils.js";
 
 export class FarmModel extends Model<
   InferAttributes<FarmModel>,
@@ -14,7 +15,7 @@ export class FarmModel extends Model<
   declare id: CreationOptional<number>;
   declare farmName: string;
   declare companyId: number;
-  declare location: Object | null;
+  declare location: GeoJsonGeometry | null;
   declare createdAt: number;
   declare disabledAt: number | null;
 }

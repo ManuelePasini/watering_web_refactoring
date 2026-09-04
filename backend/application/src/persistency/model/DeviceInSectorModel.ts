@@ -6,6 +6,7 @@ import {
   Model,
   Sequelize,
 } from "sequelize";
+import { DeviceModel } from "./DeviceModel.js";
 
 export class DeviceInSectorModel extends Model<
   InferAttributes<DeviceInSectorModel>,
@@ -16,6 +17,7 @@ export class DeviceInSectorModel extends Model<
   declare sectorId: number;
   declare validFrom: number;
   declare validTo: number | null;
+  declare device?: DeviceModel;
 }
 
 export function initDeviceInSector(

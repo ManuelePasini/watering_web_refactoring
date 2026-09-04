@@ -11,11 +11,11 @@ export class GridOptimalProfileAssignmentModel extends Model<
   InferAttributes<GridOptimalProfileAssignmentModel>,
   InferCreationAttributes<GridOptimalProfileAssignmentModel>
 > {
-  declare id: CreationOptional<string>;
-  declare optimalProfileId: string;
+  declare id: CreationOptional<number>;
+  declare optimalProfileId: number;
   declare validFrom: number;
   declare validTo: number | null;
-  declare gridId: string;
+  declare gridId: number;
   declare stopThreshold: number | null;
   declare optimalDryBound: number | null;
   declare optimalWetBound: number | null;

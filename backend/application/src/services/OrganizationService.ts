@@ -1,14 +1,10 @@
 import { TABLES } from '../commons/constants.js'
+import { Organization } from '../dtos/organizationDto.js'
+import OrganizationRepository from '../persistency/repository/OrganizationRepository.js'
 import DtoConverter from './DtoConverter.js'
 import type UserActionService from './UserActionService.js'
 
 const dtoConverter = new DtoConverter()
-
-type OrganizationRepository = {
-  createOrganization(organizationName: string): Promise<{ id?: number | null }>
-  getOrganizations(filteringIds?: number[] | null): Promise<unknown[]>
-  getOrganizationDetails(organizationId: number, userId: number, isAdmin: boolean): Promise<unknown>
-}
 
 class OrganizationService {
   private organizationRepository: OrganizationRepository
@@ -33,14 +29,13 @@ class OrganizationService {
     }
   }
 
-  async getOrganizations(filteringIds?: number[] | null): Promise<unknown> {
-    const result = await this.organizationRepository.getOrganizations(filteringIds)
+  async getOrganizations(): Promise<Organization[]> {
+    const result = await this.organizationRepository.getOrganizations()
     return dtoConverter.convertOrganizationsDataWrapper(result)
   }
 
   async getOrganizationDetails(organizationId: number, userId: number, isAdmin: boolean): Promise<unknown> {
-    const result = await this.organizationRepository.getOrganizationDetails(organizationId, userId, isAdmin)
-    return dtoConverter.convertOrganizationDataWrapper(result)
+    return await this.organizationRepository.getOrganizationDetails(organizationId, userId, isAdmin)
   }
 }
 

@@ -8,6 +8,7 @@ import SignalRepository from "../persistency/repository/SignalRepository.js";
 import InterpolatedProfileRepository from "../persistency/repository/InterpolatedProfileRepository.js";
 import OptimalStateRepository from "../persistency/repository/OptimalStateRepository.js";
 import UserActionService from "./UserActionService.js";
+import { getErrorMessage } from "../commons/utils.js";
 
 const dtoConverter = new DtoConverter();
 const paginationService = new PaginationService();
@@ -52,10 +53,7 @@ class DeviceService {
             return createdDeviceId;
         } catch (error) {
             console.error(
-                `Error creating device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error creating device: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -110,10 +108,7 @@ class DeviceService {
             }
         } catch (error) {
             console.error(
-                `Error connecting signals to device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error connecting signals to device: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -168,10 +163,7 @@ class DeviceService {
             }
         } catch (error) {
             console.error(
-                `Error disconnecting signals from device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error disconnecting signals from device: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -301,10 +293,7 @@ class DeviceService {
             );
         } catch (error) {
             console.error(
-                `Error linking device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error linking device: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -339,7 +328,7 @@ class DeviceService {
                     TABLES.THESIS_DEVICE,
             };
 
-            let linkId: number;
+            let linkId: number | number[];
 
             switch (deviceAssociation.targetType) {
                 case DeviceTargetType.FARM:
@@ -387,10 +376,7 @@ class DeviceService {
             );
         } catch (error) {
             console.error(
-                `Error unlinking device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error unlinking device: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -610,10 +596,7 @@ class DeviceService {
             );
         } catch (error) {
             console.error(
-                `Error disabling device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error disabling device: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -763,10 +746,7 @@ class DeviceService {
             );
         } catch (error) {
             console.error(
-                `Error deleting device: ${error instanceof Error
-                    ? error.message
-                    : error
-                }`
+                `Error deleting device: ${getErrorMessage(error)}`
             );
 
             throw error;

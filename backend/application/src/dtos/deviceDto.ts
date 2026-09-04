@@ -1,24 +1,24 @@
-type GeoJsonGeometry = Record<string, unknown> | null | undefined
+import { GeoJsonGeometry } from "../commons/utils.js"
 
 type DeviceConstructorArgs = {
   deviceId: number
   deviceType: string
-  deviceDescription?: string | null
+  deviceDescription?: string
   signals?: unknown[]
   location?: GeoJsonGeometry
-  binningId?: number | null
+  binningId?: number
   createdAt?: number
-  disabledAt?: number | null
+  disabledAt?: number
 }
 
 export class Device {
   id: number
   type: string
-  description?: string | null
+  description?: string
   location?: GeoJsonGeometry
-  binningId?: number | null
+  binningId?: number
   createdAt?: number
-  disabledAt?: number | null
+  disabledAt?: number
   signals?: unknown[]
 
   constructor({ deviceId, deviceType, deviceDescription, signals, location, binningId, createdAt, disabledAt }: DeviceConstructorArgs) {

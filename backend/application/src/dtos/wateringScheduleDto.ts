@@ -62,6 +62,7 @@ type WateringEventArgs = {
   expectedWater?: number | null
   note?: string | null
   enabled?: boolean
+  scheduled?: boolean
 }
 
 export class WateringEvent {
@@ -70,12 +71,14 @@ export class WateringEvent {
   expectedWater?: number | null
   note?: string | null
   enabled: boolean
+  scheduled: boolean
 
-  constructor({ sectorId, wateringStart, expectedWater, note, enabled = true }: WateringEventArgs) {
+  constructor({ sectorId, wateringStart, expectedWater, note, enabled = true, scheduled = false }: WateringEventArgs) {
     this.sectorId = sectorId
     this.wateringStart = wateringStart
     this.expectedWater = expectedWater
     this.note = note
     this.enabled = enabled
+    this.scheduled = scheduled
   }
 }

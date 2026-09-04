@@ -20,7 +20,7 @@ export class Thesis {
   }
 }
 
-export class ThesisRef {
+export class EntityRef {
   id: number
   name: string
 

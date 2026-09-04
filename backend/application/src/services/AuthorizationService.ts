@@ -9,6 +9,7 @@ import DtoConverter from "./DtoConverter.js";
 import UserActionService from "./UserActionService.js";
 import { Permission, UserRole } from "../dtos/userPermitsDto.js";
 import AuthorizationRepository from "../persistency/repository/AuthorizationRepository.js";
+import { getErrorMessage } from "../commons/utils.js";
 
 const dtoConverter = new DtoConverter;
 
@@ -170,8 +171,7 @@ class AuthorizationService {
             }
         } catch (error) {
             console.error(
-                `Error deleting user permission: ${error instanceof Error ? error.message : error
-                }`
+                `Error deleting user permission: ${getErrorMessage(error)}`
             );
 
             throw error;

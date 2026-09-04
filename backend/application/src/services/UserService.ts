@@ -5,36 +5,14 @@ import {
 } from "../commons/authUtils.js";
 import { TABLES } from "../commons/constants.js";
 import { sendEmail } from "../commons/gmail.service.js";
+import { getErrorMessage } from "../commons/utils.js";
 import { User } from "../dtos/userDto.js";
 import { UserRole, UserPermits, Permission } from "../dtos/userPermitsDto.js";
+import UserRepository from "../persistency/repository/UserRepository.js";
 import DtoConverter from "./DtoConverter.js";
 import UserActionService from "./UserActionService.js";
 
 const dtoConverter = new DtoConverter();
-
-interface UserRepository {
-    findUser(userId: number): Promise<User | null>;
-
-    findUserByEmail(email: string): Promise<User | null>;
-
-    createUser(
-        email: string,
-        password: string | undefined,
-        name: string
-    ): Promise<number | null>;
-
-    updatePassword(
-        userId: number,
-        password: string
-    ): Promise<void>;
-
-    findUserPermits(userId: number): Promise<Permission[]>;
-
-    disableUser(
-        userId: number,
-        validTo: Date | string
-    ): Promise<void>;
-}
 
 class UserService {
     constructor(
@@ -99,11 +77,7 @@ class UserService {
             return newUserId;
         } catch (error) {
             console.error(
-                `Error creating user: ${
-                    error instanceof Error
-                        ? error.message
-                        : error
-                }`
+                `Error creating user: ${getErrorMessage(error)}`
             );
 
             throw error;
@@ -274,7 +248,7 @@ class UserService {
     async disableUser(
         userId: number,
         targetUserId: number,
-        validTo: Date | string
+        validTo: number
     ): Promise<void> {
         try {
             await this.userRepository.disableUser(
@@ -289,11 +263,7 @@ class UserService {
             );
         } catch (error) {
             console.error(
-                `Error disabling user: ${
-                    error instanceof Error
-                        ? error.message
-                        : error
-                }`
+                `Error disabling user: ${getErrorMessage(error)}`
             );
 
             throw error;

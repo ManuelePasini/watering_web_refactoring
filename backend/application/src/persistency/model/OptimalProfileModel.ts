@@ -10,7 +10,7 @@ export class OptimalProfileModel extends Model<
   InferAttributes<OptimalProfileModel>,
   InferCreationAttributes<OptimalProfileModel>
 > {
-  declare profileId: string;
+  declare profileId: number;
   declare x: number;
   declare y: number;
   declare z: number;
