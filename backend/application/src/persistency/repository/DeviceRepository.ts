@@ -501,7 +501,7 @@ class DeviceRepository {
         `;
 
         try {
-            const [result] = await this.sequelize.query<{total: number}>(
+            const [result] = await this.sequelize.query<{total: string}>(
                 query,
                 {
                     replacements: {
@@ -516,7 +516,7 @@ class DeviceRepository {
                 },
             );
 
-            return result.total;
+            return Number(result.total);
         } catch (error) {
             console.error(
                 `Fail counting devices data: ${getErrorMessage(error)}`,
