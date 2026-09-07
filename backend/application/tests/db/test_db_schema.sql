@@ -1642,25 +1642,32 @@ VALUES
 (12, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 13:00:00'), false, '2025-01-22', '13:00:00', 44.76, '44.76');
 
 INSERT INTO public.interpolated_profiles(id, grid_id, "timestamp", true_sensor_number)
-VALUES (1, 4, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 13:30:00'), 2),
-(2, 5, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 13:30:00'), 1);
+VALUES (1, 4, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 13:00:00'), 2),
+(2, 5, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 13:00:00'), 1),
+(3, 3, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 13:00:00'), 2);
 
 INSERT INTO public.interpolated_cells(profile_id, x, y, z, value, value_source)
 VALUES 
 (1, 0, 20, 0, 22, 'Sensor Reading'),
 (1, 40, 60, 0, 34.4, 'Sensor Reading'),
 (2, 0, 20, 0, 44.76, 'Sensor Reading'),
-(2, 40, 60, 0, 50.34, 'Interpolated');
+(2, 40, 60, 0, 50.34, 'Interpolated'),
+(3, 0, 20, 0, 23, 'Sensor Reading'),
+(3, 40, 60, 0, 32.4, 'Sensor Reading');
 
 INSERT INTO public.optimal_profiles(profile_id, x, y, z, value, weight)
-	VALUES (1, 0, 20, 0, 28, 1);
+VALUES
+(1, 0, 20, 0, 28, 1),
+(2, 0, 20, 0, 30, 1),
+(2, 40, 60, 0, 33, 1);
 
 INSERT INTO public.grid_optimal_profile_assignment(optimal_profile_id, grid_id, valid_from, valid_to, id, stop_threshold, optimal_wet_bound, optimal_dry_bound)
 	VALUES (1, 4, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 12:30:00'), NULL, 1, NULL, -20, -300);
 
 INSERT INTO public.theses_devices(thesis_id, device_id, valid_from, valid_to, id)
 VALUES (2, 4, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 12:00:00'), NULL, 1),
-(3, 5, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 12:00:00'), NULL, 2);
+(3, 5, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 12:00:00'), NULL, 2),
+(1, 3, EXTRACT(EPOCH FROM TIMESTAMP '2025-01-22 12:00:00'), NULL, 3);
 
 INSERT INTO public.users (id, email, password, name)
 VALUES (
@@ -1744,7 +1751,7 @@ SELECT pg_catalog.setval('public.grid_optimal_profile_assignment_id_seq', 2, fal
 -- Name: interpolated_profiles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.interpolated_profiles_id_seq', 3, false);
+SELECT pg_catalog.setval('public.interpolated_profiles_id_seq', 4, false);
 
 
 --
@@ -1835,7 +1842,7 @@ SELECT pg_catalog.setval('public.theses_in_sectors_id_seq', 6, true);
 -- Name: theses_signals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.theses_signals_id_seq', 3, true);
+SELECT pg_catalog.setval('public.theses_signals_id_seq', 4, true);
 
 
 --

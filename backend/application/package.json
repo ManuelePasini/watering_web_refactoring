@@ -2,33 +2,45 @@
   "name": "watering_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "dist/server.js",
   "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx watch src/server.ts",
     "test": "vitest --config ./tests/vitest.config.js",
-    "start": "node src/server.js"
+    "prestart": "npm run build",
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
   "type": "module",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "16.4.5",
-    "express": "^4.18.2",
-    "express-jwt": "^8.4.1",
-    "express-openapi-validator": "^5.6.0",
-    "sequelize": "^6.35.0",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0",
+    "cors": "^2.8.6",
     "crypto-js": "^4.2.0",
-    "googleapis": "^171.4.0"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-jwt": "^8.5.1",
+    "express-openapi-validator": "^5.6.2",
+    "googleapis": "^178.0.0",
+    "sequelize": "^6.37.8",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "vitest": "^4.0.17",
+    "@testcontainers/postgresql": "^12.1.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.4.1",
+    "@types/supertest": "^7.2.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "knex": "^3.3.0",
+    "pg": "^8.23.0",
     "supertest": "^7.2.2",
-    "testcontainers": "^11.11.0",
-    "@testcontainers/postgresql": "^11.11.0",
-    "knex": "^3.1.0",
-    "pg": "^8.16.3"
+    "testcontainers": "^12.1.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
   }
 }
